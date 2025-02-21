@@ -1,5 +1,5 @@
 body {
-    background-color: darkviolet;
+    background-color: #46178f;
     color: white;
     font-family: Arial, sans-serif;
     width: 200px;
@@ -23,7 +23,7 @@ body {
 }
 
 .button {
-    background-color: blue;
+    background-color: #1369ce;
     color: white;
     padding: 8px;
     width: 100%;
@@ -33,7 +33,7 @@ body {
 }
 
 .button:hover {
-    background-color: darkblue;
+    background-color: #0542b9;
 }
 
 .hidden {
@@ -47,7 +47,8 @@ body {
 }
 
 .text, .answer {
-    background: gray;
+    background: white;
+    color: black;
     padding: 5px;
     border-radius: 5px;
     margin-top: 5px;
