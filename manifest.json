@@ -14,7 +14,17 @@
   },
   "permissions": [
     "activeTab",
-    "tabs"
+    "tabs",
+    "scripting"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.kahoot.it/*"],
+      "js": ["scripts/content.js"]
+    }
+  ],
+  "host_permissions": [
+    "*://kahoot.it/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"

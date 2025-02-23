@@ -76,7 +76,26 @@ async function getAnswer(question) {
         const answer = result.choices[0].message.content.trim();
         document.getElementById('answerText').innerText = answer;
         console.log('Groq API Answer:', answer);
+
+        // Send the answer to the content script
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length === 0) {
+                console.error("No active tab found.");
+                return;
+            }
+
+            chrome.tabs.sendMessage(tabs[0].id, { action: 'highlightAnswer', answer }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.error("Error sending message:", chrome.runtime.lastError.message);
+                } else {
+                    console.log("Message sent successfully:", response);
+                }
+            });
+        });
+
+
     } catch (err) {
         console.error('Error fetching answer from Groq API:', err);
     }
+
 }
