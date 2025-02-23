@@ -9,9 +9,10 @@ chrome.runtime.onMessage.addListener(async (request) => {
 function highlightAnswer(answerText) {
     const answerElements = document.getElementsByTagName('div');
 
-    Array.from(answerElements).forEach(element => {
+    for (let element of answerElements) {
         if (element.innerText.trim() === answerText.trim()) {
-            element.style.border = '3px solid red';
+            element.style.border = '5px solid black';
+            break;
         }
-    });
+    }
 }
