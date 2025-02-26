@@ -1,6 +1,6 @@
 # Kahoot Chrome Extension
 
-Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du immer die richtige Antwort parat! Die Erweiterung nutzt OCR und KI, um Fragen aus einem Screenshot zu extrahieren und die richtige Antwort automatisch auf der Kahoot-Seite hervorzuheben.
+Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du immer die richtige Antwort parat! Die Erweiterung nutzt OCR und **GPT-4o** KI, um Fragen aus einem Screenshot zu extrahieren und die richtige Antwort automatisch auf der Kahoot-Seite hervorzuheben.
 
 <img src="https://github.com/user-attachments/assets/2cd9801c-880d-496e-bb65-96b5b5f0d033" alt="AI-Voice-Assistant-Screenshot" width="700"/>
 
@@ -15,7 +15,7 @@ Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du imm
 ## Features
 - Screenshot-Erfassung der aktuellen Webseite
 - Texterkennung mittels OCR.Space API
-- Automatische Frageverarbeitung über die Groq KI-API
+- Automatische Frageverarbeitung über OpenAI-API
 - Hervorhebung der korrekten Antwort auf der Kahoot-Seite
 
 
