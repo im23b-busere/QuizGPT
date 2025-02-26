@@ -1,4 +1,4 @@
-// I know Api keys are exposed, kind of tricky because chrome extensions can't read normal imports //
+// I know some Api keys are exposed, kind of tricky because chrome extensions can't read normal imports //
 
 // Use chrome API to take screenshot of current tab
 document.getElementById('screenshotBtn').addEventListener('click', async () => {
@@ -46,11 +46,11 @@ async function extractTextFromImage(imageDataUrl) {
 
 
 async function getAnswer(question) {
-    const groqApiKey = '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';
-    const groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+    const openaiApiKey = '*versteckt*';
+    const openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
 
     const body = {
-        model: 'llama-3.1-8b-instant',
+        model: 'gpt-4o-mini',
         messages: [
             { role: "system", content: "I will give you a question and either a multiple choice or true/false answer. Please provide ONLY the correct answer. Nothing more, nothing less." },
             { role: "user", content: question }
@@ -58,24 +58,24 @@ async function getAnswer(question) {
     };
 
     try {
-        const response = await fetch(groqApiUrl, {
+        const response = await fetch(openaiApiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${groqApiKey}`
+                'Authorization': `Bearer ${openaiApiKey}`
             },
             body: JSON.stringify(body)
         });
 
         const result = await response.json();
         if (result.error) {
-            console.error('Error from Groq API:', result.error.message);
+            console.error('Error from OpenAI API:', result.error.message);
             return;
         }
 
         const answer = result.choices[0].message.content.trim();
         document.getElementById('answerText').innerText = answer;
-        console.log('Groq API Answer:', answer);
+        console.log('OpenAI API Answer:', answer);
 
         // Send the answer to the content script
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
