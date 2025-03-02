@@ -7,12 +7,10 @@ chrome.runtime.onMessage.addListener(async (request) => {
 });
 
 function highlightAnswer(answerText) {
-    const answerElements = document.getElementsByTagName('div');
-
-    for (let element of answerElements) {
-        if (element.innerText.trim() === answerText.trim()) {
-            element.style.border = '5px solid black';
-            break;
+    const answerElements = document.querySelectorAll("button");
+    for (let button of answerElements) {
+        if (button.innerText.trim() === answerText.trim()) {
+            button.style.border = '5px solid black';
         }
     }
 }

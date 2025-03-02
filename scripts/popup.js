@@ -1,12 +1,17 @@
 // I know some Api keys are exposed, kind of tricky because chrome extensions can't read normal imports //
 
+// Cache DOM elements
+const screenshotBtn = document.getElementById('screenshotBtn');
+const questionText = document.getElementById('questionText');
+const extractedData = document.getElementById('extractedData');
+const answerText = document.getElementById('answerText');
+
 // Use chrome API to take screenshot of current tab
-document.getElementById('screenshotBtn').addEventListener('click', async () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.captureVisibleTab(tabs[0].windowId, { format: 'png' }, (dataUrl) => {
-            console.log('Screenshot taken');
-            extractTextFromImage(dataUrl);
-        });
+screenshotBtn.addEventListener('click', async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, (dataUrl) => {
+        console.log('Screenshot taken');
+        extractTextFromImage(dataUrl);
     });
 });
 
@@ -32,8 +37,8 @@ async function extractTextFromImage(imageDataUrl) {
         }
 
         const extractedText = result.ParsedResults[0].ParsedText;
-        document.getElementById('questionText').innerText = extractedText;
-        document.getElementById('extractedData').classList.remove('hidden');
+        questionText.innerText = extractedText;
+        extractedData.classList.remove('hidden');
         console.log('Extracted Text:', extractedText);
 
         //send question to Groq API
@@ -43,7 +48,6 @@ async function extractTextFromImage(imageDataUrl) {
         console.error('Error:', err);
     }
 }
-
 
 async function getAnswer(question) {
     const openaiApiKey = '*versteckt*';
@@ -74,28 +78,20 @@ async function getAnswer(question) {
         }
 
         const answer = result.choices[0].message.content.trim();
-        document.getElementById('answerText').innerText = answer;
+        answerText.innerText = answer;
         console.log('OpenAI API Answer:', answer);
 
         // Send the answer to the content script
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs.length === 0) {
-                console.error("No active tab found.");
-                return;
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        chrome.tabs.sendMessage(tab.id, { action: 'highlightAnswer', answer }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.error("Error sending message:", chrome.runtime.lastError.message);
+            } else {
+                console.log("Message sent successfully:", response);
             }
-
-            chrome.tabs.sendMessage(tabs[0].id, { action: 'highlightAnswer', answer }, (response) => {
-                if (chrome.runtime.lastError) {
-                    console.error("Error sending message:", chrome.runtime.lastError.message);
-                } else {
-                    console.log("Message sent successfully:", response);
-                }
-            });
         });
-
 
     } catch (err) {
         console.error('Error fetching answer from Groq API:', err);
     }
-
 }
