@@ -1,4 +1,4 @@
-# Kahoot Chrome Extension
+# KahootGPT
 
 Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du immer die richtige Antwort parat! Die Erweiterung nutzt OCR und **GPT-4o** KI, um Fragen aus einem Screenshot zu extrahieren und die richtige Antwort automatisch auf der Kahoot-Seite hervorzuheben.
 
@@ -21,18 +21,22 @@ Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du imm
 
 ## Installation
 1. **Repository klonen oder herunterladen**
-2. **Chrome-Erweiterungen verwalten:**
+2. **API-Schlüssel angeben:**
+   - OCR.Space API (kostenloser API-Schlüssel erhältlich)
+   - OpenAI API (erfordert ein OpenAI-Konto)
+3. **Chrome-Erweiterungen verwalten:**
    - `chrome://extensions/` in Chrome öffnen
    - Entwicklermodus aktivieren
    - "Entpackte Erweiterung laden" auswählen und den Projektordner angeben
-3. **Erweiterung nutzen!**
+4. **Erweiterung nutzen!**
 
 ## Technologien
 - **Frontend:** HTML, CSS, JavaScript, JSON
 - **API's:** Chrome API, OCR.Space API, Groq API
 
 ## Hinweise
-Die Frage selber muss zwingend auf den Endgeräten sichtbar sein (Einstellbar in den Kahoot Einstellung).
+- Die Frage selber muss zwingend auf den Endgeräten sichtbar sein (Einstellbar in den Kahoot Einstellung).
+- Ein eigener API-Schlüssel für OCR.Space und OpenAI ist erforderlich, um die Erweiterung korrekt zu nutzen.
 
 ## Autor
 
