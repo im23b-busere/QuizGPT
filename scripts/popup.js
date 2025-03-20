@@ -6,6 +6,17 @@ const questionText = document.getElementById('questionText');
 const extractedData = document.getElementById('extractedData');
 const answerText = document.getElementById('answerText');
 
+
+// Retrieve last saved answer from local storage
+chrome.storage.local.get(['savedQuestion', 'savedAnswer'], (data) => {
+    if (data.savedQuestion && data.savedAnswer) {
+        questionText.innerText = data.savedQuestion;
+        answerText.innerText = data.savedAnswer;
+        extractedData.classList.remove('hidden');
+    }
+});
+
+
 // Use chrome API to take screenshot of current tab
 screenshotBtn.addEventListener('click', async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -41,7 +52,7 @@ async function extractTextFromImage(imageDataUrl) {
         extractedData.classList.remove('hidden');
         console.log('Extracted Text:', extractedText);
 
-        //send question to Groq API
+        //send question to OpenAI API
         await getAnswer(extractedText);
 
     } catch (err) {
@@ -81,6 +92,11 @@ async function getAnswer(question) {
         answerText.innerText = answer;
         console.log('OpenAI API Answer:', answer);
 
+          // Save the question and answer to Chrome storage
+        chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer }, () => {
+            console.log("Question and answer saved.");
+        });
+
         // Send the answer to the content script
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         chrome.tabs.sendMessage(tab.id, { action: 'highlightAnswer', answer }, (response) => {
@@ -92,6 +108,7 @@ async function getAnswer(question) {
         });
 
     } catch (err) {
-        console.error('Error fetching answer from Groq API:', err);
+        console.error('Error fetching answer from OpenAI API:', err);
+
     }
 }
