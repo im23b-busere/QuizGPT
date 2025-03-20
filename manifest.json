@@ -1,7 +1,7 @@
 {
-  "name": "kahoot-chrome-extension",
-  "version": "1.0.0",
-  "description": "chrome extension for kahoot",
+  "name": "KahootGPT",
+  "version": "2.1.0",
+  "description": "KahootGPT",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -10,7 +10,7 @@
   "manifest_version": 3,
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Kahoot Extension"
+    "default_title": "KahootGPT"
   },
   "permissions": [
     "storage",
