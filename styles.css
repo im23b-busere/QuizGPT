@@ -85,3 +85,24 @@ body.popup-container {
     background: #4e4e4e;
     color: #9d86c3;
 }
+
+.settings-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
+
+.settings-button {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    fill: white;
+    background: transparent;
+}
+
+.settings-button:hover {
+    cursor: pointer;
+    fill: gray;
+}
