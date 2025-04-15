@@ -1,5 +1,3 @@
-// I know some API keys are exposed, kind of tricky because chrome extensions can't read normal imports //
-
 // Cache DOM elements
 const screenshotBtn = document.getElementById('screenshotBtn');
 const questionText = document.getElementById('questionText');
@@ -70,6 +68,11 @@ chrome.storage.local.get(['savedQuestion', 'savedAnswer'], (data) => {
     }
 });
 
+/*
+--------------------
+- NO LONGER NEEDED -
+--------------------
+
 // Trigger screenshot + OCR
 screenshotBtn.addEventListener('click', async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -79,9 +82,10 @@ screenshotBtn.addEventListener('click', async () => {
     });
 });
 
-// OCR with OCR.Space API
+
+ OCR with OCR.Space API
 async function extractTextFromImage(imageDataUrl) {
-    const spaceApiKey = 'K83273013088957';
+    const spaceApiKey = '';
     const spaceApiUrl = 'https://api.ocr.space/parse/image';
 
     const formData = new FormData();
@@ -111,6 +115,8 @@ async function extractTextFromImage(imageDataUrl) {
         console.error('Error:', err);
     }
 }
+
+*/
 
 // OpenAI request
 async function getAnswer(question, selectedModel) {
