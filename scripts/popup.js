@@ -1,4 +1,4 @@
-// I know some Api keys are exposed, kind of tricky because chrome extensions can't read normal imports //
+// I know some API keys are exposed, kind of tricky because chrome extensions can't read normal imports //
 
 // Cache DOM elements
 const screenshotBtn = document.getElementById('screenshotBtn');
@@ -9,6 +9,8 @@ const settingsButton = document.querySelector('.settings-button');
 const settingsModal = document.getElementById('settingsModal');
 const modelSelect = document.getElementById('model');
 const closeModalBtn = document.querySelector('.close-modal');
+const highlightCheckbox = document.getElementById("highlight");
+const autoClickCheckbox = document.getElementById("autoclick");
 
 // Show settings on button click
 settingsButton.addEventListener('click', () => {
@@ -20,25 +22,46 @@ closeModalBtn.addEventListener('click', () => {
     settingsModal.classList.add('hidden');
 });
 
-// Model changes event listener
+// Save selected model to local storage
 modelSelect.addEventListener('change', (event) => {
     const selectedModel = event.target.value;
-    console.log('Ausgewähltes Modell:', selectedModel);
-
     chrome.storage.local.set({ selectedModel }, () => {
-        console.log('Modell gespeichert:', selectedModel);
+        console.log('Model saved:', selectedModel);
     });
 });
 
-
-// Retrieve selected model from local storage
+// Restore selected model on load
 chrome.storage.local.get(['selectedModel'], (data) => {
     if (data.selectedModel) {
         modelSelect.value = data.selectedModel;
     }
 });
 
-// Retrieve last saved answer from local storage
+// Save checkbox states to local storage
+highlightCheckbox.addEventListener('change', () => {
+    chrome.storage.local.set({ highlightOption: highlightCheckbox.checked }, () => {
+        console.log('Highlight-Option gespeichert:', highlightCheckbox.checked);
+    });
+});
+
+autoClickCheckbox.addEventListener('change', () => {
+    chrome.storage.local.set({ autoClickOption: autoClickCheckbox.checked }, () => {
+        console.log('AutoClick-Option gespeichert:', autoClickCheckbox.checked);
+    });
+});
+
+// Restore checkbox states on load
+chrome.storage.local.get(['highlightOption', 'autoClickOption'], (data) => {
+    if (data.highlightOption !== undefined) {
+        highlightCheckbox.checked = data.highlightOption;
+    }
+    if (data.autoClickOption !== undefined) {
+        autoClickCheckbox.checked = data.autoClickOption;
+    }
+});
+
+
+// Restore last question/answer on load
 chrome.storage.local.get(['savedQuestion', 'savedAnswer'], (data) => {
     if (data.savedQuestion && data.savedAnswer) {
         questionText.innerText = data.savedQuestion;
@@ -47,11 +70,10 @@ chrome.storage.local.get(['savedQuestion', 'savedAnswer'], (data) => {
     }
 });
 
-
-// Use chrome API to take screenshot of current tab
+// Trigger screenshot + OCR
 screenshotBtn.addEventListener('click', async () => {
-    const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-    chrome.tabs.captureVisibleTab(tab.windowId, {format: 'png'}, (dataUrl) => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, (dataUrl) => {
         console.log('Screenshot taken');
         extractTextFromImage(dataUrl);
     });
@@ -83,7 +105,6 @@ async function extractTextFromImage(imageDataUrl) {
         extractedData.classList.remove('hidden');
         console.log('Extracted Text:', extractedText);
 
-        //send question to OpenAI API
         await getAnswer(extractedText, modelSelect.value);
 
     } catch (err) {
@@ -91,6 +112,7 @@ async function extractTextFromImage(imageDataUrl) {
     }
 }
 
+// OpenAI request
 async function getAnswer(question, selectedModel) {
     const openaiApiKey = '*versteckt*';
     const openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
@@ -102,8 +124,8 @@ async function getAnswer(question, selectedModel) {
                 role: "system",
                 content: "I will give you a question and either a multiple choice or true/false answer. Please provide ONLY the correct answer. Nothing more, nothing less."
             },
-            {role: "user", content: question}
-        ],
+            { role: "user", content: question }
+        ]
     };
 
     try {
@@ -118,31 +140,37 @@ async function getAnswer(question, selectedModel) {
 
         const result = await response.json();
         if (result.error) {
-            console.error('Error from OpenAI API:', result.error.message);
+            console.error('OpenAI error:', result.error.message);
             return;
         }
 
         const answer = result.choices[0].message.content.trim();
         answerText.innerText = answer;
-        console.log('OpenAI API Answer:', answer);
+        console.log('Answer:', answer);
 
-        // Save the question and answer to Chrome storage
-        chrome.storage.local.set({savedQuestion: question, savedAnswer: answer}, () => {
-            console.log("Question and answer saved.");
+        // Save for later use
+        chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer }, () => {
+            console.log("Saved question and answer.");
         });
 
-        // Send the answer to the content script
-        const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-        chrome.tabs.sendMessage(tab.id, {action: 'highlightAnswer', answer}, (response) => {
+        // Send answer with options to content script
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        chrome.tabs.sendMessage(tab.id, {
+            action: 'highlightAnswer',
+            answer,
+            options: {
+                highlight: highlightCheckbox.checked,
+                autoClick: autoClickCheckbox.checked
+            }
+        }, (response) => {
             if (chrome.runtime.lastError) {
                 console.error("Error sending message:", chrome.runtime.lastError.message);
             } else {
-                console.log("Message sent successfully:", response);
+                console.log("Message sent:", response);
             }
         });
 
     } catch (err) {
-        console.error('Error fetching answer from OpenAI API:', err);
-
+        console.error('OpenAI fetch error:', err);
     }
 }
