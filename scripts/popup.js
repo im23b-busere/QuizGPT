@@ -58,15 +58,20 @@ chrome.storage.local.get(['highlightOption', 'autoClickOption'], (data) => {
     }
 });
 
-
-// Restore last question/answer on load
-chrome.storage.local.get(['savedQuestion', 'savedAnswer'], (data) => {
-    if (data.savedQuestion && data.savedAnswer) {
-        questionText.innerText = data.savedQuestion;
-        answerText.innerText = data.savedAnswer;
+// get last question from local storage
+chrome.storage.local.get("lastKahootQuestion", (data) => {
+    if (data.lastKahootQuestion) {
+        const { title, choices } = data.lastKahootQuestion;
+        questionText.innerText = title;
+        answerText.innerText = choices.join(" / ");
         extractedData.classList.remove('hidden');
+        const fullQuestion = `${title}\n\nOptions:\n${choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
+        getAnswer(fullQuestion, modelSelect.value);
+
     }
 });
+
+
 
 /*
 --------------------
@@ -128,7 +133,7 @@ async function getAnswer(question, selectedModel) {
         messages: [
             {
                 role: "system",
-                content: "I will give you a question and either a multiple choice or true/false answer. Please provide ONLY the correct answer. Nothing more, nothing less."
+                content: "I will give you a question and either a multiple choice or true/false answer. Please provide ONLY the correct answer (without the number). Nothing more, nothing less."
             },
             { role: "user", content: question }
         ]

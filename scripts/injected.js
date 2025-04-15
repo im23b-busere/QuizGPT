@@ -56,6 +56,15 @@ window.WebSocket = function (url, protocols) {
 
                             console.log("[AutoClick] New question:", window.kahootCurrentQuestion.title, window.kahootCurrentQuestion.choices);
 
+                            // send question to content script
+                            window.dispatchEvent(new CustomEvent("kahootQuestionParsed", {
+                                detail: {
+                                    title: content.title,
+                                    choices: content.choices.map(c => c.answer),
+                                    questionIndex: content.questionIndex
+                                }
+                            }));
+
 
                         }
                     } catch (e) {
