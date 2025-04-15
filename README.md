@@ -1,8 +1,11 @@
 # KahootGPT
 
-Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du immer die richtige Antwort parat! Die Erweiterung nutzt OCR und **GPT-4o** KI, um Fragen aus einem Screenshot zu extrahieren und die richtige Antwort automatisch auf der Kahoot-Seite hervorzuheben.
+Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du immer die richtige Antwort parat! Die Erweiterung nutzt OCR und **GPT-4** KI, um Fragen aus einem Screenshot zu extrahieren und die richtige Antwort automatisch auf der Kahoot-Seite hervorzuheben.
 
-<img src="https://github.com/user-attachments/assets/2cd9801c-880d-496e-bb65-96b5b5f0d033" alt="AI-Voice-Assistant-Screenshot" width="700"/>
+<img src="https://github.com/user-attachments/assets/8aa5df7b-8447-40c9-8b36-39587442686b" alt="AI-Voice-Assistant-Screenshot" width="1000"/>
+
+
+
 
 
 ## Inhaltsverzeichnis
@@ -13,10 +16,12 @@ Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du imm
 - [Autor](#autor)
 
 ## Features
-- Screenshot-Erfassung der aktuellen Webseite
-- Texterkennung mittels OCR.Space API
+- Beantworte Kahoot-Fragen direkt, ohne zu raten
 - Automatische Frageverarbeitung über OpenAI-API
-- Hervorhebung der korrekten Antwort auf der Kahoot-Seite
+- Hervorhebung der richtigen Antwort im Spiel (optional einstellbar)
+- **NEU! Automatisches Klicken der korrekten Antwort (optional einstellbar)**
+- Unterstützt mehrere GPT-Modelle zur Beantwortung von Fragen (optional einstellbar)
+
 
 
 ## Installation
@@ -35,7 +40,7 @@ Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du imm
 - **API's:** Chrome API, OCR.Space API, Groq API
 
 ## Hinweise
-- Die Frage selber muss zwingend auf den Endgeräten sichtbar sein (Einstellbar in den Kahoot Einstellung).
+- Die Frage selber muss **momentan nocht** zwingend auf den Endgeräten sichtbar sein (Einstellbar in den Kahoot Einstellung).
 - Ein eigener API-Schlüssel für OCR.Space und OpenAI ist erforderlich, um die Erweiterung korrekt zu nutzen.
 
 ## Autor
