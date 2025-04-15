@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Kahoot Cheat</title>
-    <link rel="stylesheet" href="styles.css"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kahoot Cheat</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body class="popup-container">
 
 <div class="settings-container" title="Settings">
-    <button class="settings-button">
-        <svg class="settings-icon" width="20" height="20" viewBox="0 0 20 20">
-            <path d="M 15.8216 10.5654 c 0.0326 -0.2606 0.057 -0.5252 0.057 -0.7939 s -0.0244 -0.5334 -0.057 -0.7939
+  <button class="settings-button">
+    <svg class="settings-icon" width="20" height="20" viewBox="0 0 20 20">
+      <path d="M 15.8216 10.5654 c 0.0326 -0.2606 0.057 -0.5252 0.057 -0.7939 s -0.0244 -0.5334 -0.057 -0.7939
                     l 1.7222 -1.3476 c 0.1547 -0.1221 0.1995 -0.342 0.0977 -0.5211 l -1.6286 -2.8215 c -0.1018 -0.1751
                     -0.3135 -0.2484 -0.4967 -0.1751 l -2.0276 0.8184 c -0.4194 -0.3216 -0.8794 -0.5944 -1.3761 -0.8021 l
                     -0.3054 -2.1579 c -0.0366 -0.1914 -0.2036 -0.342 -0.4071 -0.342 h -3.2571 c -0.2036 0 -0.3705 0.1506
@@ -25,43 +25,46 @@
                     0.4967 -0.1751 l 1.6286 -2.8215 c 0.1018 -0.1751 0.057 -0.3949 -0.0977 -0.5211 l -1.7181 -1.3476 z m
                     -6.0501 2.0561 c -1.5756 0 -2.85 -1.2744 -2.85 -2.85 s 1.2744 -2.85 2.85 -2.85 s 2.85 1.2744 2.85
                     2.85 s -1.2744 2.85 -2.85 2.85 z">
-            </path>
-        </svg>
-    </button>
+      </path>
+    </svg>
+  </button>
 </div>
 
 <div id="settingsModal" class="modal hidden">
-    <div class="modal-content">
-        <button class="close-modal">&times;</button>
-        <h2>Einstellungen</h2>
-        <label for="model">ChatGPT model: </label>
-        <select id="model" class="select">
-            <option value="gpt-4o">GPT-4o</option>
-            <option value="gpt-4o-mini">GPT-4o-mini</option>
-            <option value="gpt-3.5-turbo">GPT-3.5</option>
-        </select>
+  <div class="modal-content">
+    <button class="close-modal" title="Schließen">&times;</button>
+    <h2>Einstellungen</h2>
 
-        <br>
+    <label for="model">ChatGPT Model:</label>
+    <select id="model" class="select">
+      <option value="gpt-4o">GPT-4o</option>
+      <option value="gpt-4o-mini">GPT-4o-mini</option>
+      <option value="gpt-3.5-turbo">GPT-3.5</option>
+    </select>
 
-        <label for="highlight">Highlight correct answer </label>
-        <input type="checkbox" id="highlight" class="checkbox">
+    <label class="checkbox-row">
+      <input type="checkbox" id="highlight" class="checkbox">
+      Highlight correct answer
+    </label>
 
-        <br>
+    <label class="checkbox-row">
+      <input type="checkbox" id="autoclick" class="checkbox">
+      Auto-click correct answer
+    </label>
 
-        <label for="autoclick">Auto-click correct answer: </label>
-        <input type="checkbox" id="autoclick" class="checkbox">
-    </div>
+  </div>
 </div>
 
+
 <div class="popup-content">
-    <h1 class="title">KahootGPT</h1>
-    <button id="screenshotBtn" class="button">Antwort suchen</button>
-    <div id="extractedData" class="hidden">
-        <h2 class="subtitle">Erkannte Frage:</h2>
-        <p id="questionText" class="text-field"></p>
-        <h2 class="subtitle">Gefundene Antwort:</h2>
-        <p id="answerText" class="text-field answer"></p>
-    </div>
+  <h1 class="title">KahootGPT</h1>
+  <button id="screenshotBtn" class="button">Antwort suchen</button>
+  <div id="extractedData" class="hidden">
+    <h2 class="subtitle">Erkannte Frage:</h2>
+    <p id="questionText" class="text-field"></p>
+    <h2 class="subtitle">Gefundene Antwort:</h2>
+    <p id="answerText" class="text-field answer"></p>
+  </div>
 </div>
 
 <script type="module" src="scripts/popup.js" defer></script>
