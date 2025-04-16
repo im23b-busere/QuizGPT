@@ -1,8 +1,10 @@
 # KahootGPT
 
-Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du immer die richtige Antwort parat! Die Erweiterung nutzt OCR und **GPT-4** KI, um Fragen aus einem Screenshot zu extrahieren und die richtige Antwort automatisch auf der Kahoot-Seite hervorzuheben.
+Müde davon, jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du automatisch die richtige Antwort parat!  
+**KahootGPT** analysiert Fragen live über die WebSocket-Verbindung und nutzt **OpenAI GPT**, um die richtige Antwort zu finden – automatisch, schnell, und auf Wunsch mit Auto-Klick.
 
-<img src="https://github.com/user-attachments/assets/8aa5df7b-8447-40c9-8b36-39587442686b" alt="AI-Voice-Assistant-Screenshot" width="1000"/>
+<img src="https://github.com/user-attachments/assets/9c7702c8-c6da-4a89-98ab-db969ece759b" alt="AI-Voice-Assistant-Screenshot" width="1000"/>
+
 
 
 
@@ -27,7 +29,6 @@ Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du imm
 ## Installation
 1. **Repository klonen oder herunterladen**
 2. **API-Schlüssel angeben:**
-   - OCR.Space API (kostenloser API-Schlüssel erhältlich)
    - OpenAI API (erfordert ein OpenAI-Konto)
 3. **Chrome-Erweiterungen verwalten:**
    - `chrome://extensions/` in Chrome öffnen
@@ -37,11 +38,11 @@ Müde davon jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du imm
 
 ## Technologien
 - **Frontend:** HTML, CSS, JavaScript, JSON
-- **API's:** Chrome API, OCR.Space API, Groq API
+- **API's:** Chrome API, OpenAI API
 
 ## Hinweise
 - Die Frage selber muss **momentan nocht** zwingend auf den Endgeräten sichtbar sein (Einstellbar in den Kahoot Einstellung).
-- Ein eigener API-Schlüssel für OCR.Space und OpenAI ist erforderlich, um die Erweiterung korrekt zu nutzen.
+- Ein eigener API-Schlüssel für OpenAI ist erforderlich, um die Erweiterung korrekt zu nutzen.
 
 ## Autor
 
