@@ -154,11 +154,7 @@ async function getAnswer(question, selectedModel) {
             console.error('OpenAI error:', result.error.message);
             return;
         }
-
-        const answer = result.choices[0].message.content.trim();
-        answerText.innerText = answer;
-        console.log('Answer:', answer);
-
+        
         // Save for later use
         chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer }, () => {
             console.log("Saved question and answer.");
