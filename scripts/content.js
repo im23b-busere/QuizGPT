@@ -40,28 +40,35 @@ window.addEventListener("kahootQuestionParsed", (event) => {
 
 
 // Finds the correct button and optionally highlights and/or auto-clicks it
-function highlightAndAutoClickAnswer(answerText, options = {highlight: true, autoClick: true}) {
+function highlightAndAutoClickAnswer(answerTextOrIndex, options = { highlight: true, autoClick: true }) {
     const buttons = document.querySelectorAll("button");
-    let index = 0;
+    let index = -1;
 
-    for (let button of buttons) {
-        const cleanedButtonText = button.innerText.trim().toLowerCase();
-        const cleanedAnswerText = answerText.trim().toLowerCase();
-
-        if (cleanedButtonText === cleanedAnswerText) {
-            if (options.highlight) {
-                button.style.border = '5px solid black'; // visual feedback
+    if (typeof answerTextOrIndex === "number") {
+        index = answerTextOrIndex;
+    } else {
+        const cleanedAnswerText = answerTextOrIndex.trim().toLowerCase();
+        buttons.forEach((button, i) => {
+            if (button.innerText.trim().toLowerCase() === cleanedAnswerText) {
+                index = i;
             }
+        });
+    }
 
-            console.log("[Kahoot AutoClick] Match found:", cleanedButtonText, "(Index:", index, ")");
+    if (index >= 0 && index < buttons.length) {
+        const button = buttons[index];
 
-            if (options.autoClick) {
-                const event = new CustomEvent("autoClickAnswer", {detail: index});
-                window.dispatchEvent(event);
-            }
-
-            break;
+        if (options.highlight) {
+            button.style.border = '5px solid black';
         }
-        index++;
+
+        console.log("[Kahoot AutoClick] Button match at index:", index);
+
+        if (options.autoClick) {
+            const event = new CustomEvent("autoClickAnswer", { detail: index });
+            window.dispatchEvent(event);
+        }
+    } else {
+        console.warn("[Kahoot AutoClick] Kein Button gefunden für:", answerTextOrIndex);
     }
 }
