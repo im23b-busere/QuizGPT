@@ -35,6 +35,9 @@
       "matches": ["<all_urls>"]
     }
   ],
+  "background": {
+    "service_worker": "scripts/autoresponder.js"
+},
   "host_permissions": [
     "*://kahoot.it/*"
   ],
