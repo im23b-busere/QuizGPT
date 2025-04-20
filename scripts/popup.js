@@ -5,10 +5,16 @@ const extractedData = document.getElementById('extractedData');
 const answerText = document.getElementById('answerText');
 const settingsButton = document.querySelector('.settings-button');
 const settingsModal = document.getElementById('settingsModal');
+
 const modelSelect = document.getElementById('model');
-const closeModalBtn = document.querySelector('.close-modal');
+const modelDescription = document.getElementById('model-description');
+
 const highlightCheckbox = document.getElementById("highlight");
 const autoClickCheckbox = document.getElementById("autoclick");
+
+const apiKeyInput = document.getElementById("apiKey");
+const saveApiKeyBtn = document.getElementById("saveApiKey");
+const apiKeyStatus = document.getElementById("apiKeyStatus");
 
 // Show settings on button click
 settingsButton.addEventListener('click', () => {
@@ -58,6 +64,25 @@ chrome.storage.local.get(['highlightOption', 'autoClickOption'], (data) => {
     }
 });
 
+// Save API key
+saveApiKeyBtn.addEventListener('click', () => {
+    const key = apiKeyInput.value.trim();
+    if (key.startsWith("sk-")) {
+        chrome.storage.local.set({ openaiApiKey: key }, () => {
+            apiKeyStatus.style.display = "inline";
+            setTimeout(() => apiKeyStatus.style.display = "none", 2000);
+        });
+    } else {
+        alert("Bitte einen gültigen OpenAI-Key eingeben (beginnend mit sk-...)");
+    }
+});
+
+chrome.storage.local.get(['openaiApiKey'], (data) => {
+    if (data.openaiApiKey) {
+        apiKeyInput.value = data.openaiApiKey;
+    }
+});
+
 // get last question from local storage
 chrome.storage.local.get("lastKahootQuestion", (data) => {
     if (data.lastKahootQuestion) {
@@ -65,8 +90,6 @@ chrome.storage.local.get("lastKahootQuestion", (data) => {
         questionText.innerText = title;
         answerText.innerText = choices.join(" / ");
         extractedData.classList.remove('hidden');
-        const fullQuestion = `${title}\n\nOptions:\n${choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
-
     }
 });
 
@@ -81,7 +104,6 @@ manualButton.addEventListener('click', () => {
         console.error('No question found to send to OpenAI.');
     }
 });
-
 
 /*
 --------------------
@@ -135,64 +157,66 @@ async function extractTextFromImage(imageDataUrl) {
 
 // OpenAI request
 async function getAnswer(question, selectedModel) {
-    const openaiApiKey = '*versteckt*';
-    const openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
-
-    const body = {
-        model: selectedModel,
-        messages: [
-            {
-                role: "system",
-                content: "I will give you a question and either a multiple choice or true/false answer. Please provide ONLY the correct answer (without the number). Nothing more, nothing less."
-            },
-            { role: "user", content: question }
-        ]
-    };
-
-    try {
-        const response = await fetch(openaiApiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${openaiApiKey}`
-            },
-            body: JSON.stringify(body)
-        });
-
-        const result = await response.json();
-        if (result.error) {
-            console.error('OpenAI error:', result.error.message);
+    chrome.storage.local.get("openaiApiKey", async ({ openaiApiKey }) => {
+        if (!openaiApiKey) {
+            alert("Bitte zuerst den OpenAI API-Key in den Einstellungen eingeben.");
             return;
         }
 
-        const answer = result.choices[0].message.content.trim();
-        
-        // Save for later use
-        chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer }, () => {
-            console.log("Saved question and answer.");
-        });
+        const openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
+        const body = {
+            model: selectedModel,
+            messages: [
+                {
+                    role: "system",
+                    content: "I will give you a question and either a multiple choice or true/false answer. Please provide ONLY the correct answer (without the number). Nothing more, nothing less."
+                },
+                { role: "user", content: question }
+            ]
+        };
 
-        // show in UI
-        answerText.innerText = answer;
+        try {
+            const response = await fetch(openaiApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiApiKey}`
+                },
+                body: JSON.stringify(body)
+            });
 
-        // Send answer with options to content script
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        chrome.tabs.sendMessage(tab.id, {
-            action: 'highlightAnswer',
-            answer,
-            options: {
-                highlight: highlightCheckbox.checked,
-                autoClick: autoClickCheckbox.checked
+            const result = await response.json();
+            if (result.error) {
+                console.error('OpenAI Fehler:', result.error.message);
+                return;
             }
-        }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.error("Error sending message:", chrome.runtime.lastError.message);
-            } else {
-                console.log("Message sent:", response);
-            }
-        });
 
-    } catch (err) {
-        console.error('OpenAI fetch error:', err);
-    }
+            const answer = result.choices[0].message.content.trim();
+
+            chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer }, () => {
+                console.log("Frage und Antwort gespeichert.");
+            });
+
+            answerText.innerText = answer;
+
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            chrome.tabs.sendMessage(tab.id, {
+                action: 'highlightAnswer',
+                answer,
+                options: {
+                    highlight: highlightCheckbox.checked,
+                    autoClick: autoClickCheckbox.checked
+                }
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.error("Fehler beim Senden:", chrome.runtime.lastError.message);
+                } else {
+                    console.log("Antwort gesendet:", response);
+                }
+            });
+
+        } catch (err) {
+            console.error('OpenAI fetch error:', err);
+        }
+    });
 }

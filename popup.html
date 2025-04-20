@@ -35,6 +35,11 @@
     <button class="close-modal" title="Schließen">&times;</button>
     <h2>Einstellungen</h2>
 
+    <label for="apiKey">OpenAI API-Key:</label>
+    <input type="password" id="apiKey" placeholder="sk-..." style="width: 100%;" />
+    <button id="saveApiKey">Speichern</button>
+    <small id="apiKeyStatus" style="color: green; display: none;">✅ Gespeichert!</small>
+
     <label for="model">ChatGPT Model:</label>
     <select id="model" class="select">
       <option value="gpt-4o">GPT-4o</option>
