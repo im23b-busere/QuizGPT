@@ -5,6 +5,7 @@ const extractedData = document.getElementById('extractedData');
 const answerText = document.getElementById('answerText');
 const settingsButton = document.querySelector('.settings-button');
 const settingsModal = document.getElementById('settingsModal');
+const closeModalBtn = document.querySelector('.close-modal');
 
 const modelSelect = document.getElementById('model');
 const modelDescription = document.getElementById('model-description');
@@ -15,6 +16,10 @@ const autoClickCheckbox = document.getElementById("autoclick");
 const apiKeyInput = document.getElementById("apiKey");
 const saveApiKeyBtn = document.getElementById("saveApiKey");
 const apiKeyStatus = document.getElementById("apiKeyStatus");
+
+const tabButtons = document.querySelectorAll('.tab-button');
+const tabContents = document.querySelectorAll('.tab-content');
+
 
 // Show settings on button click
 settingsButton.addEventListener('click', () => {
@@ -70,7 +75,7 @@ saveApiKeyBtn.addEventListener('click', () => {
     if (key.startsWith("sk-")) {
         chrome.storage.local.set({ openaiApiKey: key }, () => {
             apiKeyStatus.style.display = "inline";
-            setTimeout(() => apiKeyStatus.style.display = "none", 2000);
+            setTimeout(() => apiKeyStatus.style.display = "none", 800);
         });
     } else {
         alert("Bitte einen gültigen OpenAI-Key eingeben (beginnend mit sk-...)");
@@ -220,3 +225,19 @@ async function getAnswer(question, selectedModel) {
         }
     });
 }
+
+// Tab Navigation
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        // Remove active class from all buttons and contents
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        // Add active class to clicked button
+        button.classList.add('active');
+        
+        // Show corresponding content
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+    });
+});

@@ -29,37 +29,47 @@
     </svg>
   </button>
 </div>
-
 <div id="settingsModal" class="modal hidden">
   <div class="modal-content">
     <button class="close-modal" title="Schließen">&times;</button>
     <h2>Einstellungen</h2>
 
-    <label for="apiKey">OpenAI API-Key:</label>
-    <input type="password" id="apiKey" placeholder="sk-..." style="width: 100%;" />
-    <button id="saveApiKey">Speichern</button>
-    <small id="apiKeyStatus" style="color: green; display: none;">✅ Gespeichert!</small>
+    <div class="settings-tabs">
+      <button class="tab-button active" data-tab="openai">OpenAI</button>
+      <button class="tab-button" data-tab="kahoot">KahootGPT</button>
+    </div>
 
-    <label for="model">ChatGPT Model:</label>
-    <select id="model" class="select">
-      <option value="gpt-4o">GPT-4o</option>
-      <option value="gpt-4o-mini">GPT-4o-mini</option>
-      <option value="gpt-3.5-turbo">GPT-3.5-turbo</option>
-    </select>
+    <div class="tab-content active" id="openai-tab">
+      <!-- API-Key -->
+      <label for="apiKey">OpenAI API-Key</label>
+      <input type="password" id="apiKey" placeholder="sk-..." class="text-field" style="width: 100%;" />
+      <button id="saveApiKey" class="button-secondary" style="margin-top: 8px;">speichern</button>
+      <small id="apiKeyStatus" style="color: white; display: none;">Gespeichert ✅</small>
 
-    <label class="checkbox-row">
-      <input type="checkbox" id="highlight" class="checkbox">
-      Highlight correct answer
-    </label>
+      <!-- Model -->
+      <label for="model" style="margin-top: 14px;">ChatGPT Modell:</label>
+      <select id="model" class="select">
+        <option value="gpt-4o" title="Sehr leistungsfähig, gut bei komplexeren Fragen">GPT-4o</option>
+        <option value="gpt-4o-mini" title="Kompakte Version, günstiger">GPT-4o-mini</option>
+        <option value="gpt-3.5-turbo" title="Schnell, günstig, ideal für Standardfragen">GPT-3.5-turbo</option>
+      </select>
+      <small id="model-description" style="display:block; font-size: 0.85em; color: #999;"></small>
+    </div>
 
-    <label class="checkbox-row">
-      <input type="checkbox" id="autoclick" class="checkbox">
-      Auto-click correct answer
-    </label>
+    <div class="tab-content" id="kahoot-tab">
+      <!-- Options -->
+      <label class="checkbox-row">
+        <input type="checkbox" id="highlight" class="checkbox">
+        Highlight richtige Antwort
+      </label>
 
+      <label class="checkbox-row">
+        <input type="checkbox" id="autoclick" class="checkbox">
+        Auto-Klick auf Antwort
+      </label>
+    </div>
   </div>
 </div>
-
 
 <div class="popup-content">
   <h1 class="title">KahootGPT</h1>
