@@ -59,8 +59,28 @@ function highlightAndAutoClickAnswer(answerTextOrIndex, options = { highlight: t
         const button = buttons[index];
 
         if (options.highlight) {
-            button.style.border = '5px solid black';
+            button.style.border = '2px solid black';
+            button.style.boxShadow = '0 0 10px 2px black';
+            button.style.borderRadius = '10px';
+            button.style.transition = 'all 0.3s ease-in-out';
+
+            // Pulsierender Effekt
+            button.animate([
+                { transform: 'scale(1)', boxShadow: '0 0 10px 2px black' },
+                { transform: 'scale(1.05)', boxShadow: '0 0 15px 4px black' },
+                { transform: 'scale(1)', boxShadow: '0 0 10px 2px black' }
+            ], {
+                duration: 1000,
+                iterations: 8
+            });
+            const checkmark = document.createElement('span');
+            checkmark.textContent = ' ✅';
+            checkmark.style.fontSize = '1.2em';
+            checkmark.style.marginLeft = '8px';
+            button.appendChild(checkmark);
+
         }
+
 
         console.log("[Kahoot AutoClick] Button match at index:", index);
 
