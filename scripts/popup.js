@@ -1,5 +1,5 @@
 // Cache DOM elements
-const screenshotBtn = document.getElementById('screenshotBtn');
+const manualButton = document.getElementById('manualButton');
 const questionText = document.getElementById('questionText');
 const extractedData = document.getElementById('extractedData');
 const answerText = document.getElementById('answerText');
@@ -66,11 +66,21 @@ chrome.storage.local.get("lastKahootQuestion", (data) => {
         answerText.innerText = choices.join(" / ");
         extractedData.classList.remove('hidden');
         const fullQuestion = `${title}\n\nOptions:\n${choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
-        getAnswer(fullQuestion, modelSelect.value);
 
     }
 });
 
+// manual button click
+manualButton.addEventListener('click', () => {
+    const question = questionText.innerText;
+    const selectedModel = modelSelect.value;
+
+    if (question) {
+        getAnswer(question, selectedModel);
+    } else {
+        console.error('No question found to send to OpenAI.');
+    }
+});
 
 
 /*
@@ -154,11 +164,16 @@ async function getAnswer(question, selectedModel) {
             console.error('OpenAI error:', result.error.message);
             return;
         }
+
+        const answer = result.choices[0].message.content.trim();
         
         // Save for later use
         chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer }, () => {
             console.log("Saved question and answer.");
         });
+
+        // show in UI
+        answerText.innerText = answer;
 
         // Send answer with options to content script
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
