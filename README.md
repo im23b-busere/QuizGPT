@@ -3,9 +3,7 @@
 Müde davon, jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du automatisch die richtige Antwort parat!  
 **KahootGPT** analysiert Fragen live über die WebSocket-Verbindung und nutzt **OpenAI GPT**, um die richtige Antwort zu finden – automatisch, schnell, und auf Wunsch mit Auto-Klick.
 
-<img src="https://github.com/user-attachments/assets/9c7702c8-c6da-4a89-98ab-db969ece759b" alt="AI-Voice-Assistant-Screenshot" width="1000"/>
-
-
+<img src="https://github.com/user-attachments/assets/480c41c3-8cf3-4d4d-990b-1a7a1c17c272" width="1000"/>
 
 
 
