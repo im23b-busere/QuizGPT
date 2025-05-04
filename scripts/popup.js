@@ -98,67 +98,35 @@ chrome.storage.local.get("lastKahootQuestion", (data) => {
     }
 });
 
+// function for spinner
+function showSpinner(button) {
+    button.disabled = true;
+    button.innerHTML = '<div class="loader" style="width: 20px; height: 20px; border-width: 3px;"></div>';
+}
+
+function hideSpinner(button, originalText) {
+    button.disabled = false;
+    button.innerHTML = originalText;
+}
+
 // manual button click
-manualButton.addEventListener('click', () => {
+manualButton.addEventListener('click', async () => {
     const question = questionText.innerText;
     const selectedModel = modelSelect.value;
 
     if (question) {
-        getAnswer(question, selectedModel);
+        const originalText = manualButton.innerHTML;
+        showSpinner(manualButton);
+
+        try {
+            await getAnswer(question, selectedModel);
+        } finally {
+            setTimeout(() => hideSpinner(manualButton, originalText), 300);
+        }
     } else {
         console.error('No question found to send to OpenAI.');
     }
 });
-
-/*
---------------------
-- NO LONGER NEEDED -
---------------------
-
-// Trigger screenshot + OCR
-screenshotBtn.addEventListener('click', async () => {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, (dataUrl) => {
-        console.log('Screenshot taken');
-        extractTextFromImage(dataUrl);
-    });
-});
-
-
- OCR with OCR.Space API
-async function extractTextFromImage(imageDataUrl) {
-    const spaceApiKey = '';
-    const spaceApiUrl = 'https://api.ocr.space/parse/image';
-
-    const formData = new FormData();
-    formData.append('apikey', spaceApiKey);
-    formData.append('base64Image', imageDataUrl);
-
-    try {
-        const response = await fetch(spaceApiUrl, {
-            method: 'POST',
-            body: formData
-        });
-
-        const result = await response.json();
-        if (result.IsErroredOnProcessing) {
-            console.error('Error processing image:', result.ErrorMessage);
-            return;
-        }
-
-        const extractedText = result.ParsedResults[0].ParsedText;
-        questionText.innerText = extractedText;
-        extractedData.classList.remove('hidden');
-        console.log('Extracted Text:', extractedText);
-
-        await getAnswer(extractedText, modelSelect.value);
-
-    } catch (err) {
-        console.error('Error:', err);
-    }
-}
-
-*/
 
 // OpenAI request
 async function getAnswer(question, selectedModel) {
@@ -241,3 +209,4 @@ tabButtons.forEach(button => {
         document.getElementById(`${tabId}-tab`).classList.add('active');
     });
 });
+
