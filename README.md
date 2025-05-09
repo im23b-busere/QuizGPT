@@ -1,49 +1,67 @@
-# KahootGPT
+# QuizGPT
 
-Müde davon, jedes Kahoot zu verlieren? Mit dieser Chrome-Erweiterung hast du automatisch die richtige Antwort parat!  
-**KahootGPT** analysiert Fragen live über die WebSocket-Verbindung und nutzt **OpenAI GPT**, um die richtige Antwort zu finden – automatisch, schnell, und auf Wunsch mit Auto-Klick.
+Tired of losing every Kahoot quiz? With this Chrome extension, you’ll always have the correct answer ready — automatically, instantly, and with optional auto-click.
 
-<img src="https://github.com/user-attachments/assets/480c41c3-8cf3-4d4d-990b-1a7a1c17c272" width="1000"/>
+**QuizGPT** analyzes questions live through the WebSocket connection and uses **OpenAI's GPT** to determine the correct answer in real time.
 
+Now available in the **Chrome Web Store**! 🚀  
+👉 [coming soon!](https://chrome.google.com/webstore/detail/YOUR-EXTENSION-ID-HERE)
 
+![Screenshot](https://github.com/user-attachments/assets/9426b30b-170c-4a6c-a2fe-28b62a2c544f)
 
+---
 
-## Inhaltsverzeichnis
+## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
-- [Technologien](#technologien)
-- [Sicherheits-Hinweis](#hinweise)
-- [Autor](#autor)
+- [Technologies](#technologies)
+- [Important Notes](#important-notes)
+- [Author](#author)
+
+---
 
 ## Features
-- Beantworte Kahoot-Fragen direkt, ohne zu raten
-- Automatische Frageverarbeitung über OpenAI-API
-- Hervorhebung der richtigen Antwort im Spiel (optional einstellbar)
-- **NEU! Automatisches Klicken der korrekten Antwort (optional einstellbar)**
-- Unterstützt mehrere GPT-Modelle zur Beantwortung von Fragen (optional einstellbar)
+- Automatically answer Kahoot questions without guessing
+- Real-time question processing using the OpenAI API
+- Highlight the correct answer during the game (optional)
+- ✅ **NEW!** Auto-click the correct answer (optional)
+- Support for multiple GPT models (configurable)
 
+![Screenshot](https://github.com/user-attachments/assets/2bb66fc5-a96b-4dad-9f84-13a95d0230fa)
 
+---
 
 ## Installation
-1. **Repository klonen oder herunterladen**
-2. **API-Schlüssel angeben:**
-   - OpenAI API (erfordert ein OpenAI-Konto)
-3. **Chrome-Erweiterungen verwalten:**
-   - `chrome://extensions/` in Chrome öffnen
-   - Entwicklermodus aktivieren
-   - "Entpackte Erweiterung laden" auswählen und den Projektordner angeben
-4. **Erweiterung nutzen!**
 
-## Technologien
+### 🧩 From the Chrome Web Store (recommended)
+1. Go to the [Chrome Web Store page](https://chrome.google.com/webstore/detail/YOUR-EXTENSION-ID-HERE)
+2. Click **"Add to Chrome"**
+3. Open the extension popup and enter your OpenAI API key
+
+### 🛠️ Manual (for developers)
+1. Clone or download this repository
+2. Open `chrome://extensions/` in Chrome
+3. Enable **Developer Mode**
+4. Click **"Load unpacked"** and select the project folder
+5. Enter your OpenAI API key in the extension settings
+
+---
+
+## Technologies
 - **Frontend:** HTML, CSS, JavaScript, JSON
-- **API's:** Chrome API, OpenAI API
+- **APIs:** Chrome Extension API, OpenAI API
 
-## Hinweise
-- Die Frage selber muss **momentan nocht** zwingend auf den Endgeräten sichtbar sein (Einstellbar in den Kahoot Einstellung).
-- Ein eigener API-Schlüssel für OpenAI ist erforderlich, um die Erweiterung korrekt zu nutzen.
+---
 
-## Autor
+## Important Notes
+- Some questions may require the text to be visible on the client device (depending on Kahoot settings)
+- You must provide your own OpenAI API key to use the extension
+- This project is **not affiliated with Kahoot! or OpenAI**
+- Use responsibly and only in settings where AI use is permitted
 
-**[im23b-busere](https://github.com/im23b-busere)**  
-Feedback oder Vorschläge? Öffne ein Issue oder erstelle einen Pull-Request!
+---
 
+## Author
+**@im23b-busere**
+
+Feedback or suggestions? Feel free to [open an issue](https://github.com/YOUR-REPO/issues) or submit a pull request!
