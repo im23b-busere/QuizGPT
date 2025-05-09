@@ -1,23 +1,23 @@
 // Injects the WebSocket hook script into the page
 const script = document.createElement('script');
 script.src = chrome.runtime.getURL('scripts/injected.js');
-script.onload = () => console.log("[Kahoot AutoClick] Script injected");
+script.onload = () => console.log("[QuizGPT AutoClick] Script injected");
 (document.head || document.documentElement).appendChild(script);
 
 // Listens for messages from popup and handles highlighting + auto-clicking
 chrome.runtime.onMessage.addListener((request) => {
     if (request.action === "highlightAnswer") {
         const {answer, options} = request;
-        console.log("[Kahoot AutoClick] Answer received:", answer, "Options:", options);
+        console.log("[QuizGPT AutoClick] Answer received:", answer, "Options:", options);
         highlightAndAutoClickAnswer(answer, options);
     }
 });
 
 // Listen for the event from injected.js
-window.addEventListener("kahootQuestionParsed", (event) => {
+window.addEventListener("quizQuestionParsed", (event) => {
     const question = event.detail;
-    chrome.storage.local.set({ lastKahootQuestion: question }, () => {
-        console.log("[Kahoot AutoClick] Question saved:", question);
+    chrome.storage.local.set({ lastQuizQuestion: question }, () => {
+        console.log("[QuizGPT AutoClick] Question saved:", question);
 
         // Automatisch auslösen
         chrome.storage.local.get(['selectedModel', 'highlightOption', 'autoClickOption'], (settings) => {
@@ -82,13 +82,14 @@ function highlightAndAutoClickAnswer(answerTextOrIndex, options = { highlight: t
         }
 
 
-        console.log("[Kahoot AutoClick] Button match at index:", index);
+        console.log("[QuizGPT AutoClick] Button match at index:", index);
 
         if (options.autoClick) {
             const event = new CustomEvent("autoClickAnswer", { detail: index });
             window.dispatchEvent(event);
         }
     } else {
-        console.warn("[Kahoot AutoClick] Kein Button gefunden für:", answerTextOrIndex);
+        console.warn("[QuizGPT AutoClick] Kein Button gefunden für:", answerTextOrIndex);
     }
 }
+
