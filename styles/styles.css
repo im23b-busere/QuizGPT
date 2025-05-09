@@ -326,8 +326,8 @@ body.popup-container {
     border: 8px solid #f3f3f3;
     border-top: 8px solid #8A2BE2;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     animation: spin 1s linear infinite;
 }
 
@@ -345,4 +345,3 @@ body.popup-container {
         transform: rotate(360deg);
     }
 }
-

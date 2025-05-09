@@ -49,13 +49,13 @@ chrome.storage.local.get(['selectedModel'], (data) => {
 // Save checkbox states to local storage
 highlightCheckbox.addEventListener('change', () => {
     chrome.storage.local.set({ highlightOption: highlightCheckbox.checked }, () => {
-        console.log('Highlight-Option gespeichert:', highlightCheckbox.checked);
+        console.log('Highlight option saved:', highlightCheckbox.checked);
     });
 });
 
 autoClickCheckbox.addEventListener('change', () => {
     chrome.storage.local.set({ autoClickOption: autoClickCheckbox.checked }, () => {
-        console.log('AutoClick-Option gespeichert:', autoClickCheckbox.checked);
+        console.log('AutoClick option saved:', autoClickCheckbox.checked);
     });
 });
 
@@ -78,7 +78,7 @@ saveApiKeyBtn.addEventListener('click', () => {
             setTimeout(() => apiKeyStatus.style.display = "none", 800);
         });
     } else {
-        alert("Bitte einen gültigen OpenAI-Key eingeben (beginnend mit sk-...)");
+        alert("Please enter a valid OpenAI key (starting with sk-...)");
     }
 });
 
@@ -132,7 +132,7 @@ manualButton.addEventListener('click', async () => {
 async function getAnswer(question, selectedModel) {
     chrome.storage.local.get("openaiApiKey", async ({ openaiApiKey }) => {
         if (!openaiApiKey) {
-            alert("Bitte zuerst den OpenAI API-Key in den Einstellungen eingeben.");
+            alert("Please enter your OpenAI API key in the settings first.");
             return;
         }
 
@@ -160,14 +160,14 @@ async function getAnswer(question, selectedModel) {
 
             const result = await response.json();
             if (result.error) {
-                console.error('OpenAI Fehler:', result.error.message);
+                console.error('OpenAI Error:', result.error.message);
                 return;
             }
 
             const answer = result.choices[0].message.content.trim();
 
             chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer }, () => {
-                console.log("Frage und Antwort gespeichert.");
+                console.log("Question and answer saved.");
             });
 
             answerText.innerText = answer;
@@ -182,9 +182,9 @@ async function getAnswer(question, selectedModel) {
                 }
             }, (response) => {
                 if (chrome.runtime.lastError) {
-                    console.error("Fehler beim Senden:", chrome.runtime.lastError.message);
+                    console.error("Error sending:", chrome.runtime.lastError.message);
                 } else {
-                    console.log("Antwort gesendet:", response);
+                    console.log("Answer sent:", response);
                 }
             });
 
@@ -200,13 +200,12 @@ tabButtons.forEach(button => {
         // Remove active class from all buttons and contents
         tabButtons.forEach(btn => btn.classList.remove('active'));
         tabContents.forEach(content => content.classList.remove('active'));
-        
+
         // Add active class to clicked button
         button.classList.add('active');
-        
+
         // Show corresponding content
         const tabId = button.getAttribute('data-tab');
         document.getElementById(`${tabId}-tab`).classList.add('active');
     });
 });
-

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Kahoot Cheat</title>
+    <title>QuizGPT</title>
     <link rel="stylesheet" href="../styles/styles.css"/>
 </head>
 <body class="popup-container">
@@ -31,27 +31,27 @@
 </div>
 <div id="settingsModal" class="modal hidden">
     <div class="modal-content">
-        <button class="close-modal" title="Schließen">&times;</button>
-        <h2>Einstellungen</h2>
+        <button class="close-modal" title="Close">&times;</button>
+        <h2>Settings</h2>
 
         <div class="settings-tabs">
             <button class="tab-button active" data-tab="openai">OpenAI</button>
-            <button class="tab-button" data-tab="kahoot">KahootGPT</button>
+            <button class="tab-button" data-tab="kahoot">QuizGPT</button>
         </div>
 
         <div class="tab-content active" id="openai-tab">
             <!-- API-Key -->
-            <label for="apiKey">OpenAI API-Key</label>
+            <label for="apiKey">OpenAI API Key</label>
             <input type="password" id="apiKey" placeholder="sk-..." class="text-field" style="width: 100%;"/>
-            <button id="saveApiKey" class="button-secondary" style="margin-top: 8px;">speichern</button>
-            <small id="apiKeyStatus" style="color: white; display: none;">Gespeichert ✅</small>
+            <button id="saveApiKey" class="button-secondary" style="margin-top: 8px;">Save</button>
+            <small id="apiKeyStatus" style="color: white; display: none;">Saved ✅</small>
 
             <!-- Model -->
-            <label for="model" style="margin-top: 14px;">ChatGPT Modell:</label>
+            <label for="model" style="margin-top: 14px;">ChatGPT Model:</label>
             <select id="model" class="select">
-                <option value="gpt-4o" title="Sehr leistungsfähig, gut bei komplexeren Fragen">GPT-4o</option>
-                <option value="gpt-4o-mini" title="Kompakte Version, günstiger">GPT-4o-mini</option>
-                <option value="gpt-3.5-turbo" title="Schnell, günstig, ideal für Standardfragen">GPT-3.5-turbo</option>
+                <option value="gpt-4o" title="Very powerful, good for complex questions">GPT-4o</option>
+                <option value="gpt-4o-mini" title="Compact version, cheaper">GPT-4o-mini</option>
+                <option value="gpt-3.5-turbo" title="Fast, cheap, ideal for standard questions">GPT-3.5-turbo</option>
             </select>
             <small id="model-description" style="display:block; font-size: 0.85em; color: #999;"></small>
         </div>
@@ -60,27 +60,27 @@
             <!-- Options -->
             <label class="checkbox-row">
                 <input type="checkbox" id="highlight" class="checkbox">
-                Highlight richtige Antwort
+                Highlight correct answer
             </label>
 
             <label class="checkbox-row">
                 <input type="checkbox" id="autoclick" class="checkbox">
-                Auto-Klick auf Antwort
+                Auto-click answer
             </label>
         </div>
     </div>
 </div>
 
 <div class="popup-content">
-    <h1 class="title">KahootGPT</h1>
-    <button id="manualButton" class="button">Antwort suchen</button>
+    <h1 class="title">QuizGPT</h1>
+    <button id="manualButton" class="button">Find Answer</button>
     <div id="loadingSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
         <div class="loader"></div>
     </div>
     <div id="extractedData" class="hidden">
-        <h2 class="subtitle">Erkannte Frage:</h2>
+        <h2 class="subtitle">Detected Question:</h2>
         <p id="questionText" class="text-field"></p>
-        <h2 class="subtitle">Gefundene Antwort:</h2>
+        <h2 class="subtitle">Found Answer:</h2>
         <p id="answerText" class="text-field answer"></p>
     </div>
 </div>
