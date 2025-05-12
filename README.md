@@ -7,7 +7,7 @@ Tired of losing every Kahoot quiz? With this Chrome extension, you’ll always h
 Now available in the **Chrome Web Store**! 🚀  
 👉 [coming soon!](https://chrome.google.com/webstore/detail/YOUR-EXTENSION-ID-HERE)
 
-![Screenshot](https://github.com/user-attachments/assets/9426b30b-170c-4a6c-a2fe-28b62a2c544f)
+![Screenshot](https://github.com/user-attachments/assets/ef55a697-9dfc-493c-986d-81d56eb65dd7)
 
 ---
 
