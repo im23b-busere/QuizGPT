@@ -27,9 +27,9 @@ Now available in the **Chrome Web Store**! 🚀
 - ✅ **NEW!** Auto-click the correct answer (optional)
 - Support for multiple GPT models (configurable)
 
-![Screenshot](https://github.com/user-attachments/assets/2bb66fc5-a96b-4dad-9f84-13a95d0230fa)
+![Screenshot](https://github.com/user-attachments/assets/d5edae72-32be-4a63-8acf-6b5c7deb0572)
 
----
+
 
 ## Installation
 
