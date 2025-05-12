@@ -311,6 +311,29 @@ body.popup-container {
     display: block;
 }
 
+.footer-buttons {
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #444;
+    text-align: center;
+}
+
+.footer-link {
+    color: white;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+    color: #DA70D6;
+}
+
+.footer-separator {
+    color: #666;
+    margin: 0 8px;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
