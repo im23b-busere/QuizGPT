@@ -177,31 +177,36 @@ a:hover {
 }
 
 .guide .feature-list li {
-    padding-left: 3rem;
+    padding: 1.2rem;
+    padding-left: 3.5rem;
+    margin-bottom: 1rem;
     background: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 .guide .feature-list li::before {
     content: counter(guide-counter);
     counter-increment: guide-counter;
-    font-size: 1rem;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     line-height: 1;
     background: var(--header-gradient);
-    width: 1.8rem;
-    height: 1.8rem;
+    color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
-    left: 0.8rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -542,5 +547,30 @@ html {
     
     .legal p {
         font-size: 0.95rem;
+    }
+}
+
+.ad-container {
+    max-width: 728px;
+    margin: 0 auto 2rem;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .ad-container {
+        margin-bottom: 1.5rem;
+    }
+}
+
+.native-ad-container {
+    margin: 2rem auto;
+    max-width: 728px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .native-ad-container {
+        margin: 1.5rem auto;
     }
 }
