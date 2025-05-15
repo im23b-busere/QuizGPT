@@ -606,13 +606,22 @@ html {
     
     .sidebar {
         width: 100%;
-        order: -1;
+        order: 1; /* Move sidebar after main content */
     }
     
     .sidebar-ad {
         position: relative;
         top: 0;
-        margin: 0 auto 2rem;
+        margin: 2rem auto;
         max-width: 300px;
+    }
+
+    .ad-container {
+        margin: 1rem auto;
+    }
+
+    /* Hide top banner ad on mobile */
+    .ad-container:first-of-type {
+        display: none;
     }
 }
