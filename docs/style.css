@@ -12,7 +12,7 @@
     --gradient-end: #FF8787;
     --card-gradient: linear-gradient(135deg, #ffffff 0%, #F8F9FA 100%);
     --header-gradient: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    --background-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF6B6B' fill-opacity='0.05'%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='20' text-anchor='middle' dominant-baseline='middle'%3EQ!%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    --background-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FF6B6B' fill-opacity='0.15'%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='20' text-anchor='middle' dominant-baseline='middle'%3EQ!%3C/text%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 body {
@@ -178,22 +178,31 @@ a:hover {
 
 .guide .feature-list li {
     padding-left: 3rem;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .guide .feature-list li::before {
     content: counter(guide-counter);
     counter-increment: guide-counter;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     line-height: 1;
-    background: var(--secondary-background);
-    width: 1.5rem;
-    height: 1.5rem;
+    background: var(--header-gradient);
+    width: 1.8rem;
+    height: 1.8rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--primary-color);
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 code {
@@ -229,34 +238,171 @@ footer a:hover {
 
 @media (max-width: 768px) {
     .navbar {
-        padding: 1rem;
+        padding: 0.8rem 1rem;
+        position: relative;
+    }
+    
+    .navbar-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .navbar-content > div {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        width: 100%;
+    }
+    
+    .navbar a {
+        margin: 0;
+        padding: 0.5rem 1rem;
+        font-size: 0.95rem;
+        background: var(--secondary-background);
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .navbar a:hover {
+        background: var(--primary-light);
+        color: white;
+    }
+    
+    .navbar a::after {
+        display: none;
+    }
+    
+    .navbar a[aria-label="QuizGPT Home"] {
+        font-size: 1.2rem;
+        background: none;
+        padding: 0.5rem 0;
+    }
+    
+    .navbar a[aria-label="QuizGPT Home"]:hover {
+        background: none;
+        color: var(--primary-color);
     }
     
     .container {
         padding: 0 1rem 1rem;
+        max-width: 100%;
     }
     
     h1 {
-        font-size: 2.25rem;
+        font-size: 2rem;
+        margin-bottom: 1rem;
     }
     
     h2 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
+        margin: 1.5rem 0 0.8rem;
     }
-
-    .feature-list li {
-        padding: 1rem 1.2rem;
-        padding-left: 2rem;
-        font-size: 1rem;
-    }
-
+    
     p {
         font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
     }
-
+    
+    .feature-list li {
+        padding: 0.8rem 1rem;
+        padding-left: 2rem;
+        font-size: 0.95rem;
+        margin-bottom: 0.8rem;
+    }
+    
     .store-link {
         padding: 0.8rem 1.5rem;
         font-size: 1.1rem;
+        margin: 1.5rem 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    footer {
+        margin-top: 2rem;
+        padding: 1.5rem 1rem;
+        text-align: center;
+    }
+    
+    footer a {
+        display: inline-block;
+        margin: 0.3rem 0.5rem;
+    }
+    
+    .legal .container {
+        padding: 0 1rem;
+    }
+    
+    .legal h1 {
+        font-size: 1.8rem;
+    }
+    
+    .legal h2 {
+        font-size: 1.3rem;
+    }
+    
+    .legal p {
+        font-size: 0.95rem;
+    }
+    
+    .legal .feature-list li {
+        padding: 0.8rem 1rem;
+        padding-left: 2.5rem;
+    }
+    
+    .guide .feature-list li {
+        padding: 1rem;
+        padding-left: 3rem;
+        margin-bottom: 0.8rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .guide .feature-list li::before {
+        width: 1.8rem;
+        height: 1.8rem;
+        font-size: 1rem;
+        left: 0.8rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--header-gradient);
+        color: white;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    .feature-list li {
+        padding-left: 1.8rem;
+    }
+    
+    .guide .feature-list li {
+        padding: 0.8rem;
+        padding-left: 2.8rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .guide .feature-list li::before {
+        width: 1.6rem;
+        height: 1.6rem;
+        font-size: 0.9rem;
+        left: 0.6rem;
     }
 }
 
