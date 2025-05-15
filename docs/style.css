@@ -574,3 +574,45 @@ html {
         margin: 1.5rem auto;
     }
 }
+
+.content-wrapper {
+    display: flex;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.sidebar {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+.sidebar-ad {
+    position: sticky;
+    top: 100px;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        order: -1;
+    }
+    
+    .sidebar-ad {
+        position: relative;
+        top: 0;
+        margin: 0 auto 2rem;
+        max-width: 300px;
+    }
+}
