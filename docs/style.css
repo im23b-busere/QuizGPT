@@ -576,52 +576,17 @@ html {
 }
 
 .content-wrapper {
-    display: flex;
-    gap: 2rem;
-    max-width: 1200px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 2rem;
 }
 
 .main-content {
-    flex: 1;
-    min-width: 0; /* Prevents flex item from overflowing */
+    width: 100%;
 }
 
-.sidebar {
-    width: 300px;
-    flex-shrink: 0;
-}
-
-.sidebar-ad {
-    position: sticky;
-    top: 100px;
-    margin-bottom: 2rem;
-}
-
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
     .content-wrapper {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        width: 100%;
-        order: 1; /* Move sidebar after main content */
-    }
-    
-    .sidebar-ad {
-        position: relative;
-        top: 0;
-        margin: 2rem auto;
-        max-width: 300px;
-    }
-
-    .ad-container {
-        margin: 1rem auto;
-    }
-
-    /* Hide top banner ad on mobile */
-    .ad-container:first-of-type {
-        display: none;
+        padding: 0 1rem;
     }
 }
