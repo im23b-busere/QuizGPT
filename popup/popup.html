@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kahoot AutoResponder</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Kahoot AutoResponder</h1>
+            <div class="account-status">
+                <div class="user-profile">
+                    <div class="profile-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="profile-info">
+                        <div class="username">User Account</div>
+                        <div class="status-indicator">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Account Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="plan-status">
+                    <div class="plan-header">
+                        <span class="plan-label">Current Plan</span>
+                        <span class="plan-badge">Free</span>
+                    </div>
+                    <div class="plan-features">
+                        <div class="feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Basic Features</span>
+                        </div>
+                        <div class="feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Standard Support</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="account-actions">
+                    <button id="upgradeButton" class="upgrade-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            <path d="M2 2l7.586 7.586"></path>
+                            <circle cx="11" cy="11" r="2"></circle>
+                        </svg>
+                        Upgrade to Premium
+                    </button>
+                    <button class="logout-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings">
+            <div class="setting-group">
+                <label for="modelSelect">AI Model:</label>
+                <select id="modelSelect">
+                    <option value="gpt-4">GPT-4</option>
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label for="apiKey">OpenAI API Key:</label>
+                <div class="api-key-input">
+                    <input type="password" id="apiKey" placeholder="Enter your API key">
+                    <button id="saveKey" class="save-button">Save</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="highlightOption" checked>
+                    Highlight correct answer
+                </label>
+            </div>
+
+            <div class="setting-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="autoClickOption" checked>
+                    Auto-click correct answer
+                </label>
+            </div>
+        </div>
+
+        <div class="question-display">
+            <h2>Current Question</h2>
+            <div id="questionText" class="question-text">No question yet</div>
+            <div id="answerText" class="answer-text"></div>
+        </div>
+
+        <div class="footer">
+            <button id="clearData" class="clear-button">Clear Saved Data</button>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html> 

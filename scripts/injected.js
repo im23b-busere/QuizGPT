@@ -10,7 +10,8 @@ window.kahootDataId = 45;
 
 // Hook into the WebSocket constructor
 window.WebSocket = function (url, protocols) {
-
+    console.log("[AutoClick] WebSocket constructor called with URL:", url);
+    
     // Check if the URL contains "ws.kahoot.it"
     let ws;
     if (protocols) {
@@ -24,6 +25,7 @@ window.WebSocket = function (url, protocols) {
     ws.addEventListener("message", function (event) {
         try {
             const data = JSON.parse(event.data);
+            console.log("[AutoClick] Raw WebSocket message:", event.data);
 
             // convert data to array
             const items = Array.isArray(data) ? data : [data];
@@ -39,36 +41,40 @@ window.WebSocket = function (url, protocols) {
                     console.log("[AutoClick] gameid found:", window.kahootGameId);
                 }
 
+                // Check for question content
                 if (item.data?.content) {
                     try {
+                        console.log("[AutoClick] Found content in message:", item.data.content);
                         const content = JSON.parse(item.data.content);
-                        if (typeof content.questionIndex === "number") {
-                            window.kahootQuestionIndex = content.questionIndex;
-                            console.log("[AutoClick] questionIndex:", window.kahootQuestionIndex);
-                        }
-
-                        if (content.title && content.choices) {
-                            window.kahootCurrentQuestion = {
+                        console.log("[AutoClick] Parsed content:", content);
+                        
+                        // Check if this is a question message
+                        if (content.type === 'quiz' && content.title && content.choices) {
+                            const question = {
                                 title: content.title,
                                 choices: content.choices.map(c => c.answer),
-                                questionIndex: content.questionIndex
+                                questionIndex: content.questionIndex || window.kahootQuestionIndex
                             };
+                            
+                            console.log("[AutoClick] New question detected:", question);
 
-                            console.log("[AutoClick] New question:", window.kahootCurrentQuestion.title, window.kahootCurrentQuestion.choices);
+                            // Update question index
+                            window.kahootQuestionIndex = question.questionIndex;
 
-                            // send question to content script
-                            window.dispatchEvent(new CustomEvent("kahootQuestionParsed", {
-                                detail: {
-                                    title: content.title,
-                                    choices: content.choices.map(c => c.answer),
-                                    questionIndex: content.questionIndex
-                                }
-                            }));
-
-
+                            // Dispatch event to content script
+                            const event = new CustomEvent("kahootQuestionParsed", {
+                                detail: question
+                            });
+                            console.log("[AutoClick] Dispatching kahootQuestionParsed event");
+                            window.dispatchEvent(event);
+                        } else {
+                            console.log("[AutoClick] Not a question message:", content);
                         }
                     } catch (e) {
+                        console.log("[AutoClick] Error parsing content:", e);
                     }
+                } else {
+                    console.log("[AutoClick] No content in message");
                 }
 
                 if (item.id) {
@@ -89,6 +95,22 @@ window.WebSocket = function (url, protocols) {
         } catch (e) {
             console.warn("[AutoClick] Error parsing WS message:", e);
         }
+    });
+
+    // Add connection status logging
+    ws.addEventListener("open", () => {
+        console.log("[AutoClick] WebSocket connection established");
+    });
+
+    ws.addEventListener("close", () => {
+        console.log("[AutoClick] WebSocket connection closed");
+        window.__kahootWS = null;
+        window.kahootClientId = null;
+        window.kahootGameId = null;
+    });
+
+    ws.addEventListener("error", (error) => {
+        console.error("[AutoClick] WebSocket error:", error);
     });
 
     return ws;

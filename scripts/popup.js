@@ -1,211 +1,220 @@
-// Cache DOM elements
-const manualButton = document.getElementById('manualButton');
-const questionText = document.getElementById('questionText');
-const extractedData = document.getElementById('extractedData');
-const answerText = document.getElementById('answerText');
-const settingsButton = document.querySelector('.settings-button');
-const settingsModal = document.getElementById('settingsModal');
-const closeModalBtn = document.querySelector('.close-modal');
+import { authService } from './auth.js';
 
-const modelSelect = document.getElementById('model');
-const modelDescription = document.getElementById('model-description');
-
-const highlightCheckbox = document.getElementById("highlight");
-const autoClickCheckbox = document.getElementById("autoclick");
-
-const apiKeyInput = document.getElementById("apiKey");
-const saveApiKeyBtn = document.getElementById("saveApiKey");
-const apiKeyStatus = document.getElementById("apiKeyStatus");
-
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabContents = document.querySelectorAll('.tab-content');
-
-
-// Show settings on button click
-settingsButton.addEventListener('click', () => {
-    settingsModal.classList.remove('hidden');
-});
-
-// Close settings
-closeModalBtn.addEventListener('click', () => {
-    settingsModal.classList.add('hidden');
-});
-
-// Save selected model to local storage
-modelSelect.addEventListener('change', (event) => {
-    const selectedModel = event.target.value;
-    chrome.storage.local.set({ selectedModel }, () => {
-        console.log('Model saved:', selectedModel);
-    });
-});
-
-// Restore selected model on load
-chrome.storage.local.get(['selectedModel'], (data) => {
-    if (data.selectedModel) {
-        modelSelect.value = data.selectedModel;
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait for auth data to be loaded
+    await authService.loadAuthData();
+    
+    // Check authentication first
+    if (!authService.isAuthenticated()) {
+        console.log('Not authenticated, redirecting to login');
+        window.location.href = 'login.html';
+        return;
     }
-});
 
-// Save checkbox states to local storage
-highlightCheckbox.addEventListener('change', () => {
-    chrome.storage.local.set({ highlightOption: highlightCheckbox.checked }, () => {
-        console.log('Highlight option saved:', highlightCheckbox.checked);
-    });
-});
+    console.log('Authentication successful, initializing popup');
+    // Initialize UI elements
+    const manualButton = document.getElementById('manualButton');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const extractedData = document.getElementById('extractedData');
+    const questionText = document.getElementById('questionText');
+    const answerText = document.getElementById('answerText');
+    const settingsButton = document.querySelector('.settings-button');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeModal = document.querySelector('.close-modal');
+    const highlightCheckbox = document.getElementById('highlight');
+    const autoclickCheckbox = document.getElementById('autoclick');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const membershipStatus = document.getElementById('membershipStatus');
+    const upgradeButton = document.getElementById('upgradeButton');
+    const logoutButton = document.querySelector('.logout-button');
 
-autoClickCheckbox.addEventListener('change', () => {
-    chrome.storage.local.set({ autoClickOption: autoClickCheckbox.checked }, () => {
-        console.log('AutoClick option saved:', autoClickCheckbox.checked);
-    });
-});
+    // Load settings
+    const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption']);
+    if (highlightCheckbox && settings.highlightOption !== undefined) highlightCheckbox.checked = settings.highlightOption;
+    if (autoclickCheckbox && settings.autoClickOption !== undefined) autoclickCheckbox.checked = settings.autoClickOption;
 
-// Restore checkbox states on load
-chrome.storage.local.get(['highlightOption', 'autoClickOption'], (data) => {
-    if (data.highlightOption !== undefined) {
-        highlightCheckbox.checked = data.highlightOption;
-    }
-    if (data.autoClickOption !== undefined) {
-        autoClickCheckbox.checked = data.autoClickOption;
-    }
-});
-
-// Save API key
-saveApiKeyBtn.addEventListener('click', () => {
-    const key = apiKeyInput.value.trim();
-    if (key.startsWith("sk-")) {
-        chrome.storage.local.set({ openaiApiKey: key }, () => {
-            apiKeyStatus.style.display = "inline";
-            setTimeout(() => apiKeyStatus.style.display = "none", 800);
+    // Settings button click handler
+    if (settingsButton) {
+        settingsButton.addEventListener('click', () => {
+            settingsModal.classList.remove('hidden');
         });
-    } else {
-        alert("Please enter a valid OpenAI key (starting with sk-...)");
     }
-});
 
-chrome.storage.local.get(['openaiApiKey'], (data) => {
-    if (data.openaiApiKey) {
-        apiKeyInput.value = data.openaiApiKey;
+    // Close modal button click handler
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            settingsModal.classList.add('hidden');
+        });
     }
-});
 
-// get last question from local storage
-chrome.storage.local.get("lastKahootQuestion", (data) => {
-    if (data.lastKahootQuestion) {
-        const { title, choices } = data.lastKahootQuestion;
-        questionText.innerText = title;
-        answerText.innerText = choices.join(" / ");
-        extractedData.classList.remove('hidden');
+    // Highlight checkbox change handler
+    if (highlightCheckbox) {
+        highlightCheckbox.addEventListener('change', async () => {
+            await chrome.storage.sync.set({ highlightOption: highlightCheckbox.checked });
+        });
     }
-});
 
-// function for spinner
-function showSpinner(button) {
-    button.disabled = true;
-    button.innerHTML = '<div class="loader" style="width: 20px; height: 20px; border-width: 3px;"></div>';
-}
-
-function hideSpinner(button, originalText) {
-    button.disabled = false;
-    button.innerHTML = originalText;
-}
-
-// manual button click
-manualButton.addEventListener('click', async () => {
-    const question = questionText.innerText;
-    const selectedModel = modelSelect.value;
-
-    if (question) {
-        const originalText = manualButton.innerHTML;
-        showSpinner(manualButton);
-
-        try {
-            await getAnswer(question, selectedModel);
-        } finally {
-            setTimeout(() => hideSpinner(manualButton, originalText), 300);
-        }
-    } else {
-        console.error('No question found to send to OpenAI.');
+    // Autoclick checkbox change handler
+    if (autoclickCheckbox) {
+        autoclickCheckbox.addEventListener('change', async () => {
+            await chrome.storage.sync.set({ autoClickOption: autoclickCheckbox.checked });
+        });
     }
-});
 
-// OpenAI request
-async function getAnswer(question, selectedModel) {
-    chrome.storage.local.get("openaiApiKey", async ({ openaiApiKey }) => {
-        if (!openaiApiKey) {
-            alert("Please enter your OpenAI API key in the settings first.");
-            return;
-        }
-
-        const openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
-        const body = {
-            model: selectedModel,
-            messages: [
-                {
-                    role: "system",
-                    content: "I will give you a question and either a multiple choice or true/false answer. Please provide ONLY the correct answer (without the number). Nothing more, nothing less."
-                },
-                { role: "user", content: question }
-            ]
-        };
-
-        try {
-            const response = await fetch(openaiApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${openaiApiKey}`
-                },
-                body: JSON.stringify(body)
+    // Tab switching
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.dataset.tab;
+            
+            // Update active tab button
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Update active tab content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                }
             });
+        });
+    });
 
-            const result = await response.json();
-            if (result.error) {
-                console.error('OpenAI Error:', result.error.message);
-                return;
+    // Logout button click handler
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async () => {
+            await authService.logout();
+            window.location.href = 'login.html';
+        });
+    }
+
+    // Upgrade button click handler
+    if (upgradeButton) {
+        upgradeButton.addEventListener('click', () => {
+            window.open('https://im23b-busere.github.io/QuizGPT/upgrade.html', '_blank');
+        });
+    }
+
+    // Find Answer button click handler
+    if (manualButton) {
+        manualButton.addEventListener('click', async () => {
+            try {
+                loadingSpinner.classList.remove('hidden');
+                manualButton.disabled = true;
+
+                // Get current tab
+                const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+                
+                // Send message to content script to get question
+                const response = await chrome.tabs.sendMessage(tab.id, { action: "getQuestion" });
+                
+                if (response && response.question) {
+                    // Display the question
+                    questionText.textContent = response.question.title;
+                    extractedData.classList.remove('hidden');
+
+                    // Get user settings
+                    const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption']);
+                    
+                    // Format the question for the backend
+                    const fullQuestion = `${response.question.title}\n\nOptions:\n${response.question.choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
+
+                    // Send to backend
+                    const backendResponse = await authService.makeAuthenticatedRequest('http://localhost:3001/api/questions/answer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            question: fullQuestion
+                        })
+                    });
+
+                    if (!backendResponse.ok) {
+                        throw new Error(`HTTP error! status: ${backendResponse.status}`);
+                    }
+
+                    const result = await backendResponse.json();
+                    answerText.textContent = result.answer;
+
+                    // Send answer back to content script
+                    await chrome.tabs.sendMessage(tab.id, {
+                        action: 'highlightAnswer',
+                        answer: result.answer,
+                        options: {
+                            highlight: settings.highlightOption !== false,
+                            autoClick: settings.autoClickOption !== false
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                answerText.textContent = 'Error: ' + error.message;
+            } finally {
+                loadingSpinner.classList.add('hidden');
+                manualButton.disabled = false;
             }
+        });
+    }
 
-            const answer = result.choices[0].message.content.trim();
-
-            chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer }, () => {
-                console.log("Question and answer saved.");
-            });
-
-            answerText.innerText = answer;
-
-            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'highlightAnswer',
-                answer,
-                options: {
-                    highlight: highlightCheckbox.checked,
-                    autoClick: autoClickCheckbox.checked
+    // Update membership status
+    async function updateMembershipStatus() {
+        try {
+            const response = await authService.makeAuthenticatedRequest('http://localhost:3001/api/membership/status');
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Membership data:', data); // Debug log
+                
+                // Update plan badge in the account status section
+                const planBadge = document.querySelector('.plan-badge');
+                if (planBadge) {
+                    const planType = data.plan_type || 'free';
+                    planBadge.textContent = planType.toUpperCase();
                 }
-            }, (response) => {
-                if (chrome.runtime.lastError) {
-                    console.error("Error sending:", chrome.runtime.lastError.message);
-                } else {
-                    console.log("Answer sent:", response);
-                }
-            });
 
-        } catch (err) {
-            console.error('OpenAI fetch error:', err);
+                // Update username in the user profile section
+                const username = document.querySelector('.username');
+                if (username && data.username) {
+                    username.textContent = data.username;
+                }
+
+                // Update status dot and text in the user profile section
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = document.querySelector('.status-text');
+                if (statusDot && statusText) {
+                    const isActive = data.status === 'active';
+                    statusDot.className = `status-dot ${isActive ? '' : 'inactive'}`;
+                    statusText.textContent = isActive ? 'Account Active' : 'Account Inactive';
+                }
+
+                // Update upgrade button visibility
+                const upgradeButton = document.getElementById('upgradeButton');
+                if (upgradeButton) {
+                    upgradeButton.style.display = (data.plan_type === 'free') ? 'flex' : 'none';
+                }
+
+                // Update membership status text in the settings modal
+                const membershipStatus = document.getElementById('membershipStatus');
+                if (membershipStatus) {
+                    membershipStatus.textContent = `${data.plan_type.toUpperCase()} Plan - ${data.status.toUpperCase()}`;
+                }
+            } else {
+                throw new Error('Failed to fetch membership status');
+            }
+        } catch (error) {
+            console.error('Error fetching membership status:', error);
+            const statusText = document.querySelector('.status-text');
+            if (statusText) {
+                statusText.textContent = 'Error loading status';
+            }
+            const membershipStatus = document.getElementById('membershipStatus');
+            if (membershipStatus) {
+                membershipStatus.textContent = 'Error loading status';
+            }
         }
-    });
-}
+    }
 
-// Tab Navigation
-tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        // Remove active class from all buttons and contents
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-
-        // Add active class to clicked button
-        button.classList.add('active');
-
-        // Show corresponding content
-        const tabId = button.getAttribute('data-tab');
-        document.getElementById(`${tabId}-tab`).classList.add('active');
-    });
+    // Initial membership status check
+    await updateMembershipStatus();
 });

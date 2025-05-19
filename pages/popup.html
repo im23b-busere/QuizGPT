@@ -34,47 +34,6 @@
         </svg>
     </button>
 </div>
-<div id="settingsModal" class="modal hidden">
-    <div class="modal-content">
-        <button class="close-modal" title="Close">&times;</button>
-        <h2>Settings</h2>
-
-        <div class="settings-tabs">
-            <button class="tab-button active" data-tab="openai">OpenAI</button>
-            <button class="tab-button" data-tab="kahoot">QuizGPT</button>
-        </div>
-
-        <div class="tab-content active" id="openai-tab">
-            <!-- API-Key -->
-            <label for="apiKey">OpenAI API Key</label>
-            <input type="password" id="apiKey" placeholder="sk-..." class="text-field" style="width: 100%;"/>
-            <button id="saveApiKey" class="button-secondary" style="margin-top: 8px;">Save</button>
-            <small id="apiKeyStatus" style="color: white; display: none;">Saved ✅</small>
-
-            <!-- Model -->
-            <label for="model" style="margin-top: 14px;">ChatGPT Model:</label>
-            <select id="model" class="select">
-                <option value="gpt-4o" title="Very powerful, good for complex questions">GPT-4o</option>
-                <option value="gpt-4o-mini" title="Compact version, cheaper">GPT-4o-mini</option>
-                <option value="gpt-3.5-turbo" title="Fast, cheap, ideal for standard questions">GPT-3.5-turbo</option>
-            </select>
-            <small id="model-description" style="display:block; font-size: 0.85em; color: #999;"></small>
-        </div>
-
-        <div class="tab-content" id="kahoot-tab">
-            <!-- Options -->
-            <label class="checkbox-row">
-                <input type="checkbox" id="highlight" class="checkbox">
-                Highlight correct answer
-            </label>
-
-            <label class="checkbox-row">
-                <input type="checkbox" id="autoclick" class="checkbox">
-                Auto-click answer
-            </label>
-        </div>
-    </div>
-</div>
 
 <div class="popup-content">
     <h1 class="title">QuizGPT</h1>
@@ -93,6 +52,41 @@
         <a href="https://im23b-busere.github.io/QuizGPT/privacy.html" target="_blank" class="footer-link">Privacy</a>
         <span class="footer-separator">•</span>
         <a href="https://im23b-busere.github.io/QuizGPT/terms.html" target="_blank" class="footer-link">Terms</a>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal hidden">
+    <div class="modal-content">
+        <button class="close-modal" title="Close">&times;</button>
+        <h2>Settings</h2>
+
+        <div class="settings-tabs">
+            <button class="tab-button active" data-tab="account">Account</button>
+            <button class="tab-button" data-tab="kahoot">QuizGPT</button>
+        </div>
+
+        <div class="tab-content active" id="account-tab">
+            <div id="userProfile">
+                <h3>Account Status</h3>
+                <p id="membershipStatus">Loading...</p>
+                <button id="upgradeButton" class="button-secondary">Upgrade Plan</button>
+                <button class="logout-button button-secondary" style="margin-top: 10px;">Logout</button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="kahoot-tab">
+            <!-- Options -->
+            <label class="checkbox-row">
+                <input type="checkbox" id="highlight" class="checkbox">
+                Highlight correct answer
+            </label>
+
+            <label class="checkbox-row">
+                <input type="checkbox" id="autoclick" class="checkbox">
+                Auto-click answer
+            </label>
+        </div>
     </div>
 </div>
 

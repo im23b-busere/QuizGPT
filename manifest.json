@@ -13,7 +13,10 @@
     "default_title": "QuizGPT"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "identity",
+    "tabs",
+    "activeTab"
   ],
   "content_scripts": [
     {
@@ -23,20 +26,23 @@
       "js": [
         "scripts/content.js"
       ],
-      "run_at": "document_start"
+      "run_at": "document_start",
+      "all_frames": true
     }
   ],
   "web_accessible_resources": [
     {
       "resources": ["scripts/injected.js"],
-      "matches": ["<all_urls>"]
+      "matches": ["*://*.kahoot.it/*"]
     }
   ],
   "background": {
-    "service_worker": "scripts/autoresponder.js"
+    "service_worker": "scripts/autoresponder.js",
+    "type": "module"
   },
   "host_permissions": [
-    "*://kahoot.it/*"
+    "*://*.kahoot.it/*",
+    "http://localhost:3001/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"

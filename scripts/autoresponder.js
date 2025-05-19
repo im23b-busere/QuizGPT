@@ -1,61 +1,77 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "getOpenAIAnswer") {
-        const { question, model, highlight, autoClick } = request.payload;
-        getAnswerFromOpenAI(question, model, highlight, autoClick);
-    }
+import { authService } from './auth.js';
+
+// Initialize auth state
+authService.loadAuthData().catch(error => {
+    console.error('[AutoResponder] Error loading auth data:', error);
 });
 
-// get the answer from OpenAI
-async function getAnswerFromOpenAI(question, selectedModel, highlight = true, autoClick = true) {
-    chrome.storage.local.get("openaiApiKey", async ({ openaiApiKey }) => {
-        if (!openaiApiKey) {
-            console.error("[AutoResponder] Kein OpenAI API-Key gespeichert.");
+// Listen for messages from content script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('[AutoResponder] Received message:', request);
+    
+    if (request.action === "processQuestion") {
+        // Send immediate response to keep the port open
+        sendResponse({ received: true });
+        
+        // Process the question asynchronously
+        processQuestionWithBackend(request.question, sender.tab.id)
+            .then(() => {
+                console.log('[AutoResponder] Question processed successfully');
+            })
+            .catch(error => {
+                console.error('[AutoResponder] Error processing question:', error);
+            });
+    }
+    return true; // Keep the message channel open
+});
+
+// Process question through backend
+async function processQuestionWithBackend(question, tabId) {
+    try {
+        // Check if we're authenticated
+        if (!authService.isAuthenticated()) {
+            console.log('[AutoResponder] Not authenticated, skipping question');
             return;
         }
 
-        const openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
+        // Get user settings
+        const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption']);
+        
+        // Format the question for the backend
+        const fullQuestion = `${question.title}\n\nOptions:\n${question.choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
 
-        const body = {
-            model: selectedModel,
-            messages: [
-                {
-                    role: "system",
-                    content: "I will give you a question and either a multiple choice or true/false answer. Please provide ONLY the correct answer (without the number). Nothing more, nothing less."
-                },
-                { role: "user", content: question }
-            ]
-        };
+        console.log('[AutoResponder] Sending question to backend:', fullQuestion);
 
-        try {
-            const response = await fetch(openaiApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${openaiApiKey}`
-                },
-                body: JSON.stringify(body)
-            });
+        // Send to backend using authService
+        const response = await authService.makeAuthenticatedRequest('http://localhost:3001/api/questions/answer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                question: fullQuestion
+            })
+        });
 
-            const result = await response.json();
-            if (result.error) {
-                console.error('[AutoResponder] OpenAI error:', result.error.message);
-                return;
-            }
-
-            const answer = result.choices[0].message.content.trim();
-            console.log('[AutoResponder] Antwort:', answer);
-
-            chrome.storage.local.set({ savedQuestion: question, savedAnswer: answer });
-
-            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'highlightAnswer',
-                answer,
-                options: { highlight, autoClick }
-            });
-
-        } catch (err) {
-            console.error('[AutoResponder] Fetch error:', err);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    });
+
+        const result = await response.json();
+        console.log('[AutoResponder] Answer from backend:', result.answer);
+
+        // Send the answer back to the content script
+        await chrome.tabs.sendMessage(tabId, {
+            action: 'highlightAnswer',
+            answer: result.answer,
+            options: {
+                highlight: settings.highlightOption !== false,
+                autoClick: settings.autoClickOption !== false
+            }
+        });
+
+    } catch (err) {
+        console.error('[AutoResponder] Error processing question:', err);
+        throw err;
+    }
 }

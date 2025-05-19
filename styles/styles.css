@@ -352,19 +352,160 @@ body.popup-container {
     width: 60px;
     height: 60px;
     animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
 }
 
-.button .loader {
-    width: 20px;
-    height: 20px;
-    border-width: 3px;
+#loadingSpinner {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#loadingSpinner.hidden {
+    display: none;
 }
 
 @keyframes spin {
     0% {
-        transform: rotate(0deg);
+        transform: translate(-50%, -50%) rotate(0deg);
     }
     100% {
-        transform: rotate(360deg);
+        transform: translate(-50%, -50%) rotate(360deg);
     }
+}
+
+/* Authentication Styles */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.auth-form .text-field {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: white;
+}
+
+.auth-form .text-field:focus {
+    outline: none;
+    border-color: #666;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 12px;
+    color: #999;
+}
+
+.auth-switch a {
+    color: #4a9eff;
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #ff4d4d;
+    text-align: center;
+    margin-top: 12px;
+    padding: 8px;
+    background-color: rgba(255, 77, 77, 0.1);
+    border-radius: 4px;
+}
+
+/* User Profile Section */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 8px;
+    background-color: #2a2a2a;
+    border-radius: 4px;
+}
+
+.user-profile .username {
+    font-weight: bold;
+    color: white;
+}
+
+.user-profile .membership-badge {
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    background-color: #4a9eff;
+    color: white;
+}
+
+.user-profile .membership-badge.premium {
+    background-color: #ffd700;
+    color: #000;
+}
+
+.logout-button {
+    margin-left: auto;
+    padding: 4px 8px;
+    background-color: transparent;
+    border: 1px solid #666;
+    border-radius: 4px;
+    color: #999;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background-color: #333;
+    color: white;
+}
+
+.question-section {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.question-section .subtitle {
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.question-section .text-field {
+    color: #fff;
+    font-size: 14px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.question-choices {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.question-choices li {
+    padding: 8px 0;
+    color: #fff;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.question-choices li:last-child {
+    border-bottom: none;
 }
