@@ -5,7 +5,7 @@ Tired of losing every Kahoot quiz? With this Chrome extension, you’ll always h
 **QuizGPT** analyzes questions live through the WebSocket connection and uses **OpenAI's GPT** to determine the correct answer in real time.
 
 Now available in the **Chrome Web Store**! 🚀  
-👉 [coming soon!](https://chrome.google.com/webstore/detail/YOUR-EXTENSION-ID-HERE)
+👉 [Get it here](https://chromewebstore.google.com/detail/QuizGPT/bnaoghpmdonopfhepombafeekbaopejl)
 
 ![Screenshot](https://github.com/user-attachments/assets/ef55a697-9dfc-493c-986d-81d56eb65dd7)
 
@@ -34,7 +34,7 @@ Now available in the **Chrome Web Store**! 🚀
 ## Installation
 
 ### 🧩 From the Chrome Web Store (recommended)
-1. Go to the [Chrome Web Store page](https://chrome.google.com/webstore/detail/YOUR-EXTENSION-ID-HERE)
+1. Go to the [Chrome Web Store page](https://chromewebstore.google.com/detail/QuizGPT/bnaoghpmdonopfhepombafeekbaopejl)
 2. Click **"Add to Chrome"**
 3. Open the extension popup and enter your OpenAI API key
 
