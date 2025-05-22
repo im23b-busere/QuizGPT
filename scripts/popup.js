@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const fullQuestion = `${response.question.title}\n\nOptions:\n${response.question.choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
 
                     // Send to backend
-                    const backendResponse = await authService.makeAuthenticatedRequest('http://localhost:3001/api/questions/answer', {
+                    const backendResponse = await authService.makeAuthenticatedRequest('http://91.99.69.198:3001/api/questions/answer', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Update membership status
     async function updateMembershipStatus() {
         try {
-            const response = await authService.makeAuthenticatedRequest('http://localhost:3001/api/membership/status');
+            const response = await authService.makeAuthenticatedRequest('http://91.99.69.198:3001/api/membership/status');
             if (response.ok) {
                 const data = await response.json();
                 console.log('Membership data:', data); // Debug log

@@ -41,8 +41,8 @@
     "type": "module"
   },
   "host_permissions": [
-    "*://*.kahoot.it/*",
-    "http://localhost:3001/*"
+    "https://*.kahoot.it/*",
+    "http://91.99.69.198:3001/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"

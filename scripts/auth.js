@@ -1,22 +1,40 @@
-const API_URL = 'http://localhost:3001/api'; // Change this to your production URL when deploying
+const API_URL = 'http://91.99.69.198:3001/api'; // Production server on Hetzner
 
 class AuthService {
     constructor() {
         this.token = null;
         this.user = null;
-        this.loadAuthData();
+        this.initialized = false;
+        this.initializing = false;
     }
 
     async loadAuthData() {
+        if (this.initializing) {
+            console.log('Auth initialization already in progress');
+            return;
+        }
+
+        this.initializing = true;
         try {
             const data = await chrome.storage.sync.get(['token', 'user']);
             console.log('Loaded auth data:', data);
-            this.token = data.token;
-            this.user = data.user;
+            
+            if (data.token) {
+                this.token = data.token;
+                this.user = data.user;
+                console.log('Auth data loaded successfully');
+            } else {
+                console.log('No auth data found in storage');
+            }
+            
+            this.initialized = true;
             return !!this.token;
         } catch (error) {
             console.error('Error loading auth data:', error);
+            this.initialized = true;
             return false;
+        } finally {
+            this.initializing = false;
         }
     }
 
@@ -43,15 +61,14 @@ class AuthService {
             return data;
         } catch (error) {
             console.error('Token refresh error:', error);
-            // If refresh fails, clear auth data and redirect to login
-            await this.logout();
             throw error;
         }
     }
 
     async makeAuthenticatedRequest(url, options = {}) {
         try {
-            if (!this.token) {
+            const token = await this.getToken();
+            if (!token) {
                 throw new Error('Not authenticated');
             }
 
@@ -59,75 +76,99 @@ class AuthService {
                 ...options,
                 headers: {
                     ...options.headers,
-                    'Authorization': `Bearer ${this.token}`,
-                },
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
-            // If token expired, try to refresh it
-            if (response.status === 401) {
-                await this.refreshToken();
-                // Retry the original request with new token
-                return fetch(url, {
-                    ...options,
-                    headers: {
-                        ...options.headers,
-                        'Authorization': `Bearer ${this.token}`,
-                    },
-                });
+            if (!response.ok) {
+                if (response.status === 403) {
+                    throw new Error('Du hast dein kostenloses Kontingent aufgebraucht. Upgrade auf Premium für unbegrenzten Zugriff auf QuizGPT!');
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             return response;
         } catch (error) {
-            console.error('Authenticated request error:', error);
+            console.error('[Auth] Request failed:', error);
             throw error;
+        }
+    }
+
+    async checkServerConnection() {
+        try {
+            const response = await fetch(`${API_URL}/auth/health`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                timeout: 5000 // 5 second timeout
+            });
+            return response.ok;
+        } catch (error) {
+            console.error('Server connection check failed:', error);
+            return false;
         }
     }
 
     async register(username, email, password) {
         try {
+            console.log('Attempting to connect to server:', API_URL);
             console.log('Registering with:', { username, email });
+            
             const response = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, email, password }),
+                timeout: 10000 // 10 second timeout
             });
 
-            const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.message || 'Registration failed');
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Registration failed with status: ${response.status}`);
             }
 
+            const data = await response.json();
             await this.setAuthData(data.token, data.user);
             return data;
         } catch (error) {
             console.error('Registration error:', error);
+            if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                throw new Error('Unable to connect to server. Please check your internet connection and try again.');
+            }
             throw error;
         }
     }
 
     async login(email, password) {
         try {
+            console.log('Attempting to connect to server:', API_URL);
             console.log('Logging in with:', { email });
+            
             const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ email, password }),
+                timeout: 10000 // 10 second timeout
             });
 
-            const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.message || 'Login failed');
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Login failed with status: ${response.status}`);
             }
 
+            const data = await response.json();
             console.log('Login successful, setting auth data:', data);
             await this.setAuthData(data.token, data.user);
             return data;
         } catch (error) {
             console.error('Login error:', error);
+            if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                throw new Error('Unable to connect to server. Please check your internet connection and try again.');
+            }
             throw error;
         }
     }
@@ -172,8 +213,12 @@ class AuthService {
     }
 
     isAuthenticated() {
+        if (!this.initialized) {
+            console.log('Auth not initialized yet');
+            return false;
+        }
         const isAuth = !!this.token;
-        console.log('Checking authentication:', { isAuth, token: this.token });
+        console.log('Checking authentication:', { isAuth, token: this.token ? this.token.substring(0, 10) + '...' : null });
         return isAuth;
     }
 

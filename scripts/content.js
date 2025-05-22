@@ -18,6 +18,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ success: true });
     } else if (request.action === "getQuestion") {
         sendResponse({ question: currentQuestion });
+    } else if (request.action === "showAuthError") {
+        if (request.message.includes('free tier limit') || request.message.includes('Free tier limit')) {
+            showPremiumUpgradeMessage();
+        } else {
+            // Show regular error message
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ff4444;
+                color: white;
+                padding: 15px;
+                border-radius: 5px;
+                z-index: 9999;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            `;
+            errorDiv.textContent = request.message;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+        sendResponse({ success: true });
     }
     return true;
 });
@@ -228,3 +250,102 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Function to show premium upgrade message
+function showPremiumUpgradeMessage() {
+    // Create message container
+    const container = document.createElement('div');
+    container.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 9999;
+        text-align: center;
+        max-width: 400px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    `;
+
+    // Add title
+    const title = document.createElement('h2');
+    title.textContent = 'Free Tier Limit Reached';
+    title.style.cssText = `
+        color: #ff4444;
+        margin: 0 0 15px 0;
+        font-size: 24px;
+    `;
+    container.appendChild(title);
+
+    // Add message
+    const message = document.createElement('p');
+    message.textContent = 'You have used all 5 free quiz attempts. Upgrade to premium for unlimited access!';
+    message.style.cssText = `
+        margin: 0 0 20px 0;
+        font-size: 16px;
+        line-height: 1.5;
+    `;
+    container.appendChild(message);
+
+    // Add upgrade button
+    const button = document.createElement('button');
+    button.textContent = 'Upgrade to Premium';
+    button.style.cssText = `
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+    `;
+    button.onmouseover = () => button.style.background = '#45a049';
+    button.onmouseout = () => button.style.background = '#4CAF50';
+    button.onclick = () => {
+        window.open('https://quizgpt.ch/premium', '_blank');
+        container.remove();
+    };
+    container.appendChild(button);
+
+    // Add close button
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '×';
+    closeButton.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    `;
+    closeButton.onclick = () => container.remove();
+    container.appendChild(closeButton);
+
+    // Add to page
+    document.body.appendChild(container);
+
+    // Add overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9998;
+    `;
+    overlay.onclick = () => {
+        container.remove();
+        overlay.remove();
+    };
+    document.body.appendChild(overlay);
+}
