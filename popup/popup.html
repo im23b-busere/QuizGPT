@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Kahoot AutoResponder</title>
-    <link rel="stylesheet" href="popup.css">
+    <link rel="stylesheet" href="../styles/styles.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>Kahoot AutoResponder</h1>
-            <div class="account-status">
+            <div class="account-section">
                 <div class="user-profile">
                     <div class="profile-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -74,7 +74,7 @@
         <div class="settings">
             <div class="setting-group">
                 <label for="modelSelect">AI Model:</label>
-                <select id="modelSelect">
+                <select id="modelSelect" class="select">
                     <option value="gpt-4">GPT-4</option>
                     <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
                 </select>
@@ -83,34 +83,34 @@
             <div class="setting-group">
                 <label for="apiKey">OpenAI API Key:</label>
                 <div class="api-key-input">
-                    <input type="password" id="apiKey" placeholder="Enter your API key">
-                    <button id="saveKey" class="save-button">Save</button>
+                    <input type="password" id="apiKey" class="text-field" placeholder="Enter your API key">
+                    <button id="saveKey" class="button">Save</button>
                 </div>
             </div>
 
             <div class="setting-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="highlightOption" checked>
+                    <input type="checkbox" id="highlightOption" class="checkbox" checked>
                     Highlight correct answer
                 </label>
             </div>
 
             <div class="setting-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="autoClickOption" checked>
+                    <input type="checkbox" id="autoClickOption" class="checkbox" checked>
                     Auto-click correct answer
                 </label>
             </div>
         </div>
 
-        <div class="question-display">
-            <h2>Current Question</h2>
-            <div id="questionText" class="question-text">No question yet</div>
+        <div class="question-section">
+            <h2 class="subtitle">Current Question</h2>
+            <div id="questionText" class="text-field">No question yet</div>
             <div id="answerText" class="answer-text"></div>
         </div>
 
         <div class="footer">
-            <button id="clearData" class="clear-button">Clear Saved Data</button>
+            <button id="clearData" class="button-secondary">Clear Saved Data</button>
         </div>
     </div>
     <script src="popup.js"></script>

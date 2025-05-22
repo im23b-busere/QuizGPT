@@ -125,7 +125,7 @@ body.popup-container {
 .modal-content {
     background: #1e1e1e;
     border: 1px solid #444;
-    padding: 30px 25px 20px 25px;
+    padding: 16px;
     border-radius: 14px;
     height: 100%;
     width: 100%;
@@ -215,7 +215,6 @@ body.popup-container {
     color: #fff;
     background-color: rgba(255, 255, 255, 0.1);
     transform: scale(1.1);
-
 }
 
 .button-secondary {
@@ -261,7 +260,7 @@ body.popup-container {
 .settings-tabs {
     display: flex;
     gap: 0;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     border-bottom: 1px solid #444;
     padding-bottom: 10px;
     width: 100%;
@@ -269,11 +268,11 @@ body.popup-container {
 
 .tab-button {
     flex: 1;
-    padding: 8px 12px;
+    padding: 6px 12px;
     background: transparent;
     border: none;
     color: #999;
-    font-size: 0.95em;
+    font-size: 13px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -305,6 +304,7 @@ body.popup-container {
     width: 100%;
     height: 100%;
     display: none;
+    padding: 8px 0;
 }
 
 .tab-content.active {
@@ -508,4 +508,156 @@ body.popup-container {
 
 .question-choices li:last-child {
     border-bottom: none;
+}
+
+/* Account Section Styles */
+.account-section {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.profile-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.profile-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.username {
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background: #4CAF50;
+    border-radius: 50%;
+}
+
+.status-text {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.plan-status {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 12px;
+}
+
+.plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.plan-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.plan-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #fff;
+}
+
+.plan-features {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.feature svg {
+    width: 14px;
+    height: 14px;
+    color: #4CAF50;
+}
+
+.account-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.upgrade-button, .logout-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.upgrade-button {
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+}
+
+.upgrade-button:hover {
+    background: #45a049;
+}
+
+.logout-button {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logout-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.upgrade-button svg, .logout-button svg {
+    width: 14px;
+    height: 14px;
 }
