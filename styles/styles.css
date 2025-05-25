@@ -395,11 +395,12 @@ body.popup-container {
 
 .auth-form .text-field {
     width: 100%;
-    padding: 8px 12px;
+    padding: 8px;
     border: 1px solid #444;
     border-radius: 4px;
     background-color: #2a2a2a;
     color: white;
+    box-sizing: border-box;
 }
 
 .auth-form .text-field:focus {
