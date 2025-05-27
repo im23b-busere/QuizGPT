@@ -171,18 +171,8 @@ a:hover {
     border-radius: 8px;
     border: 1px solid var(--border-color);
     position: relative;
-    padding-left: 2.5rem;
     font-size: 1.1rem;
     line-height: 1.6;
-}
-
-.feature-list li::before {
-    content: "•";
-    position: absolute;
-    left: 1rem;
-    color: var(--primary-color);
-    font-size: 1.5rem;
-    line-height: 1;
 }
 
 /* Guide page specific styles */

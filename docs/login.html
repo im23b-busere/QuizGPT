@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>QuizGPT - Login</title>
+    <link rel="stylesheet" href="style.css"/>
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .auth-form h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .auth-form .text-field {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #2a2a2a;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .auth-form .text-field:focus {
+            outline: none;
+            border-color: #8A2BE2;
+        }
+
+        .auth-form .button {
+            background-image: linear-gradient(30deg, #8A2BE2, #DA70D6);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 300ms;
+        }
+
+        .auth-form .button:hover {
+            background-position: right center;
+            background-size: 200% auto;
+            animation: pulse 1.5s infinite;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 12px;
+            color: #999;
+        }
+
+        .auth-switch a {
+            color: #8A2BE2;
+            text-decoration: none;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            text-align: center;
+            margin-top: 12px;
+            padding: 8px;
+            background-color: rgba(255, 77, 77, 0.1);
+            border-radius: 4px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 #8A2BE266;
+            }
+            70% {
+                box-shadow: 0 0 0 10px #DA70D600;
+            }
+            100% {
+                box-shadow: 0 0 0 0 #DA70D600;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div id="loginForm" class="auth-form">
+            <h2>Login</h2>
+            <input type="email" id="loginEmail" placeholder="Email" class="text-field" required/>
+            <input type="password" id="loginPassword" placeholder="Password" class="text-field" required/>
+            <button id="loginButton" class="button">Login</button>
+            <p class="auth-switch">Don't have an account? <a href="#" id="showRegister">Register</a></p>
+        </div>
+
+        <div id="registerForm" class="auth-form hidden">
+            <h2>Register</h2>
+            <input type="text" id="registerUsername" placeholder="Username" class="text-field" required/>
+            <input type="email" id="registerEmail" placeholder="Email" class="text-field" required/>
+            <input type="password" id="registerPassword" placeholder="Password" class="text-field" required/>
+            <button id="registerButton" class="button">Register</button>
+            <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login</a></p>
+        </div>
+
+        <div id="errorMessage" class="error-message hidden"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const showRegisterLink = document.getElementById('showRegister');
+            const showLoginLink = document.getElementById('showLogin');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Show/hide forms
+            showRegisterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+            });
+
+            showLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+            });
+
+            // Handle login
+            document.getElementById('loginButton').addEventListener('click', async () => {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                try {
+                    const response = await fetch('https://api.quizgpt.com/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Invalid email or password');
+                    }
+
+                    const data = await response.json();
+                    localStorage.setItem('authToken', data.token);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    showError(error.message);
+                }
+            });
+
+            // Handle registration
+            document.getElementById('registerButton').addEventListener('click', async () => {
+                const username = document.getElementById('registerUsername').value;
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+
+                try {
+                    const response = await fetch('https://api.quizgpt.com/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, email, password }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Registration failed. Please try again.');
+                    }
+
+                    const data = await response.json();
+                    localStorage.setItem('authToken', data.token);
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    showError(error.message);
+                }
+            });
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html> 
