@@ -436,16 +436,19 @@ body.popup-container {
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-    padding: 8px;
+    gap: 10px;
+    padding: 10px;
     background-color: #2a2a2a;
-    border-radius: 4px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: left;
 }
 
 .user-profile .username {
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 500;
     color: white;
+    margin: 0;
 }
 
 .user-profile .membership-badge {
@@ -669,4 +672,58 @@ body.popup-container {
     width: 14px;
     height: 14px;
     stroke: currentColor;
+}
+
+/* Code input styles */
+.code-input-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#codeInput {
+    width: 200px;
+    text-align: center;
+    letter-spacing: 4px;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 8px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: white;
+}
+
+.info-text {
+    color: #666;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.button.secondary {
+    background-color: #f0f0f0;
+    color: #333;
+    margin-top: 10px;
+}
+
+.button.secondary:hover {
+    background-color: #e0e0e0;
+}
+
+.button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Error message styles */
+.error-message {
+    color: #dc3545;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.hidden {
+    display: none;
 }

@@ -10,21 +10,23 @@
     <div class="popup-content">
         <h1 class="title">QuizGPT</h1>
         
-        <div id="loginForm" class="auth-form">
-            <h2 class="subtitle">Login</h2>
-            <input type="email" id="loginEmail" placeholder="Email" class="text-field" required/>
-            <input type="password" id="loginPassword" placeholder="Password" class="text-field" required/>
-            <button id="loginButton" class="button">Login</button>
-            <p class="auth-switch">Don't have an account? <a href="#" id="showRegister">Register</a></p>
+        <div id="emailForm" class="auth-form">
+            <h2 class="subtitle">Login with Email</h2>
+            <input type="email" id="emailInput" placeholder="Enter your email" class="text-field" required/>
+            <button id="requestCodeButton" class="button">Send Code</button>
+            <div id="emailError" class="error-message hidden"></div>
+            <p class="auth-switch">Don't have an account? <a href="register.html">Register</a></p>
         </div>
 
-        <div id="registerForm" class="auth-form hidden">
-            <h2 class="subtitle">Register</h2>
-            <input type="text" id="registerUsername" placeholder="Username" class="text-field" required/>
-            <input type="email" id="registerEmail" placeholder="Email" class="text-field" required/>
-            <input type="password" id="registerPassword" placeholder="Password" class="text-field" required/>
-            <button id="registerButton" class="button">Register</button>
-            <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Login</a></p>
+        <div id="codeForm" class="auth-form hidden">
+            <h2 class="subtitle">Enter Code</h2>
+            <p class="info-text">We sent a 6-digit code to your email</p>
+            <div class="code-input-container">
+                <input type="text" id="codeInput" placeholder="Enter 6-digit code" class="text-field" maxlength="6" pattern="[0-9]*" inputmode="numeric" required/>
+            </div>
+            <button id="verifyCodeButton" class="button">Verify Code</button>
+            <button id="resendCodeButton" class="button secondary">Resend Code</button>
+            <div id="codeError" class="error-message hidden"></div>
         </div>
 
         <div id="errorMessage" class="error-message hidden"></div>

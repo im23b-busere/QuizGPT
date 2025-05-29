@@ -37,21 +37,25 @@
 
 <div class="popup-content">
     <h1 class="title">QuizGPT</h1>
-    <button id="manualButton" class="button">Find Answer</button>
-    <div id="loadingSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
-        <div class="loader"></div>
-    </div>
-    <div id="extractedData" class="hidden">
-        <h2 class="subtitle">Detected Question:</h2>
-        <p id="questionText" class="text-field"></p>
-        <h2 class="subtitle">Found Answer:</h2>
-        <p id="answerText" class="text-field answer"></p>
-    </div>
     
-    <div class="footer-buttons">
-        <a href="https://im23b-busere.github.io/QuizGPT/privacy.html" target="_blank" class="footer-link">Privacy</a>
-        <span class="footer-separator">•</span>
-        <a href="https://im23b-busere.github.io/QuizGPT/terms.html" target="_blank" class="footer-link">Terms</a>
+    <div id="userProfile" class="user-profile">
+        <div class="profile-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        </div>
+        <div class="profile-info">
+            <div id="username" class="username">Loading...</div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span class="status-text">Online</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainContent">
+        <!-- Main content will be loaded here -->
     </div>
 </div>
 
