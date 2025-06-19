@@ -7,13 +7,23 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body class="upgrade-page">
-    <div class="container">
+    <div class="container" id="upgradeContainer">
         <h1>Upgrade to Premium</h1>
         <p>Get unlimited access to QuizGPT features by upgrading to Premium!</p>
         <button id="buyPremiumBtn" class="button">Buy Premium</button>
         <div id="errorMessage" class="error-message" style="display:none;"></div>
     </div>
+    <div class="container" id="cancelContainer" style="display:none;">
+        <h1>Payment Canceled</h1>
+        <p>Your payment was canceled. No money was charged.</p>
+        <a href="upgrade.html" class="button">Try Again</a>
+    </div>
     <script>
+    // Show cancel message if canceled=1 in URL
+    if (window.location.search.includes('canceled=1')) {
+        document.getElementById('upgradeContainer').style.display = 'none';
+        document.getElementById('cancelContainer').style.display = 'block';
+    }
     document.getElementById('buyPremiumBtn').addEventListener('click', async () => {
         const btn = document.getElementById('buyPremiumBtn');
         const errorDiv = document.getElementById('errorMessage');
