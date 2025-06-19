@@ -19,6 +19,12 @@
         <a href="upgrade.html" class="button">Try Again</a>
     </div>
     <script>
+    // Store token from URL param if present
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get('token');
+    if (urlToken) {
+        localStorage.setItem('token', urlToken);
+    }
     // Show cancel message if canceled=1 in URL
     if (window.location.search.includes('canceled=1')) {
         document.getElementById('upgradeContainer').style.display = 'none';

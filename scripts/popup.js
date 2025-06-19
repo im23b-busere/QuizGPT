@@ -141,8 +141,18 @@ function initializeEventListeners() {
 
     // Upgrade button click handler
     if (upgradeButton) {
-        upgradeButton.addEventListener('click', () => {
-            window.open('https://im23b-busere.github.io/QuizGPT/upgrade.html', '_blank');
+        upgradeButton.addEventListener('click', async () => {
+            let token = authService.token;
+            if (!token) {
+                // Try to load from chrome.storage
+                const data = await chrome.storage.sync.get(['token']);
+                token = data.token;
+            }
+            if (!token) {
+                alert('You must be logged in to upgrade.');
+                return;
+            }
+            window.open(`https://quizgpt.site/docs/upgrade.html?token=${encodeURIComponent(token)}`, '_blank');
         });
     }
 
