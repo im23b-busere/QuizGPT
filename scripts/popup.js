@@ -229,5 +229,31 @@ async function handleManualButtonClick() {
     }
 }
 
+// Listen for refreshMembership message from success page
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "refreshMembership") {
+    // Re-fetch membership status from backend
+    authService.loadAuthData().then(async () => {
+      // Optionally, update UI or show a thank you message
+      // Fetch latest plan status
+      try {
+        const response = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/membership/status');
+        if (response.ok) {
+          const data = await response.json();
+          const planType = data.plan_type || data.planType || 'free';
+          if (planType.toLowerCase() === 'premium') {
+            alert('Thank you for purchasing QuizGPT Premium! Have fun 🎉');
+          }
+          // Optionally update the UI
+          updatePlanStatus(planType);
+        }
+      } catch (e) {
+        // fallback: just show thank you
+        alert('Thank you for purchasing QuizGPT Premium! Have fun 🎉');
+      }
+    });
+  }
+});
+
 // Initialize
 document.addEventListener('DOMContentLoaded', checkAuth);

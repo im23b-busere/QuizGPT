@@ -12,5 +12,15 @@
         <p>Your payment was successful. Your premium access will be activated shortly.</p>
         <a href="../popup.html" class="button">Back to QuizGPT</a>
     </div>
+    <script>
+    // Notify the extension to refresh membership status
+    if (window.chrome && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({ action: "refreshMembership" });
+    }
+    // Show a thank you message (in case the extension popup is open)
+    setTimeout(() => {
+      alert("Thank you for purchasing QuizGPT Premium! Have fun 🎉");
+    }, 500);
+    </script>
 </body>
 </html> 
