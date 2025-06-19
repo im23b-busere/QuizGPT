@@ -1,5 +1,4 @@
-import { API_URL } from '../js/config.js';
-import { showError, hideError } from '../js/utils.js';
+console.log('login.js loaded');
 import { authService } from './auth.js';
 
 // DOM Elements
@@ -18,10 +17,26 @@ const emailSection = document.getElementById('emailSection');
 
 let currentEmail = '';
 
+// TEMP: Inline API_URL and showError/hideError if missing
+const API_URL = 'http://91.99.69.198:3001/api';
+function showError(element, message) {
+    if (element) {
+        element.textContent = message;
+        element.classList.remove('hidden');
+    }
+}
+function hideError(element) {
+    if (element) {
+        element.textContent = '';
+        element.classList.add('hidden');
+    }
+}
+
 // Request login code
 async function requestCode() {
     try {
         const email = emailInput.value.trim();
+        console.log('[requestCode] Email entered:', email);
         if (!email) {
             showError(emailError, 'Please enter your email');
             return;
@@ -40,20 +55,35 @@ async function requestCode() {
 
         // Check if user exists
         const userExists = await checkUserExists(email);
+        console.log('[requestCode] userExists:', userExists);
         if (!userExists) {
             showError(emailError, 'No account found with this email. Please register first.');
             requestCodeButton.disabled = false;
             requestCodeButton.textContent = 'Send Code';
             return;
         }
-        
-        await requestCode(email);
-        
-        requestCodeButton.disabled = false;
-        requestCodeButton.textContent = 'Send Code';
+
+        // Call backend to send code
+        const response = await fetch(`${API_URL}/auth/request-code`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
+        if (!response.ok) {
+            const data = await response.json();
+            showError(emailError, data.message || 'Failed to send code');
+            return;
+        }
+
+        // Show code form
+        emailForm.classList.add('hidden');
+        codeForm.classList.remove('hidden');
+        currentEmail = email;
     } catch (error) {
         console.error('Code request error:', error);
-        showError(error.message);
+        showError(emailError, error.message || 'Error sending code');
     } finally {
         requestCodeButton.disabled = false;
         requestCodeButton.textContent = 'Send Code';
@@ -97,6 +127,7 @@ async function verifyCode() {
 // Check if user exists
 async function checkUserExists(email) {
     try {
+        console.log('[checkUserExists] Checking user:', email);
         const response = await fetch(`${API_URL}/auth/check-user`, {
             method: 'POST',
             headers: {
@@ -104,8 +135,8 @@ async function checkUserExists(email) {
             },
             body: JSON.stringify({ email })
         });
-
         const data = await response.json();
+        console.log('[checkUserExists] Response:', data);
         return data.exists;
     } catch (error) {
         console.error('Error checking user:', error);
