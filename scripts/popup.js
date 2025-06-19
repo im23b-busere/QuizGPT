@@ -152,7 +152,7 @@ function initializeEventListeners() {
                 alert('You must be logged in to upgrade.');
                 return;
             }
-            window.open(`https://quizgpt.site/docs/upgrade.html?token=${encodeURIComponent(token)}`, '_blank');
+            window.open(`https://quizgpt.site/upgrade?token=${encodeURIComponent(token)}`, '_blank');
         });
     }
 
