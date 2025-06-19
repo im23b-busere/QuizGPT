@@ -183,7 +183,7 @@ async function handleManualButtonClick() {
             const fullQuestion = `${response.question.title}\n\nOptions:\n${response.question.choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
 
             // Send to backend
-            const backendResponse = await authService.makeAuthenticatedRequest('http://91.99.69.198:3001/api/questions/answer', {
+            const backendResponse = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/questions/answer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

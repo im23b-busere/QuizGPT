@@ -1,4 +1,4 @@
-const API_URL = 'http://91.99.69.198:3001/api';
+const API_URL = 'https://api.quizgpt.site/api';
 
 const registerForm = document.getElementById('registerForm');
 const registerEmail = document.getElementById('registerEmail');

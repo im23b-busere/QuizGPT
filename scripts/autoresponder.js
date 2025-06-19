@@ -64,7 +64,7 @@ async function processQuestionWithBackend(question, tabId) {
         console.log('[AutoResponder] Sending question to backend:', fullQuestion);
 
         // Send to backend using authService
-        const response = await authService.makeAuthenticatedRequest('http://91.99.69.198:3001/api/questions/answer', {
+        const response = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/questions/answer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

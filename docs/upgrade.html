@@ -21,7 +21,7 @@
         btn.textContent = 'Redirecting...';
         errorDiv.style.display = 'none';
         try {
-            const res = await fetch('https://91.99.69.198:3001/api/stripe/create-checkout-session', {
+            const res = await fetch('https://api.quizgpt.site/api/stripe/create-checkout-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({})

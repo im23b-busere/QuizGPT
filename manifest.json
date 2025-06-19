@@ -1,6 +1,6 @@
 {
   "name": "QuizGPT",
-  "version": "2.1.0",
+  "version": "2.0.0",
   "description": "A browser extension to assist with quizzes using OpenAI.",
   "icons": {
     "16": "icons/icon16.png",
@@ -42,7 +42,7 @@
   },
   "host_permissions": [
     "https://*.kahoot.it/*",
-    "http://91.99.69.198:3001/*"
+    "https://api.quizgpt.site/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"

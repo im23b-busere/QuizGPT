@@ -1,4 +1,4 @@
-const API_URL = 'http://91.99.69.198:3001/api'; // Production server on Hetzner
+const API_URL = 'https://api.quizgpt.site/api';
 
 class AuthService {
     constructor() {
