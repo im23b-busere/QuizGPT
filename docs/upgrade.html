@@ -30,10 +30,22 @@
         btn.disabled = true;
         btn.textContent = 'Redirecting...';
         errorDiv.style.display = 'none';
+        // Get JWT from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+            errorDiv.textContent = 'You must be logged in to upgrade.';
+            errorDiv.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Buy Premium';
+            return;
+        }
         try {
             const res = await fetch('https://api.quizgpt.site/api/stripe/create-checkout-session', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
                 body: JSON.stringify({})
             });
             const data = await res.json();
