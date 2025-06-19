@@ -128,6 +128,8 @@ async function verifyCode() {
 async function checkUserExists(email) {
     try {
         console.log('[checkUserExists] Checking user:', email);
+        console.log('[checkUserExists] API URL:', `${API_URL}/auth/check-user`);
+        
         const response = await fetch(`${API_URL}/auth/check-user`, {
             method: 'POST',
             headers: {
@@ -135,9 +137,27 @@ async function checkUserExists(email) {
             },
             body: JSON.stringify({ email })
         });
-        const data = await response.json();
-        console.log('[checkUserExists] Response:', data);
-        return data.exists;
+        
+        console.log('[checkUserExists] Response status:', response.status);
+        console.log('[checkUserExists] Response headers:', response.headers);
+        
+        const responseText = await response.text();
+        console.log('[checkUserExists] Response text:', responseText);
+        
+        if (!response.ok) {
+            console.error('[checkUserExists] HTTP error:', response.status, responseText);
+            return false;
+        }
+        
+        try {
+            const data = JSON.parse(responseText);
+            console.log('[checkUserExists] Parsed data:', data);
+            return data.exists;
+        } catch (parseError) {
+            console.error('[checkUserExists] JSON parse error:', parseError);
+            console.error('[checkUserExists] Raw response:', responseText);
+            return false;
+        }
     } catch (error) {
         console.error('Error checking user:', error);
         return false;

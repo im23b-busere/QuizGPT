@@ -41,6 +41,9 @@ async function checkAuth() {
         // Load main content
         loadMainContent();
         initializeEventListeners();
+        
+        // Fetch and display membership status
+        await updateMembershipStatus();
     } catch (error) {
         console.error('Auth check error:', error);
         window.location.href = 'login.html';
@@ -229,25 +232,111 @@ async function handleManualButtonClick() {
     }
 }
 
+// Function to fetch and update membership status
+async function updateMembershipStatus() {
+    try {
+        console.log('Fetching membership status...');
+        console.log('Current auth token:', authService.token);
+        
+        const response = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/membership/status');
+        console.log('Membership status response:', response);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Membership status data:', data);
+            
+            const planType = data.plan_type || 'free';
+            console.log('Plan type:', planType);
+            
+            const planBadge = document.querySelector('.plan-badge');
+            const planFeatures = document.querySelector('.plan-features');
+            
+            console.log('Found plan badge element:', planBadge);
+            console.log('Found plan features element:', planFeatures);
+            
+            if (planBadge) {
+                planBadge.textContent = planType.charAt(0).toUpperCase() + planType.slice(1);
+                console.log('Updated plan badge text to:', planBadge.textContent);
+                
+                // Update badge styling based on plan type
+                planBadge.className = 'plan-badge';
+                if (planType.toLowerCase() === 'premium') {
+                    planBadge.classList.add('premium');
+                    console.log('Added premium class to badge');
+                } else {
+                    planBadge.classList.add('free');
+                    console.log('Added free class to badge');
+                }
+            }
+            
+            // Update features based on plan type
+            if (planFeatures) {
+                if (planType.toLowerCase() === 'premium') {
+                    planFeatures.innerHTML = `
+                        <div class="feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Up to 200 Questions</span>
+                        </div>
+                        <div class="feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Advanced Features</span>
+                        </div>
+                    `;
+                    console.log('Updated features to premium');
+                } else {
+                    planFeatures.innerHTML = `
+                        <div class="feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Basic Features</span>
+                        </div>
+                        <div class="feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Standard Support</span>
+                        </div>
+                    `;
+                    console.log('Updated features to free');
+                }
+            }
+            
+            console.log('Membership status updated successfully');
+        } else {
+            console.error('Failed to fetch membership status:', response.status);
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+        }
+    } catch (error) {
+        console.error('Error updating membership status:', error);
+        console.error('Error stack:', error.stack);
+    }
+}
+
 // Listen for refreshMembership message from success page
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "refreshMembership") {
     // Re-fetch membership status from backend
     authService.loadAuthData().then(async () => {
-      // Optionally, update UI or show a thank you message
       // Fetch latest plan status
       try {
-        const response = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/membership/status');
-        if (response.ok) {
-          const data = await response.json();
-          const planType = data.plan_type || data.planType || 'free';
-          if (planType.toLowerCase() === 'premium') {
-            alert('Thank you for purchasing QuizGPT Premium! Have fun 🎉');
-          }
-          // Optionally update the UI
-          updatePlanStatus(planType);
+        await updateMembershipStatus();
+        // Show thank you message if premium
+        const planBadge = document.querySelector('.plan-badge');
+        if (planBadge && planBadge.textContent.toLowerCase() === 'premium') {
+          alert('Thank you for purchasing QuizGPT Premium! Have fun 🎉');
         }
       } catch (e) {
+        console.error('Error refreshing membership:', e);
         // fallback: just show thank you
         alert('Thank you for purchasing QuizGPT Premium! Have fun 🎉');
       }

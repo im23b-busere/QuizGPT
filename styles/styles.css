@@ -606,6 +606,17 @@ body.popup-container {
     font-weight: 600;
 }
 
+.plan-badge.premium {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #333;
+    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+.plan-badge.free {
+    background: #666;
+    color: white;
+}
+
 .plan-features {
     display: flex;
     flex-direction: column;
