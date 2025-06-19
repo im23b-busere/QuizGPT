@@ -134,32 +134,39 @@
         <a href="/upgrade" class="button">Try Again</a>
     </div>
     <script>
-    // Store token from URL param if present
+    // Store token from URL param if present, otherwise clear token
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get('token');
     if (urlToken) {
         localStorage.setItem('token', urlToken);
+    } else {
+        localStorage.removeItem('token');
     }
     // Show cancel message if canceled=1 in URL
     if (window.location.search.includes('canceled=1')) {
         document.getElementById('upgradeContainer').style.display = 'none';
         document.getElementById('cancelContainer').style.display = 'block';
     }
-    document.getElementById('buyPremiumBtn').addEventListener('click', async () => {
-        const btn = document.getElementById('buyPremiumBtn');
-        const errorDiv = document.getElementById('errorMessage');
-        btn.disabled = true;
-        btn.textContent = 'Redirecting...';
-        errorDiv.style.display = 'none';
-        // Get JWT from localStorage
+    const buyBtn = document.getElementById('buyPremiumBtn');
+    const errorDiv = document.getElementById('errorMessage');
+    // Disable buy button if no token
+    if (!localStorage.getItem('token')) {
+        buyBtn.disabled = true;
+        errorDiv.textContent = 'You must be logged in to upgrade.';
+        errorDiv.style.display = 'block';
+    }
+    buyBtn.addEventListener('click', async () => {
         const token = localStorage.getItem('token');
         if (!token) {
             errorDiv.textContent = 'You must be logged in to upgrade.';
             errorDiv.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = 'Buy Premium – €4.99/month';
+            buyBtn.disabled = true;
+            buyBtn.textContent = 'Buy Premium – €4.99/month';
             return;
         }
+        buyBtn.disabled = true;
+        buyBtn.textContent = 'Redirecting...';
+        errorDiv.style.display = 'none';
         try {
             const res = await fetch('https://api.quizgpt.site/api/stripe/create-checkout-session', {
                 method: 'POST',
@@ -175,8 +182,8 @@
         } catch (err) {
             errorDiv.textContent = err.message;
             errorDiv.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = 'Buy Premium – €4.99/month';
+            buyBtn.disabled = false;
+            buyBtn.textContent = 'Buy Premium – €4.99/month';
         }
     });
     </script>
