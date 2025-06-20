@@ -738,3 +738,16 @@ body.popup-container {
 .hidden {
     display: none;
 }
+
+.premium-badge {
+    display: inline-block;
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #333;
+    font-size: 0.75em;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-left: 8px;
+    vertical-align: middle;
+    box-shadow: 0 1px 4px rgba(255, 215, 0, 0.15);
+}

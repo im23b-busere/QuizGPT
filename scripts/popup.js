@@ -11,6 +11,7 @@ const highlightCheckbox = document.getElementById('highlight');
 const autoclickCheckbox = document.getElementById('autoclick');
 const logoutButton = document.querySelector('.logout-button');
 const upgradeButton = document.getElementById('upgradeButton');
+const premiumBadge = document.getElementById('premiumBadge');
 
 // Check authentication and load user data
 async function checkAuth() {
@@ -258,7 +259,6 @@ async function updateMembershipStatus() {
                 planBadge.textContent = planType.charAt(0).toUpperCase() + planType.slice(1);
                 console.log('Updated plan badge text to:', planBadge.textContent);
                 
-                // Update badge styling based on plan type
                 planBadge.className = 'plan-badge';
                 if (planType.toLowerCase() === 'premium') {
                     planBadge.classList.add('premium');
@@ -267,6 +267,15 @@ async function updateMembershipStatus() {
                     planBadge.classList.add('free');
                     console.log('Added free class to badge');
                 }
+            }
+            
+            // Show/hide upgrade button and premium badge
+            if (planType.toLowerCase() === 'premium') {
+                if (upgradeButton) upgradeButton.classList.add('hidden');
+                if (premiumBadge) premiumBadge.classList.remove('hidden');
+            } else {
+                if (upgradeButton) upgradeButton.classList.remove('hidden');
+                if (premiumBadge) premiumBadge.classList.add('hidden');
             }
             
             // Update features based on plan type
