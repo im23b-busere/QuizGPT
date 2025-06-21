@@ -11,6 +11,7 @@ const highlightCheckbox = document.getElementById('highlight');
 const autoclickCheckbox = document.getElementById('autoclick');
 const logoutButton = document.querySelector('.logout-button');
 const upgradeButton = document.getElementById('upgradeButton');
+const manageSubscriptionButton = document.getElementById('manageSubscriptionButton');
 const premiumBadge = document.getElementById('premiumBadge');
 
 // Check authentication and load user data
@@ -160,6 +161,113 @@ function initializeEventListeners() {
         });
     }
 
+    // Manage subscription button click handler
+    if (manageSubscriptionButton) {
+        manageSubscriptionButton.addEventListener('click', async () => {
+            try {
+                console.log('Manage subscription button clicked');
+                
+                // Get auth token
+                let token = authService.token;
+                if (!token) {
+                    // Try to load from chrome.storage
+                    const data = await chrome.storage.sync.get(['token']);
+                    token = data.token;
+                }
+                if (!token) {
+                    alert('You must be logged in to manage your subscription.');
+                    return;
+                }
+
+                console.log('Creating portal session...');
+
+                // Create portal session
+                const response = await fetch('https://api.quizgpt.site/api/stripe/create-portal-session', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('Portal session response status:', response.status);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.log('Portal session error:', errorData);
+                    
+                    // If the error is about missing subscription, try to sync customer ID first
+                    if (errorData.message === 'No subscription found for this user.') {
+                        console.log('Attempting to sync customer ID...');
+                        
+                        const syncResponse = await fetch('https://api.quizgpt.site/api/stripe/sync-customer-id', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        console.log('Sync response status:', syncResponse.status);
+
+                        if (syncResponse.ok) {
+                            const syncData = await syncResponse.json();
+                            console.log('Customer ID synced successfully:', syncData);
+                            
+                            // Retry creating portal session
+                            const retryResponse = await fetch('https://api.quizgpt.site/api/stripe/create-portal-session', {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            console.log('Retry response status:', retryResponse.status);
+
+                            if (retryResponse.ok) {
+                                const data = await retryResponse.json();
+                                console.log('Portal session created successfully:', data.url);
+                                window.open(data.url, '_blank');
+                                return;
+                            } else {
+                                const retryErrorData = await retryResponse.json();
+                                console.error('Retry failed:', retryErrorData);
+                                throw new Error(retryErrorData.message || retryErrorData.details || 'Failed to create portal session after sync');
+                            }
+                        } else {
+                            const syncErrorData = await syncResponse.json();
+                            console.error('Sync failed:', syncErrorData);
+                            throw new Error(syncErrorData.message || 'Failed to sync customer ID');
+                        }
+                    }
+                    
+                    // Show detailed error message from backend
+                    const errorMessage = errorData.details || errorData.message || 'Failed to create portal session';
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                console.log('Portal session created successfully:', data.url);
+                
+                // Open the portal URL
+                window.open(data.url, '_blank');
+            } catch (error) {
+                console.error('Error creating portal session:', error);
+                
+                // Fallback: Ask user if they want to go to Stripe dashboard
+                const fallback = confirm(
+                    'Error: ' + error.message + 
+                    '\n\nWould you like to go to the Stripe dashboard instead?'
+                );
+                
+                if (fallback) {
+                    window.open('https://dashboard.stripe.com/billing', '_blank');
+                }
+            }
+        });
+    }
+
     // Find Answer button click handler
     const manualButton = document.getElementById('manualButton');
     if (manualButton) {
@@ -272,9 +380,11 @@ async function updateMembershipStatus() {
             // Show/hide upgrade button and premium badge
             if (planType.toLowerCase() === 'premium') {
                 if (upgradeButton) upgradeButton.classList.add('hidden');
+                if (manageSubscriptionButton) manageSubscriptionButton.classList.remove('hidden');
                 if (premiumBadge) premiumBadge.classList.remove('hidden');
             } else {
                 if (upgradeButton) upgradeButton.classList.remove('hidden');
+                if (manageSubscriptionButton) manageSubscriptionButton.classList.add('hidden');
                 if (premiumBadge) premiumBadge.classList.add('hidden');
             }
             
@@ -355,3 +465,69 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', checkAuth);
+
+// Global debug function for testing Stripe integration
+window.debugStripe = async () => {
+    try {
+        console.log('=== Stripe Debug Test ===');
+        
+        // Get auth token
+        let token = authService.token;
+        if (!token) {
+            const data = await chrome.storage.sync.get(['token']);
+            token = data.token;
+        }
+        
+        if (!token) {
+            console.error('No auth token found');
+            return;
+        }
+        
+        console.log('Auth token found:', token.substring(0, 20) + '...');
+        
+        // Test 1: Check Stripe configuration
+        console.log('\n1. Testing Stripe configuration...');
+        const testResponse = await fetch('https://api.quizgpt.site/api/stripe/test');
+        const testData = await testResponse.json();
+        console.log('Stripe test result:', testData);
+        
+        // Test 2: Check user membership
+        console.log('\n2. Checking user membership...');
+        const membershipResponse = await fetch('https://api.quizgpt.site/api/membership/status', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const membershipData = await membershipResponse.json();
+        console.log('Membership status:', membershipData);
+        
+        // Test 3: Try to sync customer ID
+        console.log('\n3. Attempting to sync customer ID...');
+        const syncResponse = await fetch('https://api.quizgpt.site/api/stripe/sync-customer-id', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const syncData = await syncResponse.json();
+        console.log('Sync result:', syncData);
+        
+        // Test 4: Try to create portal session
+        console.log('\n4. Attempting to create portal session...');
+        const portalResponse = await fetch('https://api.quizgpt.site/api/stripe/create-portal-session', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const portalData = await portalResponse.json();
+        console.log('Portal session result:', portalData);
+        
+        console.log('\n=== Debug Test Complete ===');
+        
+    } catch (error) {
+        console.error('Debug test failed:', error);
+    }
+};

@@ -644,7 +644,7 @@ body.popup-container {
     padding-top: 8px;
 }
 
-.upgrade-button, .logout-button {
+.upgrade-button, .logout-button, .manage-subscription-button {
     flex: 1;
     display: flex;
     align-items: center;
@@ -668,6 +668,16 @@ body.popup-container {
     background: #9b4de3;
 }
 
+.manage-subscription-button {
+    background: #8A2BE2;
+    color: white;
+    border: none;
+}
+
+.manage-subscription-button:hover {
+    background: #9b4de3;
+}
+
 .logout-button {
     background: #3a3a3a;
     color: #bbb;
@@ -679,7 +689,7 @@ body.popup-container {
     color: white;
 }
 
-.upgrade-button svg, .logout-button svg {
+.upgrade-button svg, .logout-button svg, .manage-subscription-button svg {
     width: 14px;
     height: 14px;
     stroke: currentColor;
