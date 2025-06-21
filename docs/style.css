@@ -1061,16 +1061,18 @@ html {
 
 .btn-outline {
     background: transparent;
-    color: white;
-    border-color: white;
+    color: #2d3436;
+    border: 2px solid #2d3436;
     font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .btn-outline:hover {
-    background: white;
-    color: #667eea;
+    background: #2d3436;
+    color: white;
     transform: translateY(-2px);
     font-weight: 700;
+    box-shadow: 0 4px 12px rgba(45, 52, 54, 0.3);
 }
 
 .pricing-features {
