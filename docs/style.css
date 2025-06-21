@@ -988,7 +988,7 @@ html {
     font-size: 1.1rem;
     opacity: 0.9;
     margin: 0;
-    font-weight: 500;
+    font-weight: 500;   
 }
 
 .card-features ul {
@@ -1225,6 +1225,92 @@ html {
     margin: 2rem 0;
 }
 
+.demo-section {
+    text-align: center;
+    margin: 2rem auto;
+    max-width: 800px;
+    padding: 0 1rem;
+}
+
+.demo-section h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    background: var(--header-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    text-shadow: none;
+}
+
+.demo-section p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: var(--text-light);
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    background: #000;
+    transform: translateZ(0);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.video-container:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+.video-container video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 16px;
+}
+
+.demo-note {
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    opacity: 0.8;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .demo-section {
+        margin: 3rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .demo-section h2 {
+        font-size: 1.8rem;
+    }
+    
+    .demo-section p {
+        font-size: 1rem;
+    }
+    
+    .video-container {
+        border-radius: 12px;
+    }
+    
+    .video-container video {
+        border-radius: 12px;
+    }
+    
+    .demo-note {
+        font-size: 0.9rem;
+    }
+}
+
 .guide-link {
     display: inline-flex;
     align-items: center;
@@ -1302,6 +1388,228 @@ html {
     }
     
     .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+.features-showcase {
+    margin: 5rem auto;
+    max-width: 1200px;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+.features-showcase h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    background: var(--header-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    text-shadow: none;
+}
+
+.features-intro {
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+    color: var(--text-light);
+    opacity: 0.9;
+    line-height: 1.6;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1) 0%, rgba(218, 112, 214, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.feature-card:hover {
+    transform: translate3d(0, -8px, 0);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border-color: rgba(138, 43, 226, 0.3);
+}
+
+.feature-card:hover::before {
+    opacity: 1;
+}
+
+.feature-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.feature-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.feature-card p {
+    color: var(--text-light);
+    line-height: 1.6;
+    font-size: 1rem;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.cta-section {
+    text-align: center;
+    margin: 5rem auto;
+    max-width: 800px;
+    padding: 0 1rem;
+    color: var(--text-color);
+}
+
+.cta-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    background: var(--header-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    text-shadow: none;
+}
+
+.cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--text-light);
+}
+
+.cta-buttons-secondary {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: var(--text-color);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 180px;
+    justify-content: center;
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translate3d(0, -4px, 0);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    color: var(--text-color);
+    text-decoration: none;
+    border-color: rgba(138, 43, 226, 0.4);
+}
+
+.btn-secondary svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .features-showcase {
+        margin: 3rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .features-showcase h2 {
+        font-size: 2rem;
+    }
+    
+    .features-intro {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .feature-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+    }
+    
+    .feature-card h3 {
+        font-size: 1.3rem;
+    }
+    
+    .cta-section {
+        margin: 3rem auto;
+    }
+    
+    .cta-section h2 {
+        font-size: 2rem;
+    }
+    
+    .cta-section p {
+        font-size: 1.1rem;
+    }
+    
+    .cta-buttons-secondary {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btn-secondary {
         width: 100%;
         max-width: 300px;
     }
