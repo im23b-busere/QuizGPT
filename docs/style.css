@@ -133,12 +133,15 @@ a:hover {
     border-radius: 8px;
     font-weight: 600;
     font-size: 1.2rem;
-    margin: 2rem 0;
+    margin: 0;
     text-align: center;
     box-shadow: 0 4px 6px rgba(66, 133, 244, 0.2);
     transition: all 0.3s ease;
     text-decoration: none;
     gap: 0.8rem;
+    height: 48px;
+    min-width: 140px;
+    justify-content: center;
 }
 
 .store-link:hover {
@@ -730,28 +733,34 @@ html {
 }
 
 .feature-item {
-    background: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
     text-align: center;
-    transition: all 0.3s ease;
+    padding: 2rem;
+    border-radius: 12px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+    background: #f8f9fa;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 
 .feature-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translate3d(0, -4px, 0);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    background: white;
 }
 
 .feature-item h3 {
     font-size: 1.3rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: #2d3436;
+    font-weight: 600;
 }
 
 .feature-item p {
+    color: #636e72;
     margin: 0;
-    color: var(--text-light);
+    line-height: 1.6;
+    font-size: 1rem;
 }
 
 /* FAQ Section */
@@ -765,27 +774,33 @@ html {
 }
 
 .faq-item {
-    background: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
     padding: 1.5rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    background: #f8f9fa;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 
 .faq-item:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: #e9ecef;
+    transform: translate3d(0, -2px, 0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .faq-item h3 {
     font-size: 1.2rem;
     margin-bottom: 0.8rem;
-    color: var(--primary-color);
+    color: #2d3436;
+    font-weight: 600;
 }
 
 .faq-item p {
+    color: #636e72;
     margin: 0;
-    color: var(--text-light);
+    line-height: 1.6;
+    font-size: 1rem;
 }
 
 /* Support Section */
@@ -890,13 +905,15 @@ html {
     border-radius: 20px;
     padding: 2.5rem;
     position: relative;
-    transition: all 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(0, 0, 0, 0.1);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 
 .pricing-card:hover {
-    transform: translateY(-8px);
+    transform: translate3d(0, -8px, 0);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
@@ -905,10 +922,12 @@ html {
     color: white;
     box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.2);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 
 .pricing-card.premium:hover {
-    transform: scale(1.05) translateY(-8px);
+    transform: translate3d(0, -8px, 0) scale(1.05);
     box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
 }
 
@@ -1082,13 +1101,15 @@ html {
     text-align: center;
     padding: 2rem;
     border-radius: 12px;
-    transition: all 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
     background: #f8f9fa;
     border: 1px solid rgba(0, 0, 0, 0.05);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 
 .feature-item:hover {
-    transform: translateY(-4px);
+    transform: translate3d(0, -4px, 0);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     background: white;
 }
@@ -1140,13 +1161,15 @@ html {
     padding: 1.5rem;
     border-radius: 12px;
     background: #f8f9fa;
-    transition: all 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
     border: 1px solid rgba(0, 0, 0, 0.05);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
 }
 
 .faq-item:hover {
     background: #e9ecef;
-    transform: translateY(-2px);
+    transform: translate3d(0, -2px, 0);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -1195,7 +1218,9 @@ html {
     display: flex;
     gap: 1rem;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
+    margin: 2rem 0;
 }
 
 .guide-link {
@@ -1212,6 +1237,9 @@ html {
     transition: all 0.3s ease;
     text-decoration: none;
     gap: 0.8rem;
+    height: 48px;
+    min-width: 140px;
+    justify-content: center;
 }
 
 .guide-link:hover {
