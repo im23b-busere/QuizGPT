@@ -10,15 +10,47 @@ script.onload = () => {
 // Store the current question
 let currentQuestion = null;
 
+// Add status indicator
+let statusIndicator = null;
+function createStatusIndicator() {
+    if (statusIndicator) return;
+    
+    statusIndicator = document.createElement('div');
+    statusIndicator.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 10000;
+        font-size: 12px;
+        font-family: Arial, sans-serif;
+        max-width: 300px;
+        word-wrap: break-word;
+    `;
+    statusIndicator.textContent = 'QuizGPT: Ready';
+    document.body.appendChild(statusIndicator);
+}
+
+function updateStatus(message) {
+    if (!statusIndicator) createStatusIndicator();
+    statusIndicator.textContent = `QuizGPT: ${message}`;
+    console.log('[Content] Status:', message);
+}
+
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[Content] Received message:', request);
     if (request.action === "highlightAnswer") {
+        updateStatus('Highlighting answer...');
         highlightAnswer(request.answer, request.options);
         sendResponse({ success: true });
     } else if (request.action === "getQuestion") {
         sendResponse({ question: currentQuestion });
     } else if (request.action === "showAuthError") {
+        updateStatus('Auth error: ' + request.message);
         if (request.message.includes('free tier limit') || request.message.includes('Free tier limit')) {
             showPremiumUpgradeMessage();
         } else {
@@ -40,6 +72,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             setTimeout(() => errorDiv.remove(), 5000);
         }
         sendResponse({ success: true });
+    } else if (request.action === "checkStatus") {
+        updateStatus('Status check requested');
+        sendResponse({ 
+            status: 'running', 
+            currentQuestion: currentQuestion,
+            timestamp: new Date().toISOString()
+        });
     }
     return true;
 });
@@ -47,11 +86,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Listen for question events from the injected script
 window.addEventListener('kahootQuestionParsed', (event) => {
     console.log('[Content] Received question event:', event.detail);
+    updateStatus('Question detected');
     
     // Validate question data
     const question = event.detail;
     if (!question || !question.title || !Array.isArray(question.choices)) {
         console.error('[Content] Invalid question data:', question);
+        updateStatus('Invalid question data');
         return;
     }
 
@@ -67,6 +108,8 @@ window.addEventListener('kahootQuestionParsed', (event) => {
         questionIndex: question.questionIndex
     });
     
+    updateStatus('Sending question to backend...');
+    
     // Send the question to the background script
     chrome.runtime.sendMessage({
         action: 'processQuestion',
@@ -74,8 +117,10 @@ window.addEventListener('kahootQuestionParsed', (event) => {
     }, (response) => {
         if (chrome.runtime.lastError) {
             console.error('[Content] Error sending message:', chrome.runtime.lastError);
+            updateStatus('Error: ' + chrome.runtime.lastError.message);
         } else {
             console.log('[Content] Message sent successfully:', response);
+            updateStatus('Question sent to backend');
         }
     });
 

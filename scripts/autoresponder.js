@@ -41,22 +41,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Process question through backend
 async function processQuestionWithBackend(question, tabId) {
     try {
+        console.log('[AutoResponder] Starting to process question:', question);
+        
         // Ensure auth is initialized
         await initializeAuth();
 
         // Check if we're authenticated
-        if (!authService.isAuthenticated()) {
+        const authData = await authService.loadAuthData();
+        console.log('[AutoResponder] Auth status:', authData);
+        
+        if (!authData.isLoggedIn) {
             console.log('[AutoResponder] Not authenticated, skipping question');
             // Send message to content script to show login prompt
             await chrome.tabs.sendMessage(tabId, {
                 action: 'showAuthError',
-                message: 'Please log in to use the auto-responder.'
+                message: 'Please log in to use the auto-responder. Click the extension icon to log in.'
             });
             return;
         }
 
         // Get user settings
         const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption']);
+        console.log('[AutoResponder] User settings:', settings);
         
         // Format the question for the backend
         const fullQuestion = `${question.title}\n\nOptions:\n${question.choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
@@ -74,8 +80,11 @@ async function processQuestionWithBackend(question, tabId) {
             })
         });
 
+        console.log('[AutoResponder] Backend response status:', response.status);
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
+            console.log('[AutoResponder] Backend error:', errorData);
             
             // Handle free tier limit error
             if (response.status === 403 && errorData.message === 'Free tier limit reached') {
@@ -108,6 +117,8 @@ async function processQuestionWithBackend(question, tabId) {
             }
         });
 
+        console.log('[AutoResponder] Answer sent to content script successfully');
+
     } catch (err) {
         console.error('[AutoResponder] Error processing question:', err);
         
@@ -127,3 +138,16 @@ async function processQuestionWithBackend(question, tabId) {
         });
     }
 }
+
+// Add a function to check if the extension is working
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "checkStatus") {
+        console.log('[AutoResponder] Status check requested');
+        sendResponse({
+            status: 'running',
+            authInitialized: isInitialized,
+            timestamp: new Date().toISOString()
+        });
+    }
+    return true;
+});
