@@ -16,17 +16,14 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     line-height: 1.6;
-    background-color: var(--background-color);
     color: var(--text-color);
-    background-image: 
-        var(--background-pattern),
-        radial-gradient(circle at 100% 0%, rgba(255, 107, 107, 0.08) 0%, transparent 50%);
-    background-attachment: fixed;
+    background: var(--background);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
 }
 
 .navbar {
@@ -321,6 +318,7 @@ footer a:hover {
         padding: 1rem 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         font-size: 1.1rem;
+        color: #333;
     }
     
     .nav-links a:last-child {
@@ -341,33 +339,41 @@ footer a:hover {
         display: none;
     }
     
-    /* Fix pricing plan buttons on mobile */
-    .pricing-cards {
-        flex-direction: column;
-        gap: 2rem;
+    /* Fix homepage layout issues */
+    .content-wrapper {
         padding: 0 1rem;
+        max-width: 100%;
+        overflow-x: hidden;
     }
     
-    .pricing-card {
-        width: 100%;
-        max-width: none;
-        margin: 0;
+    .main-content {
+        padding: 0;
+        max-width: 100%;
     }
     
-    .card-action {
-        padding: 0 1rem;
+    .main-content h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
-    .btn {
-        width: 100%;
-        max-width: none;
-        box-sizing: border-box;
+    .main-content p {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
+    /* Fix CTA buttons */
     .cta-buttons {
         flex-direction: column;
         gap: 1rem;
-        padding: 0 1rem;
+        padding: 0;
+        margin: 2rem 0;
+        width: 100%;
     }
     
     .store-link,
@@ -375,132 +381,263 @@ footer a:hover {
         width: 100%;
         max-width: none;
         justify-content: center;
+        box-sizing: border-box;
+        padding: 1rem;
+        font-size: 1rem;
     }
     
-    .container {
-        padding: 0 1rem 1rem;
+    .store-link img {
+        height: 24px;
+        width: auto;
+    }
+    
+    /* Fix demo section */
+    .demo-section {
+        margin: 3rem auto;
+        padding: 0;
         max-width: 100%;
     }
     
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-    
-    h2 {
-        font-size: 1.4rem;
-        margin: 1.5rem 0 0.8rem;
-    }
-    
-    p {
-        font-size: 1rem;
-        line-height: 1.6;
-        margin-bottom: 1rem;
-    }
-    
-    .feature-list li {
-        padding: 0.8rem 1rem;
-        padding-left: 2rem;
-        font-size: 0.95rem;
-        margin-bottom: 0.8rem;
-    }
-    
-    .store-link {
-        padding: 0.8rem 1.5rem;
-        font-size: 1.1rem;
-        margin: 1.5rem 0;
+    .video-container {
         width: 100%;
+        max-width: 100%;
+        border-radius: 12px;
+        margin: 0;
+    }
+    
+    .video-container video {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+    }
+    
+    /* Fix CTA section */
+    .cta-section {
+        margin: 3rem auto;
+        padding: 0;
+        max-width: 100%;
+    }
+    
+    .cta-section h2 {
+        font-size: 2rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-section p {
+        font-size: 1.1rem;
+        line-height: 1.5;
+        margin-bottom: 2rem;
+    }
+    
+    .cta-buttons-secondary {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+    
+    .btn-secondary {
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    /* Fix pricing plan buttons on mobile */
+    .pricing-cards {
+        flex-direction: column;
+        gap: 2rem;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
     }
     
+    .pricing-card {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+        padding: 2rem 1.5rem;
+    }
+    
+    .pricing-card.premium {
+        transform: none;
+        margin: 0;
+    }
+    
+    .pricing-card.premium:hover {
+        transform: none;
+    }
+    
+    .card-header {
+        padding: 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header h2 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .price {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .price-description {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+    
+    .card-features {
+        margin: 1.5rem 0;
+    }
+    
+    .card-features ul {
+        padding: 0;
+        margin: 0;
+    }
+    
+    .card-features li {
+        padding: 0.8rem 0;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    
+    .card-features svg {
+        width: 18px;
+        height: 18px;
+        margin-right: 0.8rem;
+    }
+    
+    .card-action {
+        padding: 0;
+        width: 100%;
+        margin-top: 1.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+        padding: 1rem;
+        font-size: 1rem;
+        margin: 0;
+    }
+    
+    .popular-badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        top: -0.5rem;
+        right: 1rem;
+    }
+    
+    /* Fix pricing features section */
+    .pricing-features {
+        margin: 3rem auto;
+        padding: 2rem 1rem;
+        border-radius: 16px;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .feature-item {
+        padding: 1.5rem;
+    }
+    
+    /* Fix FAQ section */
+    .faq-section {
+        margin: 3rem auto;
+        padding: 2rem 1rem;
+        border-radius: 16px;
+    }
+    
+    .faq-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .faq-item {
+        padding: 1.5rem;
+    }
+    
+    /* Fix CTA section on pricing page */
+    .cta-section {
+        margin: 3rem auto;
+        padding: 0 1rem;
+        max-width: 100%;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+    }
+    
+    .btn-outline {
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    /* Fix footer */
     footer {
-        margin-top: 2rem;
-        padding: 1.5rem 1rem;
+        padding: 2rem 1rem;
         text-align: center;
+    }
+    
+    footer p {
+        margin-bottom: 1rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     footer a {
         display: inline-block;
-        margin: 0.3rem 0.5rem;
-    }
-    
-    .legal .container {
-        padding: 0 1rem;
-    }
-    
-    .legal h1 {
-        font-size: 1.8rem;
-    }
-    
-    .legal h2 {
-        font-size: 1.3rem;
-    }
-    
-    .legal p {
-        font-size: 0.95rem;
-    }
-    
-    .legal .feature-list li {
-        padding: 0.8rem 1rem;
-        padding-left: 2.5rem;
-    }
-    
-    .guide .feature-list li {
-        padding: 1rem;
-        padding-left: 3rem;
-        margin-bottom: 0.8rem;
-        font-size: 0.95rem;
-        line-height: 1.5;
-        background: var(--card-background);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-    
-    .guide .feature-list li::before {
-        width: 1.8rem;
-        height: 1.8rem;
-        font-size: 1rem;
-        left: 0.8rem;
-        top: 50%;
-        transform: translateY(-50%);
-        background: var(--header-gradient);
-        color: white;
-        border: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 0 0.5rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 }
 
+/* Additional fixes for very small screens */
 @media (max-width: 480px) {
-    h1 {
+    .content-wrapper {
+        padding: 0 0.5rem;
+    }
+    
+    .main-content h1 {
         font-size: 1.8rem;
     }
     
-    h2 {
-        font-size: 1.3rem;
+    .cta-section h2 {
+        font-size: 1.8rem;
     }
     
-    .feature-list li {
-        padding-left: 1.8rem;
-    }
-    
-    .guide .feature-list li {
+    .store-link,
+    .guide-link,
+    .btn-secondary {
         padding: 0.8rem;
-        padding-left: 2.8rem;
-        margin-bottom: 0.6rem;
+        font-size: 0.95rem;
     }
     
-    .guide .feature-list li::before {
-        width: 1.6rem;
-        height: 1.6rem;
-        font-size: 0.9rem;
-        left: 0.6rem;
+    .nav-links {
+        width: 200px;
+        padding: 80px 1rem 2rem 1rem;
     }
 }
 
 /* Add smooth scrolling */
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 /* Add selection color */
@@ -638,19 +775,16 @@ html {
 }
 
 .content-wrapper {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
+    min-height: calc(100vh - 200px);
+    overflow-x: hidden;
 }
 
 .main-content {
-    width: 100%;
-}
-
-@media (max-width: 768px) {
-    .content-wrapper {
-        padding: 0 1rem;
-    }
+    padding: 2rem 0;
+    overflow-x: hidden;
 }
 
 /* Setup Section */
@@ -949,27 +1083,25 @@ html {
 
 .pricing-header {
     text-align: center;
-    margin: 3rem 0 4rem;
-    color: var(--text-color);
+    margin: 2rem auto;
+    padding: 0 1rem;
+    max-width: 100%;
 }
 
 .pricing-header h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
+    font-size: 2.2rem;
+    line-height: 1.2;
     margin-bottom: 1rem;
-    color: var(--text-color);
-    background: var(--header-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: none;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .pricing-subtitle {
-    font-size: 1.3rem;
-    opacity: 0.8;
-    margin: 0;
-    font-weight: 500;
-    color: var(--text-light);
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .pricing-cards {
@@ -1694,4 +1826,37 @@ html {
         width: 100%;
         max-width: 300px;
     }
+}
+
+/* Fix pricing page overall layout */
+.pricing .content-wrapper {
+    padding: 0 1rem;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.pricing .main-content {
+    padding: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Fix pricing page footer */
+.pricing footer {
+    padding: 2rem 1rem;
+    text-align: center;
+    max-width: 100%;
+}
+
+.pricing footer p {
+    margin-bottom: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.pricing footer a {
+    display: inline-block;
+    margin: 0 0.5rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
