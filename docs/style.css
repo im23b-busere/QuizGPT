@@ -715,6 +715,9 @@ footer a:hover {
         font-size: 0.9rem;
         left: 0.6rem;
     }
+    .video-container {
+        box-shadow: none !important;
+      }
 }
 
 /* Add smooth scrolling */
@@ -866,10 +869,18 @@ html {
     width: 100%;
 }
 
+.video-container {
+    box-shadow: none !important;
+  }
+
 @media (max-width: 768px) {
     .content-wrapper {
         padding: 0 1rem;
     }
+    
+    .video-container {
+        box-shadow: none !important;
+      }
 }
 
 /* Setup Section */
