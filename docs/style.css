@@ -281,23 +281,31 @@ footer a:hover {
 
 @media (max-width: 768px) {
     /* Fix horizontal scrolling */
-    body {
+    html, body {
         overflow-x: hidden;
         width: 100%;
+        max-width: 100vw;
         position: relative;
+    }
+    
+    * {
+        box-sizing: border-box;
     }
     
     .content-wrapper {
         overflow-x: hidden;
         width: 100%;
         max-width: 100vw;
+        position: relative;
     }
     
     .main-content {
         overflow-x: hidden;
         width: 100%;
+        max-width: 100vw;
         padding: 0 1rem;
         box-sizing: border-box;
+        position: relative;
     }
     
     /* Fix navbar */
@@ -309,15 +317,18 @@ footer a:hover {
         left: 0;
         right: 0;
         width: 100%;
+        max-width: 100vw;
         z-index: 1000;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        overflow: hidden;
     }
     
     .navbar-content {
         padding: 0 1rem;
         position: relative;
         max-width: 100%;
+        width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .burger-menu {
@@ -340,6 +351,7 @@ footer a:hover {
         z-index: 1000;
         border-left: 1px solid rgba(0, 0, 0, 0.1);
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .nav-links.active {
@@ -353,6 +365,8 @@ footer a:hover {
         font-size: 1.1rem;
         color: #333;
         box-sizing: border-box;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .nav-links a:last-child {
@@ -382,6 +396,8 @@ footer a:hover {
         text-align: center;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     p {
@@ -390,6 +406,8 @@ footer a:hover {
         text-align: center;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     /* Fix CTA buttons */
@@ -399,16 +417,19 @@ footer a:hover {
         padding: 0 1rem;
         margin: 2rem 0;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .store-link,
     .guide-link {
         width: 100%;
-        max-width: none;
+        max-width: 100%;
         justify-content: center;
         box-sizing: border-box;
         margin: 0;
+        overflow: hidden;
     }
     
     /* Fix demo section */
@@ -416,7 +437,9 @@ footer a:hover {
         margin: 3rem auto;
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .video-container {
@@ -424,6 +447,7 @@ footer a:hover {
         max-width: 100%;
         margin: 0 auto;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .video-container video {
@@ -438,7 +462,9 @@ footer a:hover {
         margin: 3rem auto;
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .cta-section h2 {
@@ -447,6 +473,8 @@ footer a:hover {
         text-align: center;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .cta-section p {
@@ -455,6 +483,8 @@ footer a:hover {
         text-align: center;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .cta-buttons-secondary {
@@ -462,20 +492,24 @@ footer a:hover {
         gap: 1rem;
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .btn-secondary {
         width: 100%;
-        max-width: none;
+        max-width: 100%;
         box-sizing: border-box;
         margin: 0;
+        overflow: hidden;
     }
     
-    /* Fix pricing page */
+    /* Fix pricing page mobile only */
     .pricing {
         overflow-x: hidden;
         width: 100%;
+        max-width: 100vw;
     }
     
     .pricing .content-wrapper {
@@ -488,6 +522,7 @@ footer a:hover {
     .pricing .main-content {
         overflow-x: hidden;
         width: 100%;
+        max-width: 100vw;
         padding: 80px 1rem 2rem 1rem;
         box-sizing: border-box;
     }
@@ -496,7 +531,9 @@ footer a:hover {
         padding: 0 1rem;
         text-align: center;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .pricing-header h1 {
@@ -505,6 +542,8 @@ footer a:hover {
         padding: 0;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .pricing-subtitle {
@@ -512,6 +551,8 @@ footer a:hover {
         padding: 0;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .pricing-cards {
@@ -519,28 +560,34 @@ footer a:hover {
         gap: 2rem;
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
         margin: 2rem 0;
+        overflow: hidden;
     }
     
     .pricing-card {
         width: 100%;
-        max-width: none;
+        max-width: 100%;
         margin: 0;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .card-action {
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .btn {
         width: 100%;
-        max-width: none;
+        max-width: 100%;
         box-sizing: border-box;
         margin: 0;
+        overflow: hidden;
     }
     
     .pricing-features,
@@ -548,37 +595,46 @@ footer a:hover {
         margin: 3rem auto;
         padding: 2rem 1rem;
         width: 100%;
-        box-sizing: border-box;
         max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
     }
     
     .features-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .faq-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .feature-item,
     .faq-item {
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
         margin: 0;
+        overflow: hidden;
     }
     
     /* Fix footer */
     footer {
         padding: 2rem 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
         text-align: center;
+        overflow: hidden;
     }
     
     footer p {
@@ -586,11 +642,49 @@ footer a:hover {
         margin: 0.5rem 0;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     footer a {
         display: inline-block;
         margin: 0 0.5rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* Fix all containers */
+    .container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        padding: 0 1rem;
+    }
+    
+    /* Fix legal pages */
+    .legal .container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        padding: 0 1rem;
+    }
+    
+    /* Fix guide page */
+    .guide .feature-list {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    
+    .guide .feature-list li {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
@@ -1775,23 +1869,31 @@ html {
 /* Mobile-specific fixes */
 @media (max-width: 768px) {
     /* Fix horizontal scrolling */
-    body {
+    html, body {
         overflow-x: hidden;
         width: 100%;
+        max-width: 100vw;
         position: relative;
+    }
+    
+    * {
+        box-sizing: border-box;
     }
     
     .content-wrapper {
         overflow-x: hidden;
         width: 100%;
         max-width: 100vw;
+        position: relative;
     }
     
     .main-content {
         overflow-x: hidden;
         width: 100%;
+        max-width: 100vw;
         padding: 0 1rem;
         box-sizing: border-box;
+        position: relative;
     }
     
     /* Fix navbar */
@@ -1803,15 +1905,18 @@ html {
         left: 0;
         right: 0;
         width: 100%;
+        max-width: 100vw;
         z-index: 1000;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        overflow: hidden;
     }
     
     .navbar-content {
         padding: 0 1rem;
         position: relative;
         max-width: 100%;
+        width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .burger-menu {
@@ -1834,6 +1939,7 @@ html {
         z-index: 1000;
         border-left: 1px solid rgba(0, 0, 0, 0.1);
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .nav-links.active {
@@ -1847,6 +1953,8 @@ html {
         font-size: 1.1rem;
         color: #333;
         box-sizing: border-box;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .nav-links a:last-child {
@@ -1876,6 +1984,8 @@ html {
         text-align: center;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     p {
@@ -1884,6 +1994,8 @@ html {
         text-align: center;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     /* Fix CTA buttons */
@@ -1893,16 +2005,19 @@ html {
         padding: 0 1rem;
         margin: 2rem 0;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .store-link,
     .guide-link {
         width: 100%;
-        max-width: none;
+        max-width: 100%;
         justify-content: center;
         box-sizing: border-box;
         margin: 0;
+        overflow: hidden;
     }
     
     /* Fix demo section */
@@ -1910,7 +2025,9 @@ html {
         margin: 3rem auto;
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .video-container {
@@ -1918,6 +2035,7 @@ html {
         max-width: 100%;
         margin: 0 auto;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .video-container video {
@@ -1932,7 +2050,9 @@ html {
         margin: 3rem auto;
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .cta-section h2 {
@@ -1941,6 +2061,8 @@ html {
         text-align: center;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .cta-section p {
@@ -1949,6 +2071,8 @@ html {
         text-align: center;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .cta-buttons-secondary {
@@ -1956,20 +2080,24 @@ html {
         gap: 1rem;
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .btn-secondary {
         width: 100%;
-        max-width: none;
+        max-width: 100%;
         box-sizing: border-box;
         margin: 0;
+        overflow: hidden;
     }
     
     /* Fix pricing page mobile only */
     .pricing {
         overflow-x: hidden;
         width: 100%;
+        max-width: 100vw;
     }
     
     .pricing .content-wrapper {
@@ -1982,6 +2110,7 @@ html {
     .pricing .main-content {
         overflow-x: hidden;
         width: 100%;
+        max-width: 100vw;
         padding: 80px 1rem 2rem 1rem;
         box-sizing: border-box;
     }
@@ -1990,7 +2119,9 @@ html {
         padding: 0 1rem;
         text-align: center;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .pricing-header h1 {
@@ -1999,6 +2130,8 @@ html {
         padding: 0;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .pricing-subtitle {
@@ -2006,6 +2139,8 @@ html {
         padding: 0;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     .pricing-cards {
@@ -2013,28 +2148,34 @@ html {
         gap: 2rem;
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
         margin: 2rem 0;
+        overflow: hidden;
     }
     
     .pricing-card {
         width: 100%;
-        max-width: none;
+        max-width: 100%;
         margin: 0;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .card-action {
         padding: 0 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .btn {
         width: 100%;
-        max-width: none;
+        max-width: 100%;
         box-sizing: border-box;
         margin: 0;
+        overflow: hidden;
     }
     
     .pricing-features,
@@ -2042,37 +2183,46 @@ html {
         margin: 3rem auto;
         padding: 2rem 1rem;
         width: 100%;
-        box-sizing: border-box;
         max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
     }
     
     .features-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .faq-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
+        overflow: hidden;
     }
     
     .feature-item,
     .faq-item {
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
         margin: 0;
+        overflow: hidden;
     }
     
     /* Fix footer */
     footer {
         padding: 2rem 1rem;
         width: 100%;
+        max-width: 100%;
         box-sizing: border-box;
         text-align: center;
+        overflow: hidden;
     }
     
     footer p {
@@ -2080,11 +2230,49 @@ html {
         margin: 0.5rem 0;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
     }
     
     footer a {
         display: inline-block;
         margin: 0 0.5rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* Fix all containers */
+    .container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        padding: 0 1rem;
+    }
+    
+    /* Fix legal pages */
+    .legal .container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        padding: 0 1rem;
+    }
+    
+    /* Fix guide page */
+    .guide .feature-list {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    
+    .guide .feature-list li {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
