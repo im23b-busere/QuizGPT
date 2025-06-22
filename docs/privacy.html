@@ -12,7 +12,12 @@
     <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="navbar-content">
             <a href="index.html" style="margin-left: 0;" aria-label="QuizGPT Home">QuizGPT</a>
-            <div>
+            <div class="burger-menu" id="burgerMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="nav-links" id="navLinks">
                 <a href="guide.html">Guide</a>
                 <a href="pricing.html">Pricing</a>
                 <a href="privacy.html">Privacy</a>
@@ -79,6 +84,33 @@
             </p>
             <p>&copy; 2025 Erik Buser</p>
         </footer>
+
+        <script>
+            // Burger menu functionality
+            const burgerMenu = document.getElementById('burgerMenu');
+            const navLinks = document.getElementById('navLinks');
+
+            burgerMenu.addEventListener('click', () => {
+                burgerMenu.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            // Close menu when clicking on a link
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    burgerMenu.classList.remove('active');
+                    navLinks.classList.remove('active');
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!burgerMenu.contains(e.target) && !navLinks.contains(e.target)) {
+                    burgerMenu.classList.remove('active');
+                    navLinks.classList.remove('active');
+                }
+            });
+        </script>
     </div>
 </body>
 </html>
