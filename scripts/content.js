@@ -40,6 +40,9 @@ function updateStatus(message) {
     console.log('[Content] Status:', message);
 }
 
+// Add this variable to track the last sent question
+let lastSentQuestionHash = null;
+
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[Content] Received message:', request);
@@ -96,35 +99,39 @@ window.addEventListener('kahootQuestionParsed', (event) => {
         return;
     }
 
+    // Create a simple hash of the question (title + choices)
+    const questionHash = JSON.stringify({
+        title: question.title,
+        choices: question.choices
+    });
+
     // Store the current question
     currentQuestion = {
         title: question.title,
         choices: question.choices
     };
 
-    console.log('[Content] Processing question:', {
-        title: question.title,
-        choices: question.choices,
-        questionIndex: question.questionIndex
-    });
-    
-    updateStatus('Sending question to backend...');
-    
-    // Send the question to the background script
-    chrome.runtime.sendMessage({
-        action: 'processQuestion',
-        question: question
-    }, (response) => {
-        if (chrome.runtime.lastError) {
-            console.error('[Content] Error sending message:', chrome.runtime.lastError);
-            updateStatus('Error: ' + chrome.runtime.lastError.message);
-        } else {
-            console.log('[Content] Message sent successfully:', response);
-            updateStatus('Question sent to backend');
-        }
-    });
+    // Nur wenn neu: an Backend schicken
+    if (questionHash !== lastSentQuestionHash) {
+        lastSentQuestionHash = questionHash;
+        updateStatus('Sending question to backend...');
+        chrome.runtime.sendMessage({
+            action: 'processQuestion',
+            question: question
+        }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.error('[Content] Error sending message:', chrome.runtime.lastError);
+                updateStatus('Error: ' + chrome.runtime.lastError.message);
+            } else {
+                console.log('[Content] Message sent successfully:', response);
+                updateStatus('Question sent to backend');
+            }
+        });
+    } else {
+        console.log('[Content] Duplicate question detected, not sending again.');
+    }
 
-    // Send the question to the popup
+    // Sende immer an Popup/UI (optional)
     chrome.runtime.sendMessage({
         action: 'updateQuestion',
         question: {
@@ -132,12 +139,13 @@ window.addEventListener('kahootQuestionParsed', (event) => {
             choices: question.choices
         }
     });
+
+    // Das Highlighting/AutoClick wird weiterhin durch highlightAnswer getriggert, sobald die Antwort vom Backend kommt.
 });
 
 // Function to highlight the correct answer
-function highlightAnswer(answer, options = {}) {
+function highlightAnswer(answer, options = {}, pollTries = 30) {
     console.log('[Content] Highlighting answer:', answer, 'with options:', options);
-    
     // Try different selectors to find answer elements
     const selectors = [
         '[data-functional-selector="answer-option"]',
@@ -149,7 +157,6 @@ function highlightAnswer(answer, options = {}) {
         'button[data-functional-selector*="answer"]',
         'button[class*="answer"]'
     ];
-    
     let answerElements = [];
     for (const selector of selectors) {
         const elements = document.querySelectorAll(selector);
@@ -159,9 +166,16 @@ function highlightAnswer(answer, options = {}) {
             break;
         }
     }
-    
     console.log('[Content] Found answer elements:', answerElements.length);
-    
+    // --- NEU: Wenn keine Buttons gefunden, poll weiter ---
+    if (answerElements.length === 0 && pollTries > 0) {
+        setTimeout(() => highlightAnswer(answer, options, pollTries - 1), 300);
+        return;
+    }
+    if (answerElements.length === 0) {
+        console.log('[Content] No matching answer element found (after polling)');
+        return;
+    }
     // Convert answer to lowercase for comparison
     const answerLower = answer.toLowerCase().trim();
     
@@ -259,27 +273,41 @@ function highlightAnswer(answer, options = {}) {
         
         // Auto-click if enabled
         if (options.autoClick !== false) {
-            // Add a small delay to make the highlight visible before clicking
-            setTimeout(() => {
-                try {
-                    // Get the index of the answer element
-                    const index = Array.from(answerElements).indexOf(correctElement);
-                    console.log('[Content] Clicking answer at index:', index);
-                    
-                    // Dispatch the autoClickAnswer event that the WebSocket hook will catch
-                    const event = new CustomEvent("autoClickAnswer", { detail: index });
-                    window.dispatchEvent(event);
-                } catch (error) {
-                    console.error('[Content] Error dispatching click event:', error);
-                }
-            }, 300);
+            // Statt setTimeout jetzt robustes Polling:
+            waitAndAutoClick(correctElement, answerElements, options);
         }
     } else {
         console.log('[Content] No matching answer element found');
     }
 }
 
+// Hilfsfunktion für AutoClick mit Polling
+function waitAndAutoClick(element, answerElements, options, retries = 20) {
+    if (!element) return;
+    // Prüfe, ob der Button klickbar ist
+    if (!element.disabled && element.offsetParent !== null) {
+        // Dispatch autoClick event
+        const index = Array.from(answerElements).indexOf(element);
+        console.log('[Content] Clicking answer at index:', index);
+        const event = new CustomEvent("autoClickAnswer", { detail: index });
+        window.dispatchEvent(event);
+    } else if (retries > 0) {
+        setTimeout(() => waitAndAutoClick(element, answerElements, options, retries - 1), 2000);
+    } else {
+        console.warn('[Content] AutoClick: Button was never enabled.');
+    }
+}
+
 // Add pulse animation to the styles
+function appendStyleWhenReady(style) {
+    if (document.head) {
+        document.head.appendChild(style);
+    } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.head) document.head.appendChild(style);
+        });
+    }
+}
 const style = document.createElement('style');
 style.textContent = `
     @keyframes pulse {
@@ -294,7 +322,7 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style);
+appendStyleWhenReady(style);
 
 // Function to show premium upgrade message
 function showPremiumUpgradeMessage() {
