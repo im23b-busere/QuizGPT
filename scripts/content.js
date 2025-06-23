@@ -1,3 +1,9 @@
+// Prevent duplicate execution in iframes
+if (window.top !== window) {
+    console.log('[Content] Skipping execution in iframe');
+    return;
+}
+
 // Inject the WebSocket hook script
 const script = document.createElement('script');
 script.src = chrome.runtime.getURL('scripts/injected.js');
@@ -9,6 +15,7 @@ script.onload = () => {
 
 // Store the current question
 let currentQuestion = null;
+let lastQuestionHash = null;
 
 // Add status indicator
 let statusIndicator = null;
@@ -96,11 +103,19 @@ window.addEventListener('kahootQuestionParsed', (event) => {
         return;
     }
 
+    // Check for duplicate question
+    const questionHash = `${question.title}|${question.choices.join('||')}`;
+    if (lastQuestionHash === questionHash) {
+        console.log('[Content] Duplicate question detected, ignoring');
+        return;
+    }
+
     // Store the current question
     currentQuestion = {
         title: question.title,
         choices: question.choices
     };
+    lastQuestionHash = questionHash;
 
     console.log('[Content] Processing question:', {
         title: question.title,
