@@ -33,7 +33,7 @@ body.upgrade-centered {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    min-height: 110vh;
 }
 
 .upgrade-centered .navbar {
