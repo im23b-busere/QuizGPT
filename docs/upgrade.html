@@ -112,15 +112,20 @@
         }
     </style>
 </head>
-<body class="upgrade-page">
+<body class="upgrade-centered">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+      <div class="navbar-content">
+        <a id="viewPricingLink" href="pricing.html" style="display: flex; align-items: center;"><span style="font-size: 1.2em; margin-right: 6px;">&#8592;</span>View Pricing Plans</a>
+      </div>
+    </nav>
     <div class="upgrade-card" id="upgradeContainer">
         <h1>Unlock <span style="color:#DA70D6;">Premium</span></h1>
         <div class="subtitle">Supercharge your QuizGPT experience</div>
         <ul class="feature-list">
             <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Up to 200 questions per month</li>
-            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Unlock Auto-Click option </li>
-            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Early access to new features</li>
-            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Support QuizGPT development</li>
+            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Auto-Click option </li>
+            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Turbo Answer Mode</li>
+            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Cancel anytime</li>
         </ul>
         <button id="buyPremiumBtn" class="buy-btn">Buy Premium – €4.99/month</button>
         <div class="secure">
@@ -140,8 +145,11 @@
     const urlToken = params.get('token');
     if (urlToken) {
         localStorage.setItem('token', urlToken);
+        // Update pricing link to include token
+        document.getElementById('viewPricingLink').href = 'pricing.html?token=' + encodeURIComponent(urlToken);
     } else {
         localStorage.removeItem('token');
+        document.getElementById('viewPricingLink').href = 'pricing.html';
     }
     // Show cancel message if canceled=1 in URL
     if (window.location.search.includes('canceled=1')) {
@@ -153,7 +161,7 @@
     // Disable buy button if no token
     if (!localStorage.getItem('token')) {
         buyBtn.disabled = true;
-        errorDiv.textContent = 'You must be logged in to upgrade.';
+        errorDiv.textContent = 'Please log in through the extension to upgrade.';
         errorDiv.style.display = 'block';
     }
     buyBtn.addEventListener('click', async () => {

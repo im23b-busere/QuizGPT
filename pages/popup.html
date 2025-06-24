@@ -148,6 +148,24 @@
     </div>
 </div>
 
+<div id="instructionsModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: transparent; backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); justify-content: center; align-items: center;">
+  <div style="background: transparent; padding: 32px 28px; border-radius: 18px; max-width: 360px; width: 90%; text-align: center; color: #f1f1f1; font-family: 'Segoe UI', sans-serif;">
+    <h2 style="margin-top: 0; font-size: 20px;">Before You Start</h2>
+    <p style="margin: 16px 0; font-size: 14px;">
+      Please read the 
+      <a href="https://quizgpt.site/guide" target="_blank" style="color: #b47af1; text-decoration: underline;">
+        instructions guide
+      </a>
+      before using this extension.
+    </p>
+    <div style="display: flex; gap: 12px; justify-content: center; margin-top: 24px;">
+      <button id="understoodBtn" style="padding: 10px 18px; border: none; background: #9b4de3; color: #fff; border-radius: 999px; cursor: pointer; transition: background 0.2s;">Understood</button>
+      <button id="dontShowBtn" style="padding: 10px 18px; border: none; background: #6c757d; color: #fff; border-radius: 999px; cursor: pointer; transition: background 0.2s;">Don't show again</button>
+    </div>
+  </div>
+</div>
+<!-- End Instructions Modal -->
+
 <script type="module" src="../scripts/popup.js" defer></script>
 </body>
 </html>

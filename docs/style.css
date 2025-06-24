@@ -29,9 +29,31 @@ body {
     background-attachment: fixed;
 }
 
+body.upgrade-centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.upgrade-centered .navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: white;
+    box-shadow: none;
+    border: none;
+}
+.upgrade-centered .navbar-content {
+    justify-content: flex-start;
+    padding-left: 0;
+}
+
 .navbar {
     background: white;
-    padding: 1rem 0;
+    padding: 0.6rem 0;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -2287,4 +2309,19 @@ html {
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
+}
+
+.upgrade-page .navbar {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+.upgrade-page .navbar-content {
+    justify-content: flex-start;
+    padding-left: 0rem;
 }

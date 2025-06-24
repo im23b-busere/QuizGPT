@@ -531,3 +531,38 @@ window.debugStripe = async () => {
         console.error('Debug test failed:', error);
     }
 };
+
+// --- Instructions Modal Logic ---
+async function handleInstructionsModal() {
+    const modal = document.getElementById('instructionsModal');
+    const understoodBtn = document.getElementById('understoodBtn');
+    const dontShowBtn = document.getElementById('dontShowBtn');
+
+    if (!(modal && understoodBtn && dontShowBtn)) return;
+
+    // Await storage to ensure we have the latest value
+    const result = await new Promise(resolve => {
+        chrome.storage.sync.get(['instructionsModalHide'], resolve);
+    });
+    console.log('[InstructionsModal] instructionsModalHide:', result.instructionsModalHide);
+    if (!result.instructionsModalHide) {
+        modal.style.display = 'flex';
+    }
+
+
+    understoodBtn.onclick = () => {
+        modal.style.display = 'none';
+        // Do not set instructionsModalHide, so it shows next time
+    };
+    dontShowBtn.onclick = () => {
+        chrome.storage.sync.set({ instructionsModalHide: true }, () => {
+            modal.style.display = 'none';
+        });
+    };
+}
+
+// Call modal logic after DOM and main UI are ready
+window.addEventListener('DOMContentLoaded', () => {
+    // ... existing code ...
+    handleInstructionsModal();
+});
