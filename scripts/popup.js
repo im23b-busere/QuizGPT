@@ -149,7 +149,6 @@ function initializeEventListeners() {
         upgradeButton.addEventListener('click', async () => {
             let token = authService.token;
             if (!token) {
-                // Try to load from chrome.storage
                 const data = await chrome.storage.sync.get(['token']);
                 token = data.token;
             }
@@ -461,6 +460,57 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     });
   }
+});
+
+// Listen for free limit reached message from background/content
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'showAuthError' && request.message && request.message.toLowerCase().includes('free tier limit')) {
+        chrome.storage.sync.set({ freeLimitReached: true });
+    }
+    return true;
+});
+
+// Show free limit modal on popup open if needed
+window.addEventListener('DOMContentLoaded', async () => {
+    const freeLimitModal = document.getElementById('freeLimitModal');
+    const freeLimitUpgradeBtn = document.getElementById('freeLimitUpgradeBtn');
+    const freeLimitCloseBtn = document.getElementById('freeLimitCloseBtn');
+    if (freeLimitModal && freeLimitUpgradeBtn && freeLimitCloseBtn) {
+        try {
+            // Fetch membership status from backend
+            const response = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/membership/status');
+            if (response.ok) {
+                const data = await response.json();
+                const planType = (data.plan_type || data.planType || 'free').toLowerCase();
+                const usage = data.usage ?? data.used;
+                const limit = data.limit ?? data.monthly_limit;
+                if (planType === 'free' && typeof usage === 'number' && typeof limit === 'number' && usage >= limit) {
+                    freeLimitModal.style.display = 'flex';
+                }
+            }
+        } catch (error) {
+            // If the backend returns a 403 or similar, assume limit reached for free users
+            if (error.message && error.message.toLowerCase().includes('kontingent') || error.message.toLowerCase().includes('limit')) {
+                freeLimitModal.style.display = 'flex';
+            }
+        }
+        // Upgrade button logic (same as settings)
+        freeLimitUpgradeBtn.onclick = async () => {
+            let token = authService.token;
+            if (!token) {
+                const data = await chrome.storage.sync.get(['token']);
+                token = data.token;
+            }
+            if (!token) {
+                alert('You must be logged in to upgrade.');
+                return;
+            }
+            window.open(`https://quizgpt.site/upgrade?token=${encodeURIComponent(token)}`, '_blank');
+        };
+        freeLimitCloseBtn.onclick = () => {
+            freeLimitModal.style.display = 'none';
+        };
+    }
 });
 
 // Initialize
