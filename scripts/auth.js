@@ -80,6 +80,12 @@ class AuthService {
             });
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    // Token expired or invalid, log out and redirect
+                    await this.logout();
+                    window.location.href = 'login.html';
+                    throw new Error('Session expired. Please log in again.');
+                }
                 if (response.status === 403) {
                     throw new Error('Du hast dein kostenloses Kontingent aufgebraucht. Upgrade auf Premium für unbegrenzten Zugriff auf QuizGPT!');
                 }
