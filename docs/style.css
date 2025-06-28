@@ -78,7 +78,7 @@ body.upgrade-centered {
 }
 
 .navbar a:hover {
-    color: #DA70D6;
+    color: var(--primary-color);
 }
 
 .navbar a::after {
@@ -175,7 +175,7 @@ a {
 }
 
 a:hover {
-    color: var(--primary-dark);
+    color: var(--primary-color);
 }
 
 .store-link {
@@ -403,7 +403,7 @@ footer a:hover {
     }
     
     .navbar a[aria-label="QuizGPT Home"]:hover {
-        color: #DA70D6;
+        color: var(--primary-color);
     }
     
     .navbar a[aria-label="QuizGPT Home"]::after {
@@ -1106,40 +1106,80 @@ html {
     margin-bottom: 2rem;
 }
 
-.faq-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-}
-
 .faq-item {
-    padding: 1.5rem;
-    border-radius: 12px;
-    background: #f8f9fa;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    will-change: transform, box-shadow;
-    transform: translateZ(0);
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .faq-item:hover {
-    background: #e9ecef;
-    transform: translate3d(0, -2px, 0);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-light);
 }
 
-.faq-item h3 {
-    font-size: 1.2rem;
-    margin-bottom: 0.8rem;
-    color: #2d3436;
-    font-weight: 600;
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    cursor: pointer;
+    background: white;
+    transition: background-color 0.3s ease;
+    user-select: none;
 }
 
-.faq-item p {
-    color: #636e72;
+.faq-question:hover {
+    background-color: #f8f9fa;
+}
+
+.faq-question h3 {
     margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    flex: 1;
+}
+
+.faq-toggle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+    margin-left: 1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.faq-item.active .faq-toggle {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 200px;
+    padding: 0 1.5rem 1.5rem;
+}
+
+.faq-answer p {
+    margin: 0;
+    color: var(--text-light);
     line-height: 1.6;
-    font-size: 1rem;
+}
+
+.faq-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .cta-section {
@@ -2002,7 +2042,7 @@ html {
     }
     
     .navbar a[aria-label="QuizGPT Home"]:hover {
-        color: #DA70D6;
+        color: var(--primary-color);
     }
     
     .navbar a[aria-label="QuizGPT Home"]::after {
