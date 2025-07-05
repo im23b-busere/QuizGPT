@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Successful | QuizGPT</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="icons/icon48.png">
+</head>
+<body class="success-page">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="navbar-content">
+            <a href="index.html" style="margin-left: 0;" aria-label="QuizGPT Home">QuizGPT</a>
+            <div class="burger-menu" id="burgerMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="guide.html">Guide</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+                <a href="https://github.com/im23b-busere/quizgpt" rel="noopener noreferrer">GitHub</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>Thank you for your purchase!</h1>
+        <p>Your payment was successful. Your premium access will be activated shortly.</p>
+        <a href="https://quizgpt.site" class="button">Back to QuizGPT</a>
+    </div>
+    <script>
+    // Notify the extension to refresh membership status
+    if (window.chrome && chrome.runtime && chrome.runtime.sendMessage) {
+      chrome.runtime.sendMessage({ action: "refreshMembership" });
+    }
+    // Show a thank you message (in case the extension popup is open)
+    setTimeout(() => {
+      alert("Thank you for purchasing QuizGPT Premium! Have fun 🎉");
+    }, 500);
+
+    // Burger menu functionality
+    const burgerMenu = document.getElementById('burgerMenu');
+    const navLinks = document.getElementById('navLinks');
+
+    burgerMenu.addEventListener('click', () => {
+        burgerMenu.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+
+    // Close menu when clicking on a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            burgerMenu.classList.remove('active');
+            navLinks.classList.remove('active');
+        });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!burgerMenu.contains(e.target) && !navLinks.contains(e.target)) {
+            burgerMenu.classList.remove('active');
+            navLinks.classList.remove('active');
+        }
+    });
+    </script>
+</body>
+</html> 

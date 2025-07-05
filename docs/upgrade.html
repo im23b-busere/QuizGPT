@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upgrade to Premium | QuizGPT</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="icons/icon48.png">
+    <style>
+        body.upgrade-page {
+            background: linear-gradient(135deg, #8A2BE2 0%, #DA70D6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .upgrade-card {
+            background: #23232b;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(34, 0, 51, 0.18);
+            padding: 40px 32px 32px 32px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            color: black;
+            position: relative;
+        }
+        .upgrade-card h1 {
+            font-size: 2.1em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+        .upgrade-card .subtitle {
+            font-size: 1.1em;
+            color: #e0c3fc;
+            margin-bottom: 24px;
+        }
+        .feature-list {
+            text-align: left;
+            margin: 0 auto 28px auto;
+            padding: 0;
+            list-style: none;
+            max-width: 320px;
+        }
+        .feature-list li {
+            margin-bottom: 14px;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-list svg {
+            color: #8A2BE2;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        .buy-btn {
+            background: linear-gradient(90deg, #8A2BE2 0%, #DA70D6 100%);
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 16px 0;
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(138,43,226,0.12);
+            transition: background 0.2s, transform 0.2s;
+        }
+        .buy-btn:hover {
+            background: linear-gradient(90deg, #DA70D6 0%, #8A2BE2 100%);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .secure {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95em;
+            color: #b7b7b7;
+            margin-bottom: 0;
+        }
+        .secure img {
+            height: 22px;
+        }
+        .error-message {
+            margin-top: 10px;
+            color: #ffb3b3;
+            font-size: 1em;
+        }
+        .cancel-card {
+            background: #23232b;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(34, 0, 51, 0.18);
+            padding: 40px 32px 32px 32px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+        }
+        .cancel-card h1 {
+            color: #ff4444;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .cancel-card .button {
+            margin-top: 18px;
+        }
+    </style>
+</head>
+<body class="upgrade-centered">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+      <div class="navbar-content">
+        <a id="viewPricingLink" href="pricing.html" style="display: flex; align-items: center;"><span style="font-size: 1.2em; margin-right: 6px;">&#8592;</span>View Pricing Plans</a>
+      </div>
+    </nav>
+    <div class="upgrade-card" id="upgradeContainer">
+        <h1>Unlock <span style="color:#DA70D6;">Premium</span></h1>
+        <div class="subtitle">Supercharge your QuizGPT experience</div>
+        <ul class="feature-list">
+            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Up to 200 questions per month</li>
+            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Auto-Click option </li>
+            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Turbo Answer Mode</li>
+            <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Cancel anytime</li>
+        </ul>
+        <button id="buyPremiumBtn" class="buy-btn">Buy Premium – €4.99/month</button>
+        <div class="secure">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" />
+            <span>Secure payment powered by Stripe</span>
+        </div>
+        <div id="errorMessage" class="error-message" style="display:none;"></div>
+    </div>
+    <div class="cancel-card" id="cancelContainer" style="display:none;">
+        <h1>Payment Canceled</h1>
+        <p>Your payment was canceled. No money was charged.</p>
+        <a href="/upgrade" class="button">Try Again</a>
+    </div>
+    <script>
+    // Store token from URL param if present, otherwise clear token
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get('token');
+    if (urlToken) {
+        localStorage.setItem('token', urlToken);
+        // Update pricing link to include token
+        document.getElementById('viewPricingLink').href = 'pricing.html?token=' + encodeURIComponent(urlToken);
+    } else {
+        localStorage.removeItem('token');
+        document.getElementById('viewPricingLink').href = 'pricing.html';
+    }
+    // Show cancel message if canceled=1 in URL
+    if (window.location.search.includes('canceled=1')) {
+        document.getElementById('upgradeContainer').style.display = 'none';
+        document.getElementById('cancelContainer').style.display = 'block';
+    }
+    const buyBtn = document.getElementById('buyPremiumBtn');
+    const errorDiv = document.getElementById('errorMessage');
+    // Disable buy button if no token
+    if (!localStorage.getItem('token')) {
+        buyBtn.disabled = true;
+        errorDiv.textContent = 'Please log in through the extension to upgrade.';
+        errorDiv.style.display = 'block';
+    }
+    buyBtn.addEventListener('click', async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            errorDiv.textContent = 'You must be logged in to upgrade.';
+            errorDiv.style.display = 'block';
+            buyBtn.disabled = true;
+            buyBtn.textContent = 'Buy Premium – €4.99/month';
+            return;
+        }
+        buyBtn.disabled = true;
+        buyBtn.textContent = 'Redirecting...';
+        errorDiv.style.display = 'none';
+        try {
+            const res = await fetch('https://api.quizgpt.site/api/stripe/create-checkout-session', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({})
+            });
+            const data = await res.json();
+            if (!res.ok || !data.url) throw new Error(data.message || 'Could not start payment.');
+            window.location.href = data.url;
+        } catch (err) {
+            errorDiv.textContent = err.message;
+            errorDiv.style.display = 'block';
+            buyBtn.disabled = false;
+            buyBtn.textContent = 'Buy Premium – €4.99/month';
+        }
+    });
+    </script>
+
+    <script>
+        // Burger menu functionality
+        const burgerMenu = document.getElementById('burgerMenu');
+        const navLinks = document.getElementById('navLinks');
+
+        burgerMenu.addEventListener('click', () => {
+            burgerMenu.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                burgerMenu.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!burgerMenu.contains(e.target) && !navLinks.contains(e.target)) {
+                burgerMenu.classList.remove('active');
+                navLinks.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html> 

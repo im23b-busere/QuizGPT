@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>QuizGPT - Register</title>
+    <link rel="stylesheet" href="../styles/styles.css"/>
+</head>
+<body class="popup-container">
+    <div class="popup-content">
+        <h1 class="title">QuizGPT</h1>
+        <div id="registerForm" class="auth-form">
+            <h2 class="subtitle">Register</h2>
+            <input type="email" id="registerEmail" placeholder="Enter your email" class="text-field" required/>
+            <input type="text" id="registerUsername" placeholder="Choose a username" class="text-field" required/>
+            <button id="registerButton" class="button">Register</button>
+            <div id="registerError" class="error-message hidden"></div>
+            <p class="auth-switch">Already have an account? <a href="login.html">Login</a></p>
+        </div>
+        <div id="registerCodeForm" class="auth-form hidden">
+            <h2 class="subtitle">Verify Email</h2>
+            <p class="info-text">We sent a 6-digit code to your email</p>
+            <input type="text" id="registerCodeInput" placeholder="Enter 6-digit code" class="text-field" maxlength="6" pattern="[0-9]*" inputmode="numeric" required/>
+            <button id="verifyRegisterCodeButton" class="button">Verify Code</button>
+            <div id="registerCodeError" class="error-message hidden"></div>
+        </div>
+    </div>
+    <script type="module" src="../scripts/register.js"></script>
+</body>
+</html> 

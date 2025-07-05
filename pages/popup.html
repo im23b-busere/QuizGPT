@@ -34,31 +34,103 @@
         </svg>
     </button>
 </div>
+
+<div class="popup-content">
+    <h1 class="title">QuizGPT</h1>
+    
+    <div id="userProfile" class="user-profile">
+        <div class="profile-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        </div>
+        <div class="profile-info">
+            <div id="username" class="username">Loading...</div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span class="status-text">Online</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainContent">
+        <!-- Main content will be loaded here -->
+    </div>
+</div>
+
+<!-- Settings Modal -->
 <div id="settingsModal" class="modal hidden">
     <div class="modal-content">
         <button class="close-modal" title="Close">&times;</button>
         <h2>Settings</h2>
 
         <div class="settings-tabs">
-            <button class="tab-button active" data-tab="openai">OpenAI</button>
+            <button class="tab-button active" data-tab="account">Account</button>
             <button class="tab-button" data-tab="kahoot">QuizGPT</button>
         </div>
 
-        <div class="tab-content active" id="openai-tab">
-            <!-- API-Key -->
-            <label for="apiKey">OpenAI API Key</label>
-            <input type="password" id="apiKey" placeholder="sk-..." class="text-field" style="width: 100%;"/>
-            <button id="saveApiKey" class="button-secondary" style="margin-top: 8px;">Save</button>
-            <small id="apiKeyStatus" style="color: white; display: none;">Saved ✅</small>
+        <div class="tab-content active" id="account-tab">
+            <div id="userProfile" class="account-section">
+                <div class="user-profile">
+                    <div class="profile-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="profile-info">
+                        <div class="username">User Account</div>
+                        <div class="status-indicator">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Account Active</span>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- Model -->
-            <label for="model" style="margin-top: 14px;">ChatGPT Model:</label>
-            <select id="model" class="select">
-                <option value="gpt-4o" title="Very powerful, good for complex questions">GPT-4o</option>
-                <option value="gpt-4o-mini" title="Compact version, cheaper">GPT-4o-mini</option>
-                <option value="gpt-3.5-turbo" title="Fast, cheap, ideal for standard questions">GPT-3.5-turbo</option>
-            </select>
-            <small id="model-description" style="display:block; font-size: 0.85em; color: #999;"></small>
+                <div class="plan-status">
+                    <div class="plan-header">
+                        <span class="plan-label">Current Plan</span>
+                        <span class="plan-badge">Free</span>
+                    </div>
+                    <div class="plan-features">
+                        <div class="feature">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Enjoy 5 FREE requests</span>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="account-actions">
+                    <button id="upgradeButton" class="upgrade-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            <path d="M2 2l7.586 7.586"></path>
+                            <circle cx="11" cy="11" r="2"></circle>
+                        </svg>
+                        Upgrade to Premium
+                    </button>
+                    <button id="manageSubscriptionButton" class="manage-subscription-button hidden">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                        Manage Subscription
+                    </button>
+                    <button class="logout-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="tab-content" id="kahoot-tab">
@@ -76,25 +148,34 @@
     </div>
 </div>
 
-<div class="popup-content">
-    <h1 class="title">QuizGPT</h1>
-    <button id="manualButton" class="button">Find Answer</button>
-    <div id="loadingSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
-        <div class="loader"></div>
+<div id="instructionsModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: transparent; backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); justify-content: center; align-items: center;">
+  <div style="background: transparent; padding: 32px 28px; border-radius: 18px; max-width: 360px; width: 90%; text-align: center; color: #f1f1f1; font-family: 'Segoe UI', sans-serif;">
+    <h2 style="margin-top: 0; font-size: 20px;">Before You Start</h2>
+    <p style="margin: 16px 0; font-size: 14px;">
+      Please read the 
+      <a href="https://quizgpt.site/guide" target="_blank" style="color: #b47af1; text-decoration: underline;">
+        instructions guide
+      </a>
+      before using this extension.
+    </p>
+    <div style="display: flex; gap: 12px; justify-content: center; margin-top: 24px;">
+      <button id="understoodBtn" style="padding: 10px 18px; border: none; background: #9b4de3; color: #fff; border-radius: 999px; cursor: pointer; transition: background 0.2s;">Understood</button>
+      <button id="dontShowBtn" style="padding: 10px 18px; border: none; background: #6c757d; color: #fff; border-radius: 999px; cursor: pointer; transition: background 0.2s;">Don't show again</button>
     </div>
-    <div id="extractedData" class="hidden">
-        <h2 class="subtitle">Detected Question:</h2>
-        <p id="questionText" class="text-field"></p>
-        <h2 class="subtitle">Found Answer:</h2>
-        <p id="answerText" class="text-field answer"></p>
-    </div>
-    
-    <div class="footer-buttons">
-        <a href="https://im23b-busere.github.io/QuizGPT/privacy.html" target="_blank" class="footer-link">Privacy</a>
-        <span class="footer-separator">•</span>
-        <a href="https://im23b-busere.github.io/QuizGPT/terms.html" target="_blank" class="footer-link">Terms</a>
-    </div>
+  </div>
 </div>
+<!-- End Instructions Modal -->
+
+<!-- Free Limit Reached Modal -->
+<div id="freeLimitModal" style="display:none; position:fixed; z-index:10000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div style="background:#23232b; color:#fff; padding:32px 24px; border-radius:16px; max-width:350px; width:90%; box-shadow:0 2px 16px rgba(0,0,0,0.2); text-align:center; position:relative;">
+    <button id="freeLimitCloseBtn" style="position:absolute; top:10px; right:14px; background:none; border:none; color:#fff; font-size:1.7em; cursor:pointer; line-height:1;">&times;</button>
+    <h2 style="margin-top:0; color:#ff6b6b;">Free Limit Reached</h2>
+    <p style="margin:16px 0; font-size:15px;">Upgrade to Premium now for more answers!</p>
+    <button id="freeLimitUpgradeBtn" class="upgrade-button" style="margin-top:18px; background: linear-gradient(90deg, #8A2BE2 0%, #DA70D6 100%); color: #fff; font-weight: 700; border: none; border-radius: 8px; padding: 12px 0; width: 100%; font-size: 1.1em; cursor: pointer; box-shadow: 0 2px 8px rgba(138,43,226,0.12); transition: background 0.2s, transform 0.2s;">Upgrade to Premium</button>
+  </div>
+</div>
+<!-- End Free Limit Reached Modal -->
 
 <script type="module" src="../scripts/popup.js" defer></script>
 </body>

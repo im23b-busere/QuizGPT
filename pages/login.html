@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>QuizGPT - Login</title>
+    <link rel="stylesheet" href="../styles/styles.css"/>
+</head>
+<body class="popup-container">
+    <div class="popup-content">
+        <h1 class="title">QuizGPT</h1>
+        
+        <div id="emailForm" class="auth-form">
+            <h2 class="subtitle">Login with Email</h2>
+            <input type="email" id="emailInput" placeholder="Enter your email" class="text-field" required/>
+            <button id="requestCodeButton" class="button">Send Code</button>
+            <div id="emailError" class="error-message hidden"></div>
+            <p class="auth-switch">Don't have an account? <a href="register.html">Register</a></p>
+        </div>
+
+        <div id="codeForm" class="auth-form hidden">
+            <h2 class="subtitle">Enter Code</h2>
+            <p class="info-text">We sent a 6-digit code to your email</p>
+            <div class="code-input-container">
+                <input type="text" id="codeInput" placeholder="Enter 6-digit code" class="text-field" maxlength="6" pattern="[0-9]*" inputmode="numeric" required/>
+            </div>
+            <button id="verifyCodeButton" class="button">Verify Code</button>
+            <button id="resendCodeButton" class="button secondary">Resend Code</button>
+            <div id="codeError" class="error-message hidden"></div>
+        </div>
+
+        <div id="errorMessage" class="error-message hidden"></div>
+    </div>
+
+    <script type="module" src="../scripts/login.js"></script>
+</body>
+</html> 
