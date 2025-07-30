@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /index.html
 
 # Sitemap location
 Sitemap: https://quizgpt.site/sitemap.xml
