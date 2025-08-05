@@ -55,7 +55,6 @@ Now available in the **Chrome Web Store**! 🚀
 
 ## Important Notes
 - Some questions may require the text to be visible on the client device (depending on Kahoot settings)
-- You must provide your own OpenAI API key to use the extension
 - This project is **not affiliated with Kahoot! or OpenAI**
 - Use responsibly and only in settings where AI use is permitted
 
