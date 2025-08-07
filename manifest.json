@@ -13,8 +13,7 @@
     "default_title": "QuizGPT"
   },
   "permissions": [
-    "storage",
-    "tabs"
+    "storage"
   ],
   "content_scripts": [
     {

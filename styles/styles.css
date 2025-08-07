@@ -125,7 +125,7 @@ body.popup-container {
 .modal-content {
     background: #1e1e1e;
     border: none;
-    padding: 20px 16px;
+    padding: 12px 10px;
     border-radius: 0;
     height: 100vh;
     width: 100vw;
@@ -136,12 +136,13 @@ body.popup-container {
     max-height: none;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 .modal-content h2 {
     margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.4em;
+    margin-bottom: 12px;
+    font-size: 1.3em;
     color: #fff;
     text-align: center;
     padding-top: 0;
@@ -519,17 +520,18 @@ body.popup-container {
 
 /* Account Section Styles */
 .account-section {
-    padding: 10px;
+    padding: 4px;
     background: #2a2a2a;
     border-radius: 8px;
     margin-top: 0px;
+    margin-bottom: 8px;
 }
 
 .user-profile {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
 }
 
 .profile-icon {
@@ -581,15 +583,15 @@ body.popup-container {
 .plan-status {
     background: #333;
     border-radius: 6px;
-    padding: 10px;
-    margin-bottom: 12px;
+    padding: 8px;
+    margin-bottom: 8px;
 }
 
 .plan-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .plan-label {
@@ -637,11 +639,66 @@ body.popup-container {
     stroke: #8A2BE2;
 }
 
+/* Usage Counter Styles */
+.usage-counter {
+    margin: 8px 0;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.usage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.usage-label {
+    font-size: 0.8em;
+    font-weight: 500;
+    color: #b7b7b7;
+}
+
+.usage-text {
+    font-size: 0.75em;
+    color: #9d86c3;
+    font-weight: 600;
+}
+
+.usage-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 3px;
+}
+
+.usage-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #8A2BE2, #DA70D6);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.usage-reset {
+    text-align: center;
+}
+
+.usage-reset small {
+    font-size: 0.65em;
+    color: #888;
+    font-style: italic;
+}
+
 .account-actions {
     display: flex;
-    gap: 8px;
-    margin-top: auto;
-    padding-top: 8px;
+    gap: 6px;
+    margin-top: 4px;
+    padding-top: 2px;
 }
 
 .upgrade-button, .logout-button, .manage-subscription-button {
@@ -650,12 +707,13 @@ body.popup-container {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 4px;
+    padding: 8px 6px;
     border-radius: 6px;
-    font-size: 0.85em;
+    font-size: 0.9em;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    min-height: 36px;
 }
 
 .upgrade-button {
