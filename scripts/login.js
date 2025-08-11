@@ -14,8 +14,11 @@ const codeError = document.getElementById('codeError');
 const errorMessage = document.getElementById('errorMessage');
 const codeSection = document.getElementById('codeSection');
 const emailSection = document.getElementById('emailSection');
+const returningUserText = document.getElementById('returningUserText');
 
 let currentEmail = '';
+let rateLimitTimer = null;
+let rateLimitEndTime = null;
 
 // TEMP: Inline API_URL and showError/hideError if missing
 const API_URL = 'https://api.quizgpt.site/api';
@@ -29,6 +32,178 @@ function hideError(element) {
     if (element) {
         element.textContent = '';
         element.classList.add('hidden');
+    }
+}
+
+// Start rate limit countdown
+function startRateLimitCountdown(seconds) {
+    if (rateLimitTimer) {
+        clearInterval(rateLimitTimer);
+    }
+    
+    // Safety check: cap at reasonable time (e.g., 30 minutes = 1800 seconds)
+    const maxSeconds = 1800; // 30 minutes max
+    const safeSeconds = Math.min(seconds, maxSeconds);
+    
+    console.log(`Rate limit countdown: ${seconds}s requested, ${safeSeconds}s used`);
+    
+    if (safeSeconds <= 0) {
+        console.warn('Invalid retry time received:', seconds);
+        return;
+    }
+    
+    rateLimitEndTime = Date.now() + (safeSeconds * 1000);
+    updateRateLimitDisplay();
+    
+    rateLimitTimer = setInterval(() => {
+        updateRateLimitDisplay();
+    }, 1000);
+}
+
+// Update rate limit display
+function updateRateLimitDisplay() {
+    if (!rateLimitEndTime) return;
+    
+    const remaining = Math.max(0, Math.ceil((rateLimitEndTime - Date.now()) / 1000));
+    
+    // Safety check: if remaining time is unreasonably large, use fallback
+    if (remaining > 3600) { // More than 1 hour
+        console.warn('Unreasonable countdown time detected:', remaining);
+        if (rateLimitTimer) {
+            clearInterval(rateLimitTimer);
+            rateLimitTimer = null;
+        }
+        rateLimitEndTime = null;
+        
+        // Show fallback message
+        requestCodeButton.disabled = false;
+        requestCodeButton.textContent = 'Send Code';
+        requestCodeButton.classList.remove('rate-limited');
+        showError(emailError, 'Too many requests. Please wait before trying again.');
+        return;
+    }
+    
+    if (remaining <= 0) {
+        // Rate limit expired
+        if (rateLimitTimer) {
+            clearInterval(rateLimitTimer);
+            rateLimitTimer = null;
+        }
+        rateLimitEndTime = null;
+        
+        // Re-enable the button
+        requestCodeButton.disabled = false;
+        requestCodeButton.textContent = 'Send Code';
+        requestCodeButton.classList.remove('rate-limited');
+        hideError(emailError);
+        return;
+    }
+    
+    // Update button text and keep disabled
+    requestCodeButton.disabled = true;
+    requestCodeButton.classList.add('rate-limited');
+    requestCodeButton.textContent = `Wait ${remaining}s`;
+    
+    // Update error message with countdown
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+    const timeString = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+    showError(emailError, `Too many requests. Please wait ${timeString} before trying again.`);
+}
+
+// Clear pending verification and go back to email form
+async function goBackToEmail() {
+    try {
+        await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+        currentEmail = '';
+        emailInput.value = '';
+        
+        // Clear rate limit timer
+        if (rateLimitTimer) {
+            clearInterval(rateLimitTimer);
+            rateLimitTimer = null;
+        }
+        rateLimitEndTime = null;
+        
+        // Show email form
+        codeForm.classList.add('hidden');
+        emailForm.classList.remove('hidden');
+        
+        // Hide returning user text
+        if (returningUserText) {
+            returningUserText.classList.add('hidden');
+        }
+        
+        // Clear any errors and reset button
+        hideError(emailError);
+        hideError(codeError);
+        errorMessage.textContent = '';
+        requestCodeButton.disabled = false;
+        requestCodeButton.textContent = 'Send Code';
+        requestCodeButton.classList.remove('rate-limited');
+    } catch (error) {
+        console.error('Error going back to email form:', error);
+    }
+}
+
+// Clear expired verifications from storage
+async function clearExpiredVerifications() {
+    try {
+        const data = await chrome.storage.sync.get(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+        if (data.pendingVerification && data.verificationTimestamp) {
+            const now = Date.now();
+            const verificationAge = now - data.verificationTimestamp;
+            const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+            
+            if (verificationAge >= maxAge) {
+                console.log('Clearing expired verification for:', data.pendingEmail);
+                await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+            }
+        }
+    } catch (error) {
+        console.error('Error clearing expired verifications:', error);
+    }
+}
+
+// Check if there's a pending verification on page load
+async function checkPendingVerification() {
+    try {
+        // First clear any expired verifications
+        await clearExpiredVerifications();
+        
+        const data = await chrome.storage.sync.get(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+        if (data.pendingVerification && data.pendingEmail) {
+            // Check if verification is not too old (24 hours)
+            const now = Date.now();
+            const verificationAge = now - (data.verificationTimestamp || 0);
+            const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+            
+            if (verificationAge < maxAge) {
+                console.log('Found pending verification for:', data.pendingEmail);
+                currentEmail = data.pendingEmail;
+                emailInput.value = data.pendingEmail;
+                
+                // Show code form directly
+                emailForm.classList.add('hidden');
+                codeForm.classList.remove('hidden');
+                
+                // Show returning user text
+                if (returningUserText) {
+                    returningUserText.classList.remove('hidden');
+                }
+                
+                // Clear any errors
+                hideError(emailError);
+                hideError(codeError);
+                errorMessage.textContent = '';
+            } else {
+                // Verification is too old, clear it
+                console.log('Verification expired, clearing pending state');
+                await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+            }
+        }
+    } catch (error) {
+        console.error('Error checking pending verification:', error);
     }
 }
 
@@ -71,11 +246,58 @@ async function requestCode() {
             },
             body: JSON.stringify({ email })
         });
+        
         if (!response.ok) {
-            const data = await response.json();
-            showError(emailError, data.message || 'Failed to send code');
+            let errorMessage = 'Failed to send code';
+            
+            try {
+                // Try to parse as JSON first
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorMessage;
+                
+                // Handle specific error cases
+                if (response.status === 429) {
+                    // Rate limit exceeded
+                    const retryAfter = errorData.retryAfter || 0;
+                    console.log('Rate limit hit, retryAfter:', retryAfter);
+                    
+                    if (retryAfter > 0 && retryAfter < 3600) { // Max 1 hour
+                        startRateLimitCountdown(retryAfter);
+                        return; // Don't show error message, countdown will handle it
+                    } else {
+                        console.warn('Invalid retry time received:', retryAfter);
+                        errorMessage = 'Too many requests. Please wait before trying again.';
+                    }
+                }
+            } catch (parseError) {
+                // If JSON parsing fails, try to get text content
+                try {
+                    const textError = await response.text();
+                    if (textError.includes('Too many')) {
+                        errorMessage = 'Too many code requests. Please wait before trying again.';
+                    } else if (textError.trim()) {
+                        errorMessage = textError.trim();
+                    }
+                } catch (textError) {
+                    // If all else fails, use status-based message
+                    if (response.status === 429) {
+                        errorMessage = 'Too many requests. Please wait before trying again.';
+                    } else if (response.status === 500) {
+                        errorMessage = 'Server error. Please try again later.';
+                    }
+                }
+            }
+            
+            showError(emailError, errorMessage);
             return;
         }
+
+        // Store pending verification state
+        await chrome.storage.sync.set({
+            pendingVerification: true,
+            pendingEmail: email,
+            verificationTimestamp: Date.now()
+        });
 
         // Show code form
         emailForm.classList.add('hidden');
@@ -93,7 +315,7 @@ async function requestCode() {
 // Verify code
 async function verifyCode() {
     try {
-        const email = emailInput.value.trim();
+        const email = currentEmail || emailInput.value.trim();
         const code = codeInput.value.trim();
 
         if (!email || !code) {
@@ -113,11 +335,27 @@ async function verifyCode() {
         await authService.setAuthData(data.token, data.user);
         console.log('Auth data stored successfully'); // Debug log
 
+        // Clear pending verification state
+        await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+
         // Redirect to popup
         window.location.href = 'popup.html';
     } catch (error) {
         console.error('Code verification error:', error);
-        showError(error.message);
+        
+        // Provide better error messages
+        let errorMessage = error.message || 'Verification failed';
+        
+        // Handle specific error cases
+        if (errorMessage.includes('Invalid or expired code')) {
+            errorMessage = 'Invalid or expired code. Please request a new one.';
+        } else if (errorMessage.includes('Invalid code')) {
+            errorMessage = 'Invalid code. Please check and try again.';
+        } else if (errorMessage.includes('Too many')) {
+            errorMessage = 'Too many attempts. Please wait before trying again.';
+        }
+        
+        showError(codeError, errorMessage);
     } finally {
         verifyCodeButton.disabled = false;
         verifyCodeButton.textContent = 'Verify Code';
@@ -168,14 +406,20 @@ async function checkUserExists(email) {
 requestCodeButton.addEventListener('click', requestCode);
 verifyCodeButton.addEventListener('click', verifyCode);
 
+// Add back button event listener
+const backToEmailButton = document.getElementById('backToEmailButton');
+if (backToEmailButton) {
+    backToEmailButton.addEventListener('click', goBackToEmail);
+}
+
 resendCodeButton.addEventListener('click', async () => {
     hideError(codeError);
-    const email = emailInput.value.trim();
+    const email = currentEmail || emailInput.value.trim();
     
     resendCodeButton.disabled = true;
     resendCodeButton.textContent = 'Sending...';
     
-    await requestCode(email);
+    await requestCode();
     
     resendCodeButton.disabled = false;
     resendCodeButton.textContent = 'Resend Code';
@@ -192,6 +436,16 @@ codeInput.addEventListener('input', (e) => {
     }
 });
 
+// Handle email input changes - clear pending verification if email changes
+emailInput.addEventListener('input', async (e) => {
+    const newEmail = e.target.value.trim();
+    if (newEmail !== currentEmail && currentEmail) {
+        console.log('Email changed, clearing pending verification');
+        await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+        currentEmail = '';
+    }
+});
+
 // Handle Enter key
 emailInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -202,5 +456,18 @@ emailInput.addEventListener('keypress', (e) => {
 codeInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         verifyCode();
+    }
+}); 
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkPendingVerification();
+});
+
+// Cleanup when page is unloaded
+window.addEventListener('beforeunload', () => {
+    if (rateLimitTimer) {
+        clearInterval(rateLimitTimer);
+        rateLimitTimer = null;
     }
 }); 

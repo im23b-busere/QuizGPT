@@ -46,8 +46,32 @@ class AuthService {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Verification failed');
+                let errorMessage = 'Verification failed';
+                
+                try {
+                    // Try to parse as JSON first
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (parseError) {
+                    // If JSON parsing fails, try to get text content
+                    try {
+                        const textError = await response.text();
+                        if (textError.trim()) {
+                            errorMessage = textError.trim();
+                        }
+                    } catch (textError) {
+                        // If all else fails, use status-based message
+                        if (response.status === 400) {
+                            errorMessage = 'Invalid or expired code';
+                        } else if (response.status === 429) {
+                            errorMessage = 'Too many attempts. Please wait before trying again.';
+                        } else if (response.status === 500) {
+                            errorMessage = 'Server error. Please try again later.';
+                        }
+                    }
+                }
+                
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
@@ -104,6 +128,13 @@ class AuthService {
         this.token = null;
         this.user = null;
         await chrome.storage.sync.remove(['token', 'user']);
+        
+        // Also clear any pending verification state
+        try {
+            await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+        } catch (error) {
+            console.log('Could not clear pending verification state:', error);
+        }
     }
 
     async setAuthData(token, user) {
@@ -115,6 +146,14 @@ class AuthService {
         this.token = token;
         this.user = user;
         await chrome.storage.sync.set({ token, user });
+        
+        // Clear any pending verification state since we're now authenticated
+        try {
+            await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+        } catch (error) {
+            console.log('Could not clear pending verification state:', error);
+        }
+        
         // Verify the data was stored
         const stored = await chrome.storage.sync.get(['token', 'user']);
         console.log('Stored auth data:', stored); // Debug log

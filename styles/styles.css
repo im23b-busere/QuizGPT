@@ -388,25 +388,30 @@ body.popup-container {
 
 /* Authentication Styles */
 .auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
+    background: #2a2a2a;
+    border-radius: 8px;
+    padding: 25px;
+    margin: 15px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .auth-form .text-field {
     width: 100%;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
     padding: 8px;
     border: 1px solid #444;
     border-radius: 4px;
-    background-color: #2a2a2a;
+    background-color: #3a3a3a;
     color: white;
-    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .auth-form .text-field:focus {
     outline: none;
-    border-color: #666;
+    border-color: #8A2BE2;
+    box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
 }
 
 .auth-switch {
@@ -773,11 +778,108 @@ body.popup-container {
     color: white;
 }
 
-.info-text {
-    color: #666;
+/* Code form header with back button */
+.code-form-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    min-height: 40px;
+    transition: opacity 0.3s ease;
+}
+
+.back-button {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #9d86c3;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-button:hover {
+    background-color: #3a3a3a;
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.back-button:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.code-form-header .subtitle {
+    margin: 0;
     text-align: center;
+    flex: 1;
+}
+
+/* Code form actions */
+.code-form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 25px;
+    transition: opacity 0.3s ease;
+}
+
+.code-form-actions .button {
+    margin-top: 0;
+}
+
+/* Improve button spacing in auth forms */
+.auth-form .button {
+    margin-top: 15px;
+}
+
+.auth-form .button.secondary {
+    margin-top: 8px;
+}
+
+/* Responsive improvements for small screens */
+@media (max-width: 320px) {
+    .code-form-header {
+        min-height: 35px;
+    }
+    
+    .back-button {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+    
+    .code-form-actions {
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .auth-form {
+        padding: 20px;
+        margin: 10px 0;
+    }
+}
+
+.info-text {
+    color: #9d86c3;
+    font-size: 0.9em;
     margin: 10px 0;
-    font-size: 14px;
+}
+
+.info-text.small {
+    font-size: 0.8em;
+    color: #8a8a8a;
+    margin: 8px 0;
 }
 
 .button.secondary {
@@ -793,6 +895,20 @@ body.popup-container {
 .button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Rate limited button state */
+.button.rate-limited {
+    background: linear-gradient(30deg, #ff6b6b, #ff8e8e);
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+.button.rate-limited:hover {
+    background: linear-gradient(30deg, #ff6b6b, #ff8e8e);
+    animation: none;
 }
 
 /* Error message styles */

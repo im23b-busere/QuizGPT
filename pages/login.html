@@ -19,13 +19,19 @@
         </div>
 
         <div id="codeForm" class="auth-form hidden">
-            <h2 class="subtitle">Enter Code</h2>
+            <div class="code-form-header">
+                <button id="backToEmailButton" class="back-button" title="Back to Email">←</button>
+                <h2 class="subtitle">Enter Code</h2>
+            </div>
             <p class="info-text">We sent a 6-digit code to your email</p>
+            <p id="returningUserText" class="info-text small hidden">Welcome back! Please enter the verification code we sent to your email.</p>
             <div class="code-input-container">
                 <input type="text" id="codeInput" placeholder="Enter 6-digit code" class="text-field" maxlength="6" pattern="[0-9]*" inputmode="numeric" required/>
             </div>
-            <button id="verifyCodeButton" class="button">Verify Code</button>
-            <button id="resendCodeButton" class="button secondary">Resend Code</button>
+            <div class="code-form-actions">
+                <button id="verifyCodeButton" class="button">Verify Code</button>
+                <button id="resendCodeButton" class="button secondary">Resend Code</button>
+            </div>
             <div id="codeError" class="error-message hidden"></div>
         </div>
 
