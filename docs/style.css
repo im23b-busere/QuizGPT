@@ -1257,11 +1257,6 @@ html {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.video-container:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-}
-
 .video-container video {
     width: 100%;
     height: auto;

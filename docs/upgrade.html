@@ -6,6 +6,12 @@
     <title>Upgrade to Premium | QuizGPT</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="icons/icon48.png">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://quizgpt.site/upgrade.html">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9299798160211376"
+     crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+    </script>
     <style>
         body.upgrade-page {
             background: linear-gradient(135deg, #8A2BE2 0%, #DA70D6 100%);
@@ -127,7 +133,7 @@
             <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Turbo Answer Mode</li>
             <li><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> Cancel anytime</li>
         </ul>
-        <button id="buyPremiumBtn" class="buy-btn">Buy Premium – €4.99/month</button>
+        <button id="buyPremiumBtn" class="buy-btn">Buy Premium – €2.99/month</button>
         <div class="secure">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" />
             <span>Secure payment powered by Stripe</span>
@@ -170,7 +176,7 @@
             errorDiv.textContent = 'You must be logged in to upgrade.';
             errorDiv.style.display = 'block';
             buyBtn.disabled = true;
-            buyBtn.textContent = 'Buy Premium – €4.99/month';
+            buyBtn.textContent = 'Buy Premium – €2.99/month';
             return;
         }
         buyBtn.disabled = true;
@@ -192,7 +198,7 @@
             errorDiv.textContent = err.message;
             errorDiv.style.display = 'block';
             buyBtn.disabled = false;
-            buyBtn.textContent = 'Buy Premium – €4.99/month';
+            buyBtn.textContent = 'Buy Premium – €2.99/month';
         }
     });
     </script>

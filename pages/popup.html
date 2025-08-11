@@ -8,7 +8,7 @@
 </head>
 <body class="popup-container">
 
-<a href="https://im23b-busere.github.io/QuizGPT/" target="_blank" title="More info"
+<a href="https://quizgpt.site" target="_blank" title="More info"
    style="position: absolute; top: 8px; left: 8px; text-decoration: none;">
     <span style="font-size: 20px; font-weight: bold; color: white;">&#9432;</span>
 </a>
@@ -93,15 +93,19 @@
                         <span class="plan-label">Current Plan</span>
                         <span class="plan-badge">Free</span>
                     </div>
-                    <div class="plan-features">
-                        <div class="feature">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <span>Enjoy 5 FREE requests</span>
+                    <div class="usage-counter">
+                        <div class="usage-header">
+                            <span class="usage-label">Monthly Usage</span>
+                            <span class="usage-text">
+                                <span id="currentUsage">0</span> / <span id="usageLimit">5</span> requests
+                            </span>
                         </div>
-                        
+                        <div class="usage-bar">
+                            <div class="usage-progress" id="usageProgress"></div>
+                        </div>
+                        <div class="usage-reset">
+                            <small>Resets monthly • <span id="usageRemaining">5</span> remaining</small>
+                        </div>
                     </div>
                 </div>
 

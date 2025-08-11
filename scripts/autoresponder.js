@@ -117,6 +117,11 @@ async function processQuestionWithBackend(question, tabId) {
             }
         });
 
+        // Send message to update usage counter in popup
+        chrome.runtime.sendMessage({
+            action: 'updateUsage'
+        });
+
         console.log('[AutoResponder] Answer sent to content script successfully');
 
     } catch (err) {

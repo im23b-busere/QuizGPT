@@ -44,7 +44,7 @@ async function checkAuth() {
         loadMainContent();
         initializeEventListeners();
         
-        // Fetch and display membership status
+        // Fetch and display membership status and usage counter
         await updateMembershipStatus();
     } catch (error) {
         console.error('Auth check error:', error);
@@ -330,6 +330,9 @@ async function handleManualButtonClick() {
                     autoClick: settings.autoClickOption !== false
                 }
             });
+
+            // Update usage counter
+            await updateMembershipStatus();
         }
     } catch (error) {
         console.error('Error:', error);
@@ -357,10 +360,8 @@ async function updateMembershipStatus() {
             console.log('Plan type:', planType);
             
             const planBadge = document.querySelector('.plan-badge');
-            const planFeatures = document.querySelector('.plan-features');
             
             console.log('Found plan badge element:', planBadge);
-            console.log('Found plan features element:', planFeatures);
             
             if (planBadge) {
                 planBadge.textContent = planType.charAt(0).toUpperCase() + planType.slice(1);
@@ -387,45 +388,40 @@ async function updateMembershipStatus() {
                 if (premiumBadge) premiumBadge.classList.add('hidden');
             }
             
-            // Update features based on plan type
-            if (planFeatures) {
-                if (planType.toLowerCase() === 'premium') {
-                    planFeatures.innerHTML = `
-                        <div class="feature">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <span>Up to 200 Questions</span>
-                        </div>
-                        <div class="feature">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <span>Advanced Features</span>
-                        </div>
-                    `;
-                    console.log('Updated features to premium');
-                } else {
-                    planFeatures.innerHTML = `
-                        <div class="feature">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <span>Basic Features</span>
-                        </div>
-                        <div class="feature">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <span>Standard Support</span>
-                        </div>
-                    `;
-                    console.log('Updated features to free');
+            // Update usage counter
+            const currentUsageElement = document.getElementById('currentUsage');
+            const usageLimitElement = document.getElementById('usageLimit');
+            const usageProgressElement = document.getElementById('usageProgress');
+            const usageRemainingElement = document.getElementById('usageRemaining');
+            
+            if (currentUsageElement && usageLimitElement && usageProgressElement) {
+                const usage = data.usage || 0;
+                const limit = data.limit || 5;
+                const remaining = Math.max(0, limit - usage);
+                
+                currentUsageElement.textContent = usage;
+                usageLimitElement.textContent = limit;
+                
+                if (usageRemainingElement) {
+                    usageRemainingElement.textContent = remaining;
                 }
+                
+                // Calculate progress percentage
+                const progressPercentage = Math.min((usage / limit) * 100, 100);
+                usageProgressElement.style.width = `${progressPercentage}%`;
+                
+                // Change progress bar color based on usage
+                if (progressPercentage >= 90) {
+                    usageProgressElement.style.background = 'linear-gradient(90deg, #ff6b6b, #ff8e8e)';
+                } else if (progressPercentage >= 75) {
+                    usageProgressElement.style.background = 'linear-gradient(90deg, #ffa726, #ffb74d)';
+                } else {
+                    usageProgressElement.style.background = 'linear-gradient(90deg, #8A2BE2, #DA70D6)';
+                }
+                
+                console.log('Updated usage counter:', usage, '/', limit, '(', progressPercentage, '%) -', remaining, 'remaining');
+            } else {
+                console.warn('Usage counter elements not found');
             }
             
             console.log('Membership status updated successfully');
@@ -459,6 +455,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         alert('Thank you for purchasing QuizGPT Premium! Have fun 🎉');
       }
     });
+  }
+  
+  // Listen for usage update message
+  if (request.action === "updateUsage") {
+    updateMembershipStatus();
   }
 });
 
