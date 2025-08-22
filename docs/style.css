@@ -1349,11 +1349,18 @@ html {
     }
     
     .pricing-card.premium:hover {
-        transform: translateY(-8px);
+        transform: none;
     }
     
     .pricing-card {
         padding: 2rem;
+        min-height: 400px;
+    }
+    
+    .discount-badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
     }
     
     .features-grid {
@@ -1378,6 +1385,7 @@ html {
     .btn {
         width: 100%;
         max-width: 300px;
+        min-width: auto;
     }
 }
 
@@ -1667,7 +1675,7 @@ html {
 
 .pricing-header {
     text-align: center;
-    margin: 3rem 0 4rem;
+    margin: 2rem 0 2rem;
     color: var(--text-color);
 }
 
@@ -1694,25 +1702,25 @@ html {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
-    max-width: 900px;
-    margin: 0 auto 4rem;
+    max-width: 800px;
+    margin: 0 auto 3rem;
     padding: 0 2rem;
 }
 
 .pricing-card {
     background: white;
     border-radius: 20px;
-    padding: 2.5rem;
+    padding: 2rem;
     position: relative;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(0, 0, 0, 0.1);
-    will-change: transform, box-shadow;
-    transform: translateZ(0);
+    display: flex;
+    flex-direction: column;
+    min-height: 450px;
 }
 
 .pricing-card:hover {
-    transform: translate3d(0, -8px, 0);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
@@ -1721,12 +1729,9 @@ html {
     color: white;
     box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.2);
-    will-change: transform, box-shadow;
-    transform: translateZ(0);
 }
 
 .pricing-card.premium:hover {
-    transform: translate3d(0, -8px, 0) scale(1.05);
     box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
 }
 
@@ -1744,9 +1749,39 @@ html {
     box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
 }
 
+.discount-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 50%, #ff3838 100%);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4), 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    animation: float 3s ease-in-out infinite;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0px);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-3px);
+    }
+}
+
+
+
 .card-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .card-header h2 {
@@ -1760,7 +1795,7 @@ html {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .currency {
@@ -1793,7 +1828,8 @@ html {
 .card-features ul {
     list-style: none;
     padding: 0;
-    margin: 0 0 2rem;
+    margin: 0 0 1.5rem;
+    flex: 1;
 }
 
 .card-features li {
@@ -1816,6 +1852,7 @@ html {
 
 .card-action {
     text-align: center;
+    margin-top: auto;
 }
 
 .btn {
@@ -1828,6 +1865,8 @@ html {
     transition: all 0.3s ease;
     border: 2px solid transparent;
     cursor: pointer;
+    min-width: 200px;
+    text-align: center;
 }
 
 .btn-primary {
