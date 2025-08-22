@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact & Impressum – QuizGPT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icons/icon48.png">
+    <meta name="description" content="Contact QuizGPT and view company information">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://quizgpt.site/contact.html">
+    
+    <style>
+        .contact-form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 40px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f0f0f0;
+        }
+
+        .contact-form-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #666;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #ccc;
+            background: #f5f5f5;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .email-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f8f8;
+            border-radius: 15px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .email-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .email-section a {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .email-section a:hover {
+            color: #333;
+        }
+
+        .impressum-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f8f8;
+            border-radius: 15px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .impressum-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #e8e8e8;
+            padding-bottom: 10px;
+        }
+
+        .impressum-section p {
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .impressum-section strong {
+            color: #333;
+        }
+
+        .impressum-section a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .impressum-section a:hover {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .contact-form-container {
+                margin: 20px;
+                padding: 30px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body class="legal">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="navbar-content">
+            <a href="index.html" style="margin-left: 0;" aria-label="QuizGPT Home">QuizGPT</a>
+            <div class="burger-menu" id="burgerMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="guide.html">Guide</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://github.com/im23b-busere/quizgpt" rel="noopener noreferrer">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Contact</h1>
+        
+        <div class="contact-form-container">
+            <h2>Contact Us</h2>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required placeholder="Your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select id="subject" name="subject" required>
+                        <option value="">Select topic</option>
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Technical Support">Technical Support</option>
+                        <option value="Bug Report">Bug Report</option>
+                        <option value="Feature Request">Feature Request</option>
+                        <option value="Billing">Billing</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="4" required placeholder="Tell us how we can help you..."></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </div>
+
+        <div class="email-section">
+            <h3>Email Us Directly</h3>
+            <p><strong>Email:</strong> <a href="mailto:quizgpt.help@gmail.com">quizgpt.help@gmail.com</a></p>
+        </div>
+
+        <div class="impressum-section">
+            <h3>Impressum</h3>
+            <p><strong>Company:</strong> QuizGPT</p>
+            <p><strong>Owner:</strong> Erik Buser</p>
+            <p><strong>Address:</strong> Switzerland</p>
+            <p><strong>Email:</strong> <a href="mailto:quizgpt.help@gmail.com">quizgpt.help@gmail.com</a></p>
+            <p><strong>Website:</strong> <a href="https://quizgpt.site">quizgpt.site</a></p>
+            <p><strong>Disclaimer:</strong> QuizGPT is not affiliated with Kahoot! in any way.</p>
+        </div>
+
+        <footer>
+            <p>
+                <a href="privacy.html">Privacy</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://github.com/im23b-busere/quizgpt">GitHub</a>
+            </p>
+            <p>&copy; 2025 Erik Buser</p>
+        </footer>
+
+        <script>
+            // Burger menu functionality
+            const burgerMenu = document.getElementById('burgerMenu');
+            const navLinks = document.getElementById('navLinks');
+
+            burgerMenu.addEventListener('click', () => {
+                burgerMenu.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            // Close menu when clicking on a link
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    burgerMenu.classList.remove('active');
+                    navLinks.classList.remove('active');
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!burgerMenu.contains(e.target) && !navLinks.contains(e.target)) {
+                    burgerMenu.classList.remove('active');
+                    navLinks.classList.remove('active');
+                }
+            });
+
+            // Form submission to backend
+            const contactForm = document.getElementById('contactForm');
+            const submitBtn = document.querySelector('.submit-btn');
+
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value.trim();
+
+                // Validation
+                if (!name || !email || !subject || !message) {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+
+                if (message.length < 5) {
+                    alert('Please provide a longer message.');
+                    return;
+                }
+
+                // Update button state
+                submitBtn.textContent = 'Sending...';
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch('https://api.quizgpt.site/api/contact', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            subject: subject,
+                            message: message
+                        })
+                    });
+
+                    if (response.ok) {
+                        alert('Message sent successfully! We\'ll get back to you soon.');
+                        contactForm.reset();
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to send message');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error sending message: ' + error.message + '. Please try again or email us directly.');
+                } finally {
+                    // Reset button state
+                    submitBtn.textContent = 'Send Message';
+                    submitBtn.disabled = false;
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
