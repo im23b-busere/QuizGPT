@@ -18,10 +18,18 @@
             <p class="auth-switch">Already have an account? <a href="login.html">Login</a></p>
         </div>
         <div id="registerCodeForm" class="auth-form hidden">
-            <h2 class="subtitle">Verify Email</h2>
+            <div class="code-form-header">
+                <button id="backToRegisterButton" class="back-button" title="Back to Register">←</button>
+                <h2 class="subtitle">Verify Email</h2>
+            </div>
             <p class="info-text">We sent a 6-digit code to your email</p>
-            <input type="text" id="registerCodeInput" placeholder="Enter 6-digit code" class="text-field" maxlength="6" pattern="[0-9]*" inputmode="numeric" required/>
-            <button id="verifyRegisterCodeButton" class="button">Verify Code</button>
+            <div class="code-input-container">
+                <input type="text" id="registerCodeInput" placeholder="Enter 6-digit code" class="text-field" maxlength="6" pattern="[0-9]*" inputmode="numeric" required/>
+            </div>
+            <div class="code-form-actions">
+                <button id="verifyRegisterCodeButton" class="button">Verify Code</button>
+                <button id="resendRegisterCodeButton" class="button secondary">Resend Code</button>
+            </div>
             <div id="registerCodeError" class="error-message hidden"></div>
         </div>
     </div>
