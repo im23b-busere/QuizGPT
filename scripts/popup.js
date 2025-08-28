@@ -67,9 +67,9 @@ function loadMainContent() {
         </div>
         
         <div class="footer-buttons">
-            <a href="https://im23b-busere.github.io/QuizGPT/privacy.html" target="_blank" class="footer-link">Privacy</a>
+            <a href="https://quizgpt.site/privacy" target="_blank" class="footer-link">Privacy</a>
             <span class="footer-separator">•</span>
-            <a href="https://im23b-busere.github.io/QuizGPT/terms.html" target="_blank" class="footer-link">Terms</a>
+            <a href="https://quizgpt.site/contact" target="_blank" class="footer-link">Contact</a>
         </div>
     `;
 }
