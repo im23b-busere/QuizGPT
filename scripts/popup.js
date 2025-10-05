@@ -364,13 +364,18 @@ async function updateMembershipStatus() {
             console.log('Found plan badge element:', planBadge);
             
             if (planBadge) {
-                planBadge.textContent = planType.charAt(0).toUpperCase() + planType.slice(1);
+                // Display "Ultra" for enterprise membership, otherwise capitalize the plan type
+                const displayText = planType.toLowerCase() === 'enterprise' ? 'Ultra' : planType.charAt(0).toUpperCase() + planType.slice(1);
+                planBadge.textContent = displayText;
                 console.log('Updated plan badge text to:', planBadge.textContent);
                 
                 planBadge.className = 'plan-badge';
                 if (planType.toLowerCase() === 'premium') {
                     planBadge.classList.add('premium');
                     console.log('Added premium class to badge');
+                } else if (planType.toLowerCase() === 'enterprise') {
+                    planBadge.classList.add('enterprise');
+                    console.log('Added enterprise class to badge');
                 } else {
                     planBadge.classList.add('free');
                     console.log('Added free class to badge');
@@ -378,7 +383,7 @@ async function updateMembershipStatus() {
             }
             
             // Show/hide upgrade button and premium badge
-            if (planType.toLowerCase() === 'premium') {
+            if (planType.toLowerCase() === 'premium' || planType.toLowerCase() === 'enterprise') {
                 if (upgradeButton) upgradeButton.classList.add('hidden');
                 if (manageSubscriptionButton) manageSubscriptionButton.classList.remove('hidden');
                 if (premiumBadge) premiumBadge.classList.remove('hidden');
