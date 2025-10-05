@@ -102,14 +102,14 @@
           </div>
         </div>
 
-        <div class="pricing-card premium featured">
+        <div class="pricing-card premium">
           <div class="discount-badge">-70%</div>
           <div class="card-header">
             <h2>Premium</h2>
             <div class="price">
               <span class="currency">€</span>
-              <span class="old-price" style="text-decoration: line-through; color: #b7b7b7; font-size: 1.1em; margin-right: 8px;">9.99</span>
-                              <span class="amount" style="color: white; font-weight: bold; font-size: 2em;">2.99</span>
+              <span class="old-price">9.99</span>
+              <span class="amount">2.99</span>
               <span class="period">/month</span>
             </div>
             <div class="discount-label" style="color: #ff6b6b; font-size: 1em; font-weight: 600; margin-top: 2px;">Limited Time Discount!</div>
@@ -151,6 +151,57 @@
           <div class="card-action">
             <button id="upgradePremiumBtn" class="btn btn-primary">
               Upgrade to Premium
+            </button>
+          </div>
+        </div>
+
+        <div class="pricing-card featured">
+  
+          <div class="card-header">
+            <h2>Ultra</h2>
+            <div class="price">
+              <span class="currency">€</span>
+              <span class="amount">4.99</span>
+              <span class="period">/month</span>
+            </div>
+          </div>
+          
+          <div class="card-features">
+            <ul>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                1'000 answers per month
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Auto-click option
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Turbo Answer Mode
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Cancel anytime
+              </li>
+            </ul>
+          </div>
+          
+          <div class="card-action">
+            <button id="upgradeUltraBtn" class="btn btn-primary">
+              Upgrade to Ultra
             </button>
           </div>
         </div>
@@ -241,7 +292,7 @@
             <span class="faq-toggle">+</span>
           </div>
           <div class="faq-answer">
-            <p>You get 5 free quiz attempts with the free plan. After that, you'll need to upgrade to premium for up to 200 requests per month.</p>
+            <p>You get 5 free quiz attempts with the free plan. After that, you'll need to upgrade to premium for up to 200 requests per month, or choose Ultra for unlimited requests.</p>
           </div>
         </div>
       </div>
@@ -299,44 +350,63 @@
     // Handle token and upgrade directly
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get('token');
-    const upgradeBtn = document.getElementById('upgradePremiumBtn');
+    const upgradePremiumBtn = document.getElementById('upgradePremiumBtn');
+    const upgradeUltraBtn = document.getElementById('upgradeUltraBtn');
     
-          if (urlToken) {
+    if (urlToken) {
         // Store token in localStorage
         localStorage.setItem('token', urlToken);
-        // Enable upgrade button
-        upgradeBtn.disabled = false;
-        upgradeBtn.textContent = 'Upgrade to Premium';
-        upgradeBtn.addEventListener('click', handleUpgrade);
-      } else {
-      // Check if token exists in localStorage
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        upgradeBtn.disabled = false;
-        upgradeBtn.textContent = 'Upgrade to Premium';
-        upgradeBtn.addEventListener('click', handleUpgrade);
-      } else {
-        // No token available, disable button and show message
-        upgradeBtn.disabled = true;
-        upgradeBtn.textContent = 'Please log in through extension';
-        upgradeBtn.style.opacity = '0.6';
-        upgradeBtn.style.cursor = 'not-allowed';
-      }
+        // Enable upgrade buttons
+        upgradePremiumBtn.disabled = false;
+        upgradePremiumBtn.textContent = 'Upgrade to Premium';
+        upgradePremiumBtn.addEventListener('click', () => handleUpgrade('premium'));
+        
+        upgradeUltraBtn.disabled = false;
+        upgradeUltraBtn.textContent = 'Upgrade to Ultra';
+        upgradeUltraBtn.addEventListener('click', () => handleUpgrade('ultra'));
+    } else {
+        // Check if token exists in localStorage
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+            upgradePremiumBtn.disabled = false;
+            upgradePremiumBtn.textContent = 'Upgrade to Premium';
+            upgradePremiumBtn.addEventListener('click', () => handleUpgrade('premium'));
+            
+            upgradeUltraBtn.disabled = false;
+            upgradeUltraBtn.textContent = 'Upgrade to Ultra';
+            upgradeUltraBtn.addEventListener('click', () => handleUpgrade('ultra'));
+        } else {
+            // No token available, disable buttons and show message
+            upgradePremiumBtn.disabled = true;
+            upgradePremiumBtn.textContent = 'Please log in through extension';
+            upgradePremiumBtn.style.opacity = '0.6';
+            upgradePremiumBtn.style.cursor = 'not-allowed';
+            
+            upgradeUltraBtn.disabled = true;
+            upgradeUltraBtn.textContent = 'Please log in through extension';
+            upgradeUltraBtn.style.opacity = '0.6';
+            upgradeUltraBtn.style.cursor = 'not-allowed';
+        }
     }
     
-    // Handle upgrade to premium
-    async function handleUpgrade() {
+    // Handle upgrade to premium or ultra
+    async function handleUpgrade(plan = 'premium') {
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Please log in through the extension to upgrade.');
         return;
       }
       
-      upgradeBtn.disabled = true;
-      upgradeBtn.textContent = 'Redirecting...';
+      const currentBtn = plan === 'ultra' ? upgradeUltraBtn : upgradePremiumBtn;
+      currentBtn.disabled = true;
+      currentBtn.textContent = 'Redirecting...';
       
       try {
-        const res = await fetch('https://api.quizgpt.site/api/stripe/create-checkout-session', {
+        const endpoint = plan === 'ultra' 
+          ? 'https://api.quizgpt.site/api/stripe/create-checkout-session-ultra'
+          : 'https://api.quizgpt.site/api/stripe/create-checkout-session';
+          
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -353,8 +423,8 @@
         window.location.href = data.url;
       } catch (err) {
         alert('Error: ' + err.message);
-        upgradeBtn.disabled = false;
-        upgradeBtn.textContent = 'Upgrade to Premium';
+        currentBtn.disabled = false;
+        currentBtn.textContent = plan === 'ultra' ? 'Upgrade to Ultra' : 'Upgrade to Premium';
       }
     }
 

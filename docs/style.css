@@ -1700,11 +1700,14 @@ html {
 
 .pricing-cards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto 3rem;
     padding: 0 2rem;
+    justify-items: center;
+    justify-content: center;
+    place-items: center;
 }
 
 .pricing-card {
@@ -1717,7 +1720,8 @@ html {
     border: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    min-height: 450px;
+    min-height: 520px;
+    width: 320px;
 }
 
 .pricing-card:hover {
@@ -1733,6 +1737,73 @@ html {
 
 .pricing-card.premium:hover {
     box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
+}
+
+.pricing-card.featured {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.pricing-card.featured:hover {
+    box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
+}
+
+.pricing-card.ultra {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.pricing-card.ultra:hover {
+    box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
+}
+
+/* Small desktop screens - reduce gap further */
+@media (max-width: 1200px) and (min-width: 1025px) {
+    .pricing-cards {
+        gap: 1.5rem;
+        padding: 0 1rem;
+        justify-content: center;
+        place-items: center;
+    }
+    
+    .pricing-card {
+        width: 280px;
+    }
+}
+
+/* Medium screens - 2 cards per row with centered ultra */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .pricing-cards {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 800px;
+        gap: 2rem;
+        justify-items: center;
+        justify-content: center;
+        place-items: center;
+    }
+    
+    .pricing-card {
+        width: 300px;
+    }
+    
+    .pricing-card.featured {
+        grid-column: 1 / -1;
+        width: 300px;
+        margin: 0 auto;
+        justify-self: center;
+    }
+}
+
+/* Mobile screens - single column layout */
+@media (max-width: 768px) {
+    .pricing-card.featured,
+    .pricing-card.ultra {
+        transform: none !important;
+    }
 }
 
 .popular-badge {
@@ -1781,12 +1852,12 @@ html {
 
 .card-header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .card-header h2 {
     font-size: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
     color: inherit;
     font-weight: 700;
 }
@@ -1810,6 +1881,14 @@ html {
     line-height: 1;
 }
 
+.old-price {
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-decoration: line-through;
+    opacity: 0.6;
+    margin-right: 0.5rem;
+}
+
 .period {
     font-size: 1.2rem;
     opacity: 0.8;
@@ -1825,20 +1904,30 @@ html {
     font-weight: 500;   
 }
 
+.card-features {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .card-features ul {
     list-style: none;
     padding: 0;
-    margin: 0 0 1.5rem;
+    margin: 0;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .card-features li {
     display: flex;
     align-items: center;
-    padding: 0.8rem 0;
+    padding: 0.6rem 0;
     font-size: 1rem;
     color: inherit;
     font-weight: 500;
+    min-height: 40px;
 }
 
 .card-features svg {
@@ -1853,6 +1942,7 @@ html {
 .card-action {
     text-align: center;
     margin-top: auto;
+    padding-top: 1rem;
 }
 
 .btn {
@@ -1865,8 +1955,10 @@ html {
     transition: all 0.3s ease;
     border: 2px solid transparent;
     cursor: pointer;
-    min-width: 200px;
+    width: 100%;
+    max-width: 250px;
     text-align: center;
+    box-sizing: border-box;
 }
 
 .btn-primary {
