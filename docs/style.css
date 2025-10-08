@@ -301,6 +301,88 @@ footer a:hover {
     color: var(--primary-color);
 }
 
+/* Floating Social Media Bar */
+.floating-social {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 16px 8px;
+    border-radius: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.8;
+}
+
+.floating-social:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.floating-social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--secondary-background);
+    color: var(--text-light);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.floating-social-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: var(--secondary-background);
+    transition: all 0.3s ease;
+    z-index: -1;
+}
+
+.floating-social-link:hover {
+    transform: scale(1.1);
+    color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.floating-social-link.instagram:hover::before {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.floating-social-link.tiktok:hover::before {
+    background: linear-gradient(45deg, #000000 0%, #ff0050 50%, #00f2ea 100%);
+}
+
+.floating-social-link.youtube:hover::before {
+    background: linear-gradient(45deg, #FF0000 0%, #CC0000 100%);
+}
+
+.floating-social-link svg {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.floating-social-link:hover svg {
+    transform: scale(1.1);
+}
+
 @media (max-width: 768px) {
     /* Fix horizontal scrolling */
     html, body {
@@ -2490,4 +2572,29 @@ html {
 .upgrade-page .navbar-content {
     justify-content: flex-start;
     padding-left: 0rem;
+}
+
+/* Mobile Social Media Links Responsive Styles */
+@media (max-width: 768px) {
+    /* Mobile floating social bar */
+    .floating-social {
+        right: 10px;
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        flex-direction: row;
+        padding: 8px 12px;
+        border-radius: 30px;
+        gap: 8px;
+        opacity: 0.9;
+    }
+    
+    .floating-social:hover {
+        transform: scale(1.02);
+    }
+    
+    .floating-social-link {
+        width: 36px;
+        height: 36px;
+    }
 }
