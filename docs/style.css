@@ -373,6 +373,10 @@ footer a:hover {
     background: linear-gradient(45deg, #FF0000 0%, #CC0000 100%);
 }
 
+.floating-social-link.github:hover::before {
+    background: linear-gradient(45deg, #333333 0%, #0D1117 100%);
+}
+
 .floating-social-link svg {
     position: relative;
     z-index: 1;
