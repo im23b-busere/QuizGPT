@@ -106,6 +106,96 @@ body.popup-container {
     fill: gray;
 }
 
+/* Header Links Styles */
+/* Half-Rectangle Cut-Off Header with Rounded Edges */
+.social-footer {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 32px;
+    z-index: 998;
+    pointer-events: none;
+}
+
+.footer-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 160px;
+    height: 32px;
+    background: linear-gradient(135deg, 
+        rgba(36, 36, 36, 0.9) 0%, 
+        rgba(45, 45, 45, 0.9) 50%, 
+        rgba(36, 36, 36, 0.9) 100%);
+    border-radius: 0 0 16px 16px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.social-links-footer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    pointer-events: auto;
+}
+
+.social-link-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+}
+
+.social-link-footer:hover {
+    transform: translateY(-2px) scale(1.15);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+.social-link-footer.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    border-color: #bc1888;
+    box-shadow: 0 3px 8px rgba(188, 24, 136, 0.4);
+}
+
+.social-link-footer.tiktok:hover {
+    background: linear-gradient(45deg, #000000 0%, #ff0050 50%, #00f2ea 100%);
+    border-color: #ff0050;
+    box-shadow: 0 3px 8px rgba(255, 0, 80, 0.4);
+}
+
+.social-link-footer.youtube:hover {
+    background: linear-gradient(45deg, #FF0000 0%, #CC0000 100%);
+    border-color: #FF0000;
+    box-shadow: 0 3px 8px rgba(255, 0, 0, 0.4);
+}
+
+.social-link-footer.github:hover {
+    background: linear-gradient(45deg, #333333 0%, #0D1117 100%);
+    border-color: #333333;
+    box-shadow: 0 3px 8px rgba(51, 51, 51, 0.4);
+}
+
 .modal {
     position: fixed;
     inset: 0;
