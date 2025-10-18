@@ -34,10 +34,28 @@ function createStatusIndicator() {
     document.body.appendChild(statusIndicator);
 }
 
-function updateStatus(message) {
-    if (!statusIndicator) createStatusIndicator();
-    statusIndicator.textContent = `QuizGPT: ${message}`;
-    console.log('[Content] Status:', message);
+function updateStatus(message, forceShow = false) {
+    // Check silent mode setting unless forced
+    if (!forceShow) {
+        chrome.storage.sync.get(['silentMode'], (settings) => {
+            if (settings.silentMode) {
+                // Remove status indicator if it exists in silent mode
+                if (statusIndicator) {
+                    statusIndicator.remove();
+                    statusIndicator = null;
+                }
+                return;
+            }
+            
+            if (!statusIndicator) createStatusIndicator();
+            statusIndicator.textContent = `QuizGPT: ${message}`;
+            console.log('[Content] Status:', message);
+        });
+    } else {
+        if (!statusIndicator) createStatusIndicator();
+        statusIndicator.textContent = `QuizGPT: ${message}`;
+        console.log('[Content] Status:', message);
+    }
 }
 
 // Add this variable to track the last sent question
@@ -53,26 +71,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else if (request.action === "getQuestion") {
         sendResponse({ question: currentQuestion });
     } else if (request.action === "showAuthError") {
-        updateStatus('Auth error: ' + request.message);
+        updateStatus('Auth error: ' + request.message, true); // Force show auth errors even in silent mode
         if (request.message.includes('free tier limit') || request.message.includes('Free tier limit')) {
-            showPremiumUpgradeMessage();
+            chrome.storage.sync.get(['silentMode'], (settings) => {
+                if (!settings.silentMode) {
+                    showPremiumUpgradeMessage();
+                }
+            });
         } else {
-            // Show regular error message
-            const errorDiv = document.createElement('div');
-            errorDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #ff4444;
-                color: white;
-                padding: 15px;
-                border-radius: 5px;
-                z-index: 9999;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            `;
-            errorDiv.textContent = request.message;
-            document.body.appendChild(errorDiv);
-            setTimeout(() => errorDiv.remove(), 5000);
+            // Show regular error message only if not in silent mode
+            chrome.storage.sync.get(['silentMode'], (settings) => {
+                if (!settings.silentMode) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #ff4444;
+                        color: white;
+                        padding: 15px;
+                        border-radius: 5px;
+                        z-index: 9999;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    `;
+                    errorDiv.textContent = request.message;
+                    document.body.appendChild(errorDiv);
+                    setTimeout(() => errorDiv.remove(), 5000);
+                }
+            });
         }
         sendResponse({ success: true });
     } else if (request.action === "checkStatus") {
@@ -289,8 +315,8 @@ function waitAndAutoClick(element, answerElements, options, retries = 20) {
     
     // Prüfe, ob der Button klickbar ist
     if (!element.disabled && element.offsetParent !== null) {
-        // Wenn der Button klickbar ist und Delay > 0, zeige Timer
-        if (answerDelay > 0) {
+        // Wenn der Button klickbar ist und Delay > 0, zeige Timer (außer in Silent Mode)
+        if (answerDelay > 0 && !options.silentMode) {
             showTimerOverlay(answerDelay, () => {
                 // Callback nach Ablauf des Timers
                 const index = Array.from(answerElements).indexOf(element);
@@ -298,6 +324,14 @@ function waitAndAutoClick(element, answerElements, options, retries = 20) {
                 const event = new CustomEvent("autoClickAnswer", { detail: index });
                 window.dispatchEvent(event);
             });
+        } else if (answerDelay > 0 && options.silentMode) {
+            // Silent mode: nur Delay ohne Timer-Overlay
+            setTimeout(() => {
+                const index = Array.from(answerElements).indexOf(element);
+                console.log('[Content] Clicking answer at index:', index, 'after', answerDelay, 'seconds delay (silent mode)');
+                const event = new CustomEvent("autoClickAnswer", { detail: index });
+                window.dispatchEvent(event);
+            }, answerDelay * 1000);
         } else {
             // Sofortiger Click ohne Delay
             const index = Array.from(answerElements).indexOf(element);
@@ -609,3 +643,29 @@ function showPremiumUpgradeMessage() {
     };
     document.body.appendChild(overlay);
 }
+
+// Function to handle silent mode changes
+function handleSilentModeChange() {
+    chrome.storage.sync.get(['silentMode'], (settings) => {
+        if (settings.silentMode) {
+            // Remove status indicator
+            if (statusIndicator) {
+                statusIndicator.remove();
+                statusIndicator = null;
+            }
+            
+            // Remove any existing timer overlay
+            const existingTimer = document.getElementById('quizgpt-timer-overlay');
+            if (existingTimer) {
+                existingTimer.remove();
+            }
+        }
+    });
+}
+
+// Listen for storage changes to handle real-time silent mode toggling
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'sync' && changes.silentMode) {
+        handleSilentModeChange();
+    }
+});

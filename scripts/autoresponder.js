@@ -61,7 +61,7 @@ async function processQuestionWithBackend(question, tabId) {
         }
 
         // Get user settings
-        const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay']);
+        const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay', 'silentMode']);
         console.log('[AutoResponder] User settings:', settings);
         
         // Format the question for the backend
@@ -114,7 +114,8 @@ async function processQuestionWithBackend(question, tabId) {
             options: {
                 highlight: settings.highlightOption !== false,
                 autoClick: settings.autoClickOption !== false,
-                answerDelay: settings.answerDelay !== undefined ? settings.answerDelay : 3
+                answerDelay: settings.answerDelay !== undefined ? settings.answerDelay : 3,
+                silentMode: settings.silentMode || false
             }
         });
 

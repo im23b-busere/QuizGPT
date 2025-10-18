@@ -9,6 +9,7 @@ const settingsModal = document.getElementById('settingsModal');
 const closeModal = document.querySelector('.close-modal');
 const highlightCheckbox = document.getElementById('highlight');
 const autoclickCheckbox = document.getElementById('autoclick');
+const silentModeCheckbox = document.getElementById('silentMode');
 const answerDelaySlider = document.getElementById('answerDelay');
 const delayValueDisplay = document.getElementById('delayValue');
 const logoutButton = document.querySelector('.logout-button');
@@ -115,12 +116,15 @@ function initializeEventListeners() {
     });
 
     // Load settings
-    chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay'], (settings) => {
+    chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay', 'silentMode'], (settings) => {
         if (highlightCheckbox && settings.highlightOption !== undefined) {
             highlightCheckbox.checked = settings.highlightOption;
         }
         if (autoclickCheckbox && settings.autoClickOption !== undefined) {
             autoclickCheckbox.checked = settings.autoClickOption;
+        }
+        if (silentModeCheckbox && settings.silentMode !== undefined) {
+            silentModeCheckbox.checked = settings.silentMode;
         }
         if (answerDelaySlider && settings.answerDelay !== undefined) {
             answerDelaySlider.value = settings.answerDelay;
@@ -147,6 +151,13 @@ function initializeEventListeners() {
     if (autoclickCheckbox) {
         autoclickCheckbox.addEventListener('change', async () => {
             await chrome.storage.sync.set({ autoClickOption: autoclickCheckbox.checked });
+        });
+    }
+
+    // Silent mode checkbox change handler
+    if (silentModeCheckbox) {
+        silentModeCheckbox.addEventListener('change', async () => {
+            await chrome.storage.sync.set({ silentMode: silentModeCheckbox.checked });
         });
     }
 
@@ -323,7 +334,7 @@ async function handleManualButtonClick() {
             extractedData.classList.remove('hidden');
 
             // Get user settings
-            const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay']);
+            const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay', 'silentMode']);
             
             // Format the question for the backend
             const fullQuestion = `${response.question.title}\n\nOptions:\n${response.question.choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
@@ -353,7 +364,8 @@ async function handleManualButtonClick() {
                 options: {
                     highlight: settings.highlightOption !== false,
                     autoClick: settings.autoClickOption !== false,
-                    answerDelay: settings.answerDelay !== undefined ? settings.answerDelay : 3
+                    answerDelay: settings.answerDelay !== undefined ? settings.answerDelay : 3,
+                    silentMode: settings.silentMode || false
                 }
             });
 
