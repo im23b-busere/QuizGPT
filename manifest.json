@@ -1,6 +1,6 @@
 {
   "name": "QuizGPT",
-  "version": "2.1.4",
+  "version": "2.2.4",
   "description": "Not affiliated with Kahoot! or ChatGPT: Use QuizGPT to win all your Kahoot! games.",
   "icons": {
     "16": "icons/icon16.png",

@@ -356,6 +356,17 @@ body.popup-container {
     user-select: none;
 }
 
+.feature-note {
+    margin-top: 6px;
+    text-align: center;
+}
+
+.feature-note small {
+    color: #888;
+    font-size: 0.75em;
+    font-style: italic;
+}
+
 .close-modal {
     all: unset;
     position: absolute;
@@ -1180,9 +1191,6 @@ body.popup-container {
 .feature-text {
     display: flex;
     align-items: center;
-    gap: 8px;
-    position: relative;
-    min-width: 140px;
 }
 
 .feature-main-text {
