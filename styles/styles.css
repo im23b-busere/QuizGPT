@@ -1148,11 +1148,13 @@ body.popup-container {
     text-transform: uppercase;
     border-radius: 6px;
     padding: 2px 5px;
-    margin-left: 6px;
-    vertical-align: middle;
     border: 1px solid rgba(255, 255, 255, 0.2);
     letter-spacing: 0.5px;
     flex-shrink: 0;
+    position: absolute;
+    right: -50px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 /* Premium Lock Styles */
@@ -1179,6 +1181,12 @@ body.popup-container {
     display: flex;
     align-items: center;
     gap: 8px;
+    position: relative;
+    min-width: 140px;
+}
+
+.feature-main-text {
+    white-space: nowrap;
 }
 
 .lock-badge {
