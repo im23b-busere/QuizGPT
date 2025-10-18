@@ -132,10 +132,10 @@ function initializeEventListeners() {
                 delayValueDisplay.textContent = settings.answerDelay;
             }
         } else if (answerDelaySlider) {
-            // Default value is 3 seconds
-            answerDelaySlider.value = 3;
+            // Default value is 0 seconds
+            answerDelaySlider.value = 0;
             if (delayValueDisplay) {
-                delayValueDisplay.textContent = "3";
+                delayValueDisplay.textContent = "0";
             }
         }
     });
@@ -157,6 +157,11 @@ function initializeEventListeners() {
     // Silent mode checkbox change handler
     if (silentModeCheckbox) {
         silentModeCheckbox.addEventListener('change', async () => {
+            // Check if user has permission to use this feature
+            if (silentModeCheckbox.disabled) {
+                silentModeCheckbox.checked = false;
+                return;
+            }
             await chrome.storage.sync.set({ silentMode: silentModeCheckbox.checked });
         });
     }
@@ -164,6 +169,15 @@ function initializeEventListeners() {
     // Answer delay slider change handler
     if (answerDelaySlider) {
         answerDelaySlider.addEventListener('input', async () => {
+            // Check if user has permission to use this feature
+            if (answerDelaySlider.disabled) {
+                answerDelaySlider.value = 0;
+                if (delayValueDisplay) {
+                    delayValueDisplay.textContent = "0";
+                }
+                return;
+            }
+            
             const value = answerDelaySlider.value;
             if (delayValueDisplay) {
                 delayValueDisplay.textContent = value;
@@ -467,6 +481,9 @@ async function updateMembershipStatus() {
                 console.warn('Usage counter elements not found');
             }
             
+            // Update premium locks based on plan type
+            updatePremiumLocks(planType);
+            
             console.log('Membership status updated successfully');
         } else {
             console.error('Failed to fetch membership status:', response.status);
@@ -477,6 +494,203 @@ async function updateMembershipStatus() {
         console.error('Error updating membership status:', error);
         console.error('Error stack:', error.stack);
     }
+}
+
+// Function to update premium locks based on user plan
+function updatePremiumLocks(planType) {
+    console.log('Updating premium locks for plan:', planType);
+    
+    const plan = planType.toLowerCase();
+    
+    // Get elements
+    const silentModeRow = document.querySelector('[data-plan="ultra"]');
+    const answerDelayRow = document.querySelector('[data-plan="premium"]');
+    const silentModeCheckbox = document.getElementById('silentMode');
+    const answerDelaySlider = document.getElementById('answerDelay');
+    
+    // Check permissions for Silent Mode (Ultra/Enterprise required)
+    if (silentModeRow && silentModeCheckbox) {
+        const hasUltraAccess = plan === 'enterprise' || plan === 'ultra';
+        
+        if (hasUltraAccess) {
+            // Unlock silent mode
+            silentModeRow.classList.remove('premium-locked');
+            silentModeCheckbox.disabled = false;
+            console.log('Silent mode unlocked for Ultra/Enterprise user');
+        } else {
+            // Lock silent mode
+            silentModeRow.classList.add('premium-locked');
+            silentModeCheckbox.disabled = true;
+            silentModeCheckbox.checked = false; // Uncheck if locked
+            chrome.storage.sync.set({ silentMode: false }); // Save disabled state
+            console.log('Silent mode locked - requires Ultra');
+        }
+    }
+    
+    // Check permissions for Answer Delay (Premium+ required)
+    if (answerDelayRow && answerDelaySlider) {
+        const hasPremiumAccess = plan === 'premium' || plan === 'enterprise' || plan === 'ultra';
+        
+        if (hasPremiumAccess) {
+            // Unlock answer delay
+            answerDelayRow.classList.remove('premium-locked');
+            answerDelaySlider.disabled = false;
+            console.log('Answer delay unlocked for Premium+ user');
+        } else {
+            // Lock answer delay
+            answerDelayRow.classList.add('premium-locked');
+            answerDelaySlider.disabled = true;
+            answerDelaySlider.value = 0; // Reset to default
+            document.getElementById('delayValue').textContent = '0';
+            chrome.storage.sync.set({ answerDelay: 0 }); // Save default value
+            console.log('Answer delay locked - requires Premium');
+        }
+    }
+    
+    // Add click handlers for locked features to show upgrade prompts
+    addLockedFeatureClickHandlers(plan);
+}
+
+// Function to add click handlers for locked features
+function addLockedFeatureClickHandlers(plan) {
+    // Handle clicks on locked silent mode
+    const silentModeRow = document.querySelector('[data-plan="ultra"]');
+    if (silentModeRow) {
+        // Remove existing listeners
+        const newSilentModeRow = silentModeRow.cloneNode(true);
+        silentModeRow.parentNode.replaceChild(newSilentModeRow, silentModeRow);
+        
+        if (plan !== 'enterprise' && plan !== 'ultra') {
+            newSilentModeRow.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showUpgradePrompt('Ultra', 'Silent mode is an Ultra exclusive feature that disables all overlays for a cleaner experience.');
+            });
+        }
+    }
+    
+    // Handle clicks on locked answer delay
+    const answerDelayRow = document.querySelector('[data-plan="premium"]');
+    if (answerDelayRow) {
+        if (plan !== 'premium' && plan !== 'enterprise' && plan !== 'ultra') {
+            // Remove existing listeners and add upgrade prompt
+            const newAnswerDelayRow = answerDelayRow.cloneNode(true);
+            answerDelayRow.parentNode.replaceChild(newAnswerDelayRow, answerDelayRow);
+            
+            newAnswerDelayRow.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showUpgradePrompt('Premium', 'Answer delay is a Premium feature that lets you customize the timing for a more natural experience.');
+            });
+        }
+        
+        // Re-add slider event listener after any DOM manipulation
+        const slider = document.getElementById('answerDelay');
+        const display = document.getElementById('delayValue');
+        if (slider && display) {
+            // Remove any existing listeners by cloning the slider
+            const newSlider = slider.cloneNode(true);
+            slider.parentNode.replaceChild(newSlider, slider);
+            
+            // Add fresh event listener
+            newSlider.addEventListener('input', async () => {
+                // Check if user has permission to use this feature
+                if (newSlider.disabled) {
+                    newSlider.value = 0;
+                    display.textContent = "0";
+                    return;
+                }
+                
+                const value = newSlider.value;
+                display.textContent = value;
+                await chrome.storage.sync.set({ answerDelay: parseFloat(value) });
+            });
+        }
+    }
+}
+
+// Function to show upgrade prompts
+function showUpgradePrompt(requiredPlan, featureDescription) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10001;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: #23232b;
+        color: #fff;
+        padding: 24px;
+        border-radius: 12px;
+        max-width: 350px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    `;
+    
+    modalContent.innerHTML = `
+        <h3 style="margin-top: 0; color: #fff;">🔒 ${requiredPlan} Feature</h3>
+        <p style="margin: 16px 0; color: #ccc; line-height: 1.4;">${featureDescription}</p>
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button id="upgradeNow" style="
+                flex: 1;
+                background: linear-gradient(90deg, #8A2BE2 0%, #DA70D6 100%);
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 10px;
+                cursor: pointer;
+                font-weight: bold;
+            ">Upgrade Now</button>
+            <button id="closePremiumPrompt" style="
+                flex: 1;
+                background: #444;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 10px;
+                cursor: pointer;
+            ">Later</button>
+        </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Add event listeners
+    modal.querySelector('#upgradeNow').addEventListener('click', () => {
+        let token = authService.token;
+        if (!token) {
+            chrome.storage.sync.get(['token']).then(data => {
+                token = data.token;
+                if (token) {
+                    window.open(`https://quizgpt.site/pricing.html?token=${encodeURIComponent(token)}`, '_blank');
+                }
+            });
+        } else {
+            window.open(`https://quizgpt.site/pricing.html?token=${encodeURIComponent(token)}`, '_blank');
+        }
+        document.body.removeChild(modal);
+    });
+    
+    modal.querySelector('#closePremiumPrompt').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    // Close on backdrop click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
 }
 
 // Listen for refreshMembership message from success page

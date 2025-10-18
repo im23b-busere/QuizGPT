@@ -1138,3 +1138,85 @@ body.popup-container {
     vertical-align: middle;
     box-shadow: 0 1px 4px rgba(255, 215, 0, 0.15);
 }
+
+.beta-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    font-size: 0.65em;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 6px;
+    padding: 2px 5px;
+    margin-left: 6px;
+    vertical-align: middle;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+/* Premium Lock Styles */
+.premium-locked {
+    position: relative;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.premium-locked .checkbox,
+.premium-locked .slider {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.feature-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.feature-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7em;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 8px;
+    padding: 2px 6px;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.premium-lock {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #333;
+    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+.ultra-lock {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.4);
+}
+
+.lock-badge svg {
+    width: 10px;
+    height: 10px;
+}
+
+/* Locked slider specific styles */
+.premium-locked.slider-row .slider-label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.premium-locked.slider-row .beta-badge {
+    margin-left: 4px;
+}
