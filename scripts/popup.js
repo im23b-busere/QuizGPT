@@ -9,6 +9,8 @@ const settingsModal = document.getElementById('settingsModal');
 const closeModal = document.querySelector('.close-modal');
 const highlightCheckbox = document.getElementById('highlight');
 const autoclickCheckbox = document.getElementById('autoclick');
+const answerDelaySlider = document.getElementById('answerDelay');
+const delayValueDisplay = document.getElementById('delayValue');
 const logoutButton = document.querySelector('.logout-button');
 const upgradeButton = document.getElementById('upgradeButton');
 const manageSubscriptionButton = document.getElementById('manageSubscriptionButton');
@@ -113,12 +115,24 @@ function initializeEventListeners() {
     });
 
     // Load settings
-    chrome.storage.sync.get(['highlightOption', 'autoClickOption'], (settings) => {
+    chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay'], (settings) => {
         if (highlightCheckbox && settings.highlightOption !== undefined) {
             highlightCheckbox.checked = settings.highlightOption;
         }
         if (autoclickCheckbox && settings.autoClickOption !== undefined) {
             autoclickCheckbox.checked = settings.autoClickOption;
+        }
+        if (answerDelaySlider && settings.answerDelay !== undefined) {
+            answerDelaySlider.value = settings.answerDelay;
+            if (delayValueDisplay) {
+                delayValueDisplay.textContent = settings.answerDelay;
+            }
+        } else if (answerDelaySlider) {
+            // Default value is 3 seconds
+            answerDelaySlider.value = 3;
+            if (delayValueDisplay) {
+                delayValueDisplay.textContent = "3";
+            }
         }
     });
 
@@ -133,6 +147,17 @@ function initializeEventListeners() {
     if (autoclickCheckbox) {
         autoclickCheckbox.addEventListener('change', async () => {
             await chrome.storage.sync.set({ autoClickOption: autoclickCheckbox.checked });
+        });
+    }
+
+    // Answer delay slider change handler
+    if (answerDelaySlider) {
+        answerDelaySlider.addEventListener('input', async () => {
+            const value = answerDelaySlider.value;
+            if (delayValueDisplay) {
+                delayValueDisplay.textContent = value;
+            }
+            await chrome.storage.sync.set({ answerDelay: parseFloat(value) });
         });
     }
 
@@ -298,7 +323,7 @@ async function handleManualButtonClick() {
             extractedData.classList.remove('hidden');
 
             // Get user settings
-            const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption']);
+            const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay']);
             
             // Format the question for the backend
             const fullQuestion = `${response.question.title}\n\nOptions:\n${response.question.choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
@@ -327,7 +352,8 @@ async function handleManualButtonClick() {
                 answer: result.answer,
                 options: {
                     highlight: settings.highlightOption !== false,
-                    autoClick: settings.autoClickOption !== false
+                    autoClick: settings.autoClickOption !== false,
+                    answerDelay: settings.answerDelay !== undefined ? settings.answerDelay : 3
                 }
             });
 

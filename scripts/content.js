@@ -281,21 +281,208 @@ function highlightAnswer(answer, options = {}, pollTries = 30) {
     }
 }
 
-// Hilfsfunktion für AutoClick mit Polling
+// Hilfsfunktion für AutoClick mit Polling und Timer
 function waitAndAutoClick(element, answerElements, options, retries = 20) {
     if (!element) return;
+    
+    const answerDelay = options.answerDelay !== undefined ? options.answerDelay : 3;
+    
     // Prüfe, ob der Button klickbar ist
     if (!element.disabled && element.offsetParent !== null) {
-        // Dispatch autoClick event
-        const index = Array.from(answerElements).indexOf(element);
-        console.log('[Content] Clicking answer at index:', index);
-        const event = new CustomEvent("autoClickAnswer", { detail: index });
-        window.dispatchEvent(event);
+        // Wenn der Button klickbar ist und Delay > 0, zeige Timer
+        if (answerDelay > 0) {
+            showTimerOverlay(answerDelay, () => {
+                // Callback nach Ablauf des Timers
+                const index = Array.from(answerElements).indexOf(element);
+                console.log('[Content] Clicking answer at index:', index, 'after', answerDelay, 'seconds delay');
+                const event = new CustomEvent("autoClickAnswer", { detail: index });
+                window.dispatchEvent(event);
+            });
+        } else {
+            // Sofortiger Click ohne Delay
+            const index = Array.from(answerElements).indexOf(element);
+            console.log('[Content] Clicking answer at index:', index, 'immediately');
+            const event = new CustomEvent("autoClickAnswer", { detail: index });
+            window.dispatchEvent(event);
+        }
     } else if (retries > 0) {
         setTimeout(() => waitAndAutoClick(element, answerElements, options, retries - 1), 2000);
     } else {
         console.warn('[Content] AutoClick: Button was never enabled.');
     }
+}
+
+// Timer Overlay Funktion
+function showTimerOverlay(duration, callback) {
+    // Entferne existierendes Timer-Overlay falls vorhanden
+    const existingTimer = document.getElementById('quizgpt-timer-overlay');
+    if (existingTimer) {
+        existingTimer.remove();
+    }
+
+    // Timer Overlay erstellen
+    const timerOverlay = document.createElement('div');
+    timerOverlay.id = 'quizgpt-timer-overlay';
+    timerOverlay.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, rgba(138, 43, 226, 0.95), rgba(218, 112, 214, 0.95));
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        z-index: 10000;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+        min-width: 180px;
+        animation: slideIn 0.3s ease-out;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    `;
+
+    // Timer Text
+    const timerText = document.createElement('div');
+    timerText.style.cssText = `
+        margin-bottom: 8px;
+        font-size: 13px;
+        opacity: 0.9;
+    `;
+    timerText.textContent = 'Auto-clicking in';
+
+    // Cancel hint
+    const cancelHint = document.createElement('div');
+    cancelHint.style.cssText = `
+        font-size: 11px;
+        opacity: 0.7;
+        margin-bottom: 8px;
+        cursor: pointer;
+    `;
+    cancelHint.textContent = '(Click to cancel)';
+
+    // Countdown Display
+    const countdownDisplay = document.createElement('div');
+    countdownDisplay.style.cssText = `
+        font-size: 24px;
+        font-weight: 700;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    `;
+
+    // Progress Bar
+    const progressBar = document.createElement('div');
+    progressBar.style.cssText = `
+        width: 100%;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+        margin-top: 10px;
+        overflow: hidden;
+    `;
+
+    const progressFill = document.createElement('div');
+    progressFill.style.cssText = `
+        height: 100%;
+        background: #fff;
+        border-radius: 2px;
+        width: 100%;
+        transition: width linear;
+        transition-duration: ${duration}s;
+    `;
+
+    progressBar.appendChild(progressFill);
+    timerOverlay.appendChild(timerText);
+    timerOverlay.appendChild(cancelHint);
+    timerOverlay.appendChild(countdownDisplay);
+    timerOverlay.appendChild(progressBar);
+
+    // CSS Animation für slide-in
+    if (!document.querySelector('#quizgpt-timer-styles')) {
+        const timerStyles = document.createElement('style');
+        timerStyles.id = 'quizgpt-timer-styles';
+        timerStyles.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+            #quizgpt-timer-overlay:hover {
+                transform: scale(1.05);
+                box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+            }
+        `;
+        document.head.appendChild(timerStyles);
+    }
+
+    document.body.appendChild(timerOverlay);
+
+    // Start Progress Bar Animation
+    setTimeout(() => {
+        progressFill.style.width = '0%';
+    }, 100);
+
+    // Countdown Logic
+    let timeLeft = duration;
+    countdownDisplay.textContent = timeLeft.toFixed(1);
+
+    const countdownInterval = setInterval(() => {
+        timeLeft -= 0.1;
+        if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            
+            // Slide out animation
+            timerOverlay.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => {
+                if (timerOverlay.parentNode) {
+                    timerOverlay.remove();
+                }
+                // Execute callback
+                callback();
+            }, 300);
+        } else {
+            countdownDisplay.textContent = timeLeft.toFixed(1);
+        }
+    }, 100);
+
+    // Click to cancel
+    timerOverlay.addEventListener('click', () => {
+        clearInterval(countdownInterval);
+        
+        // Show canceled message briefly
+        timerText.textContent = 'Auto-click canceled';
+        cancelHint.style.display = 'none';
+        countdownDisplay.textContent = '✕';
+        progressFill.style.width = '0%';
+        progressFill.style.background = '#ff6b6b';
+        
+        setTimeout(() => {
+            timerOverlay.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => {
+                if (timerOverlay.parentNode) {
+                    timerOverlay.remove();
+                }
+            }, 300);
+        }, 800);
+    });
 }
 
 // Add pulse animation to the styles
