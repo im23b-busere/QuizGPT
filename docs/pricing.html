@@ -117,6 +117,20 @@
                 </svg>
                 Highlight correct answers
               </li>
+              <li style="visibility: hidden;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Placeholder
+              </li>
+              <li style="visibility: hidden;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Placeholder
+              </li>
             </ul>
           </div>
           
@@ -161,7 +175,7 @@
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
-                Faster AI responses
+                Answer delay settings
               </li>
               <li>  
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -169,6 +183,13 @@
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
                 Cancel anytime
+              </li>
+              <li style="visibility: hidden;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Placeholder
               </li>
             </ul>
           </div>
@@ -214,7 +235,14 @@
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
-                Turbo AI responses
+                Answer delay settings
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Silent mode (no overlays)
               </li>
               <li>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -240,42 +268,54 @@
       </div>
 
       <div class="pricing-features">
-        <h2>All Plans Include</h2>
+        <h2>Why choose QuizGPT ?</h2>
         <div class="features-grid">
           <div class="feature-item">
             <div class="feature-icon">🤖</div>
             <h3>AI-Powered Answers</h3>
-            <p>Get instant, accurate answers to any Kahoot question using advanced AI technology.</p>
+            <p>Get instant, accurate answers to any Kahoot question using advanced AI technology. Available on all plans.</p>
           </div>
           
           <div class="feature-item">
             <div class="feature-icon">🎯</div>
             <h3>Smart Highlighting</h3>
-            <p>Automatically highlight the correct answer with a visual indicator.</p>
+            <p>Automatically highlight the correct answer with a visual indicator. Works on all devices.</p>
           </div>
           
           <div class="feature-item">
             <div class="feature-icon">⚡</div>
-            <h3>Auto-Click (Premium)</h3>
-            <p>Automatically click the correct answer for you. Exclusive to premium users.</p>
+            <h3>Auto-Click</h3>
+            <p>Automatically click the correct answer for you. <strong>Premium & Ultra exclusive</strong> feature for hands-free experience.</p>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">⏱️</div>
+            <h3>Answer Delay Control</h3>
+            <p>Customize timing delays for more natural gameplay. <strong>Premium & Ultra exclusive</strong> - make it look human!</p>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">🔇</div>
+            <h3>Silent Mode</h3>
+            <p>Disable all visual overlays for a clean, undetectable experience. <strong>Ultra exclusive</strong> stealth mode.</p>
           </div>
           
           <div class="feature-item">
             <div class="feature-icon">🔒</div>
             <h3>Secure & Private</h3>
-            <p>Your data is encrypted and never shared with third parties.</p>
+            <p>Your data is encrypted and never shared with third parties. Privacy-first approach on all plans.</p>
           </div>
           
           <div class="feature-item">
             <div class="feature-icon">📱</div>
             <h3>Easy Setup</h3>
-            <p>No API keys needed. Just install, create an account, and start using.</p>
+            <p>No API keys needed. Just install the Chrome extension, create an account, and start dominating Kahoots!</p>
           </div>
           
           <div class="feature-item">
             <div class="feature-icon">🔄</div>
             <h3>Always Updated</h3>
-            <p>Regular updates with new features and improvements.</p>
+            <p>Regular updates with new features and improvements. Stay ahead with the latest Kahoot-solving technology.</p>
           </div>
         </div>
       </div>
@@ -405,12 +445,12 @@
         } else {
             // No token available, disable buttons and show message
             upgradePremiumBtn.disabled = true;
-            upgradePremiumBtn.textContent = 'Please log in through extension';
+            upgradePremiumBtn.textContent = 'Login via Extension';
             upgradePremiumBtn.style.opacity = '0.6';
             upgradePremiumBtn.style.cursor = 'not-allowed';
             
             upgradeUltraBtn.disabled = true;
-            upgradeUltraBtn.textContent = 'Please log in through extension';
+            upgradeUltraBtn.textContent = 'Login via Extension';
             upgradeUltraBtn.style.opacity = '0.6';
             upgradeUltraBtn.style.cursor = 'not-allowed';
         }
