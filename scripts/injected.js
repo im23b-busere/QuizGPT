@@ -6,7 +6,7 @@ window.kahootClientId = null;
 window.kahootGameId = null;
 window.kahootQuestionIndex = 0;
 window.kahootMessageId = 0;
-window.kahootDataId = 45;
+window.kahootDataId = 45; // Fixed value for answer submissions based on Burp Suite analysis
 
 // Hook into the WebSocket constructor
 window.WebSocket = function (url, protocols) {
@@ -36,9 +36,13 @@ window.WebSocket = function (url, protocols) {
                     console.log("[AutoClick] clientId found:", window.kahootClientId);
                 }
 
-                if (item.data?.gameid && !window.kahootGameId) {
-                    window.kahootGameId = item.data.gameid;
-                    console.log("[AutoClick] gameid found:", window.kahootGameId);
+                if (item.data?.gameid) {
+                    // If this is a new game, reset tracking variables
+                    if (window.kahootGameId !== item.data.gameid) {
+                        window.kahootGameId = item.data.gameid;
+                        window.kahootQuestionIndex = 0;
+                        console.log("[AutoClick] New game detected, gameid:", window.kahootGameId);
+                    }
                 }
 
                 // Check for question content
@@ -85,12 +89,7 @@ window.WebSocket = function (url, protocols) {
                     }
                 }
 
-                if (item.data?.id && typeof item.data.id === "number") {
-                    if (item.data.id > window.kahootDataId) {
-                        window.kahootDataId = item.data.id;
-                        console.log("[AutoClick] data.id updated:", item.data.id);
-                    }
-                }
+                console.log("[AutoClick] Found data.id:", item.data?.id, "channel:", item.channel);
             });
         } catch (e) {
             console.warn("[AutoClick] Error parsing WS message:", e);
@@ -107,6 +106,8 @@ window.WebSocket = function (url, protocols) {
         window.__kahootWS = null;
         window.kahootClientId = null;
         window.kahootGameId = null;
+        window.kahootQuestionIndex = 0;
+        window.kahootMessageId = 0;
     });
 
     ws.addEventListener("error", (error) => {
@@ -124,8 +125,22 @@ window.sendAutoClickMessage = function (answerChoice) {
     const clientId = window.kahootClientId;
     const questionIndex = window.kahootQuestionIndex;
 
+    console.log("[AutoClick] Current state:", {
+        gameid,
+        clientId,
+        dataId: window.kahootDataId,
+        questionIndex,
+        messageId: window.kahootMessageId,
+        websocketReady: window.__kahootWS?.readyState === 1
+    });
+
     if (!gameid || !clientId || !window.__kahootWS) {
-        console.warn("[AutoClick] Missing data (gameid, clientId, or WebSocket)");
+        console.warn("[AutoClick] Missing data (gameid, clientId, or WebSocket)", {
+            gameid: !!gameid,
+            clientId: !!clientId,
+            dataId: window.kahootDataId,
+            websocket: !!window.__kahootWS
+        });
         return;
     }
 
