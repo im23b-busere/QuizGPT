@@ -584,6 +584,26 @@ function addLockedFeatureClickHandlers(plan) {
             });
         }
         
+        // Re-add silent mode event listener after any DOM manipulation
+        const silentModeCheckbox = document.getElementById('silentMode');
+        if (silentModeCheckbox) {
+            // Remove any existing listeners by cloning the checkbox
+            const newSilentCheckbox = silentModeCheckbox.cloneNode(true);
+            silentModeCheckbox.parentNode.replaceChild(newSilentCheckbox, silentModeCheckbox);
+            
+            // Add fresh event listener
+            newSilentChWeckbox.addEventListener('change', async () => {
+                // Check if user has permission to use this feature
+                if (newSilentCheckbox.disabled) {
+                    newSilentCheckbox.checked = false;
+                    return;
+                }
+                console.log('Silent mode checkbox changed to:', newSilentCheckbox.checked);
+                await chrome.storage.sync.set({ silentMode: newSilentCheckbox.checked });
+                console.log('Silent mode saved to storage:', newSilentCheckbox.checked);
+            });
+        }
+
         // Re-add slider event listener after any DOM manipulation
         const slider = document.getElementById('answerDelay');
         const display = document.getElementById('delayValue');
