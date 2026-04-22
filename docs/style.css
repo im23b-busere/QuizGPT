@@ -79,8 +79,29 @@ body.upgrade-centered {
     color: var(--text-color);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.2s ease, filter 0.2s ease, border-color 0.2s ease;
+    transition: color 0.3s ease, filter 0.3s ease;
     position: relative;
+    padding: 0.5rem 1rem;
+}
+
+.navbar a::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--header-gradient);
+    transition: width 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar a:hover {
+    color: var(--primary-color);
+}
+
+.navbar a:hover::after {
+    width: 80%;
 }
 
 .navbar a[aria-label="QuizGPT Home"] {
@@ -97,6 +118,12 @@ body.upgrade-centered {
 
 .navbar a[aria-label="QuizGPT Home"]:hover {
     filter: brightness(1.06) saturate(1.05);
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar a[aria-label="QuizGPT Home"]::after {
+    display: none;
 }
 
 .navbar a[aria-label="QuizGPT Home"]:focus-visible {
@@ -108,19 +135,11 @@ body.upgrade-centered {
 /* Standalone nav actions (e.g. upgrade page back link) */
 .navbar-content > a:not([aria-label="QuizGPT Home"]) {
     color: var(--text-light);
-    padding: 0.35rem 0;
     font-size: 0.9rem;
     font-weight: 500;
     border: none;
     background: none;
     border-radius: 0;
-    border-bottom: 1px solid transparent;
-}
-
-.navbar-content > a:not([aria-label="QuizGPT Home"]):hover {
-    color: var(--primary-color);
-    border-bottom-color: rgba(255, 107, 107, 0.45);
-    background: none;
 }
 
 .navbar-content > a:not([aria-label="QuizGPT Home"]):focus-visible {
@@ -177,32 +196,8 @@ body.upgrade-centered {
     font-weight: 500;
     font-size: 0.9375rem;
     letter-spacing: 0.01em;
-    padding: 0.35rem 0;
     border-radius: 0;
     border: none;
-}
-
-.nav-links a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0.15rem;
-    height: 1px;
-    background: var(--primary-color);
-    transform: scaleX(0);
-    transition: transform 0.2s ease;
-    transform-origin: center;
-    opacity: 0.85;
-}
-
-.nav-links a:hover {
-    color: var(--text-color);
-    background: none;
-}
-
-.nav-links a:hover::after {
-    transform: scaleX(1);
 }
 
 .nav-links a:focus-visible {
@@ -211,16 +206,18 @@ body.upgrade-centered {
     border-radius: 4px;
 }
 
+/* Beat .nav-links a / standalone base color so hover matches classic .navbar a:hover */
+.navbar .nav-links a:hover,
+.navbar-content > a:not([aria-label="QuizGPT Home"]):hover {
+    color: var(--primary-color);
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .nav-links a::after {
+    .navbar a::after {
         transition: none;
     }
-    .nav-links a::after,
-    .nav-links a:hover::after {
-        transform: scaleX(0);
-    }
-    .nav-links a:hover {
-        color: var(--primary-color);
+    .navbar a:hover::after {
+        width: 0;
     }
 }
 

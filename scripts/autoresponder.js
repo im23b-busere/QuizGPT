@@ -34,7 +34,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             .catch(error => {
                 console.error('[AutoResponder] Error processing question:', error);
             });
+        return true;
     }
+
+    if (request.action === "openLoginPage") {
+        // Content scripts can't open chrome-extension:// URLs directly (popup blocker).
+        // Prefer opening the toolbar popup, fall back to a tab.
+        const fallbackToTab = () => {
+            chrome.tabs.create({ url: chrome.runtime.getURL('pages/login.html') });
+        };
+        try {
+            if (chrome.action && typeof chrome.action.openPopup === 'function') {
+                chrome.action.openPopup().catch(fallbackToTab);
+            } else {
+                fallbackToTab();
+            }
+        } catch (_) {
+            fallbackToTab();
+        }
+        sendResponse({ ok: true });
+        return true;
+    }
+
     return true; // Keep the message channel open
 });
 
@@ -123,6 +144,11 @@ async function processQuestionWithBackend(question, tabId) {
         chrome.runtime.sendMessage({
             action: 'updateUsage'
         });
+
+        // Also notify the originating tab so the on-page panel can refresh its usage bar
+        try {
+            await chrome.tabs.sendMessage(tabId, { action: 'updateUsage' });
+        } catch (_) { /* content script may not be listening; fine */ }
 
         console.log('[AutoResponder] Answer sent to content script successfully');
 

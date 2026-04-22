@@ -1,16 +1,28 @@
-html {
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
     background: #242424;
+    height: 100%;
+}
+
+html {
     font-family: "Segoe UI", Tahoma, sans-serif;
     color: #b7b7b7;
     text-align: center;
 }
 
 body.popup-container {
-    width: 300px;
-    height: 300px;
+    width: 310px;
+    height: 350px;
+    background: #242424;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .popup-content {
@@ -202,8 +214,8 @@ body.popup-container {
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(6px);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: stretch;
+    justify-content: stretch;
     z-index: 2000;
 }
 
@@ -215,29 +227,32 @@ body.popup-container {
 .modal-content {
     background: #1e1e1e;
     border: none;
-    padding: 12px 10px;
+    padding: 10px 10px 8px;
     border-radius: 0;
-    height: 100vh;
-    width: 100vw;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     max-width: none;
+    max-height: none;
     color: #eee;
     text-align: left;
-    position: relative;
-    max-height: none;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
+    min-height: 0;
 }
 
 .modal-content h2 {
     margin-top: 0;
-    margin-bottom: 12px;
-    font-size: 1.3em;
+    margin-bottom: 8px;
+    font-size: 1.2em;
     color: #fff;
     text-align: center;
     padding-top: 0;
     position: relative;
     z-index: 1;
+    flex-shrink: 0;
 }
 
 .modal-content label[for="model"] {
@@ -434,10 +449,11 @@ body.popup-container {
 .settings-tabs {
     display: flex;
     gap: 0;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     border-bottom: 1px solid #444;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
     width: 100%;
+    flex-shrink: 0;
 }
 
 .tab-button {
@@ -478,13 +494,27 @@ body.popup-container {
     width: 100%;
     height: auto;
     display: none;
-    padding: 8px 0;
+    padding: 6px 0 2px;
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
 }
 
 .tab-content.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
     height: auto;
+}
+
+/* Account tab: no inner scroll; content is tightened to fit the popup */
+.modal-content #account-tab.tab-content.active {
+    overflow: hidden;
+}
+
+/* QuizGPT tab can scroll only if the viewport is unusually short */
+.modal-content #kahoot-tab.tab-content.active {
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .footer-buttons {
@@ -714,6 +744,30 @@ body.popup-container {
     margin-bottom: 8px;
 }
 
+/* Settings modal: Account tab fits without inner scroll */
+.modal-content #account-tab .account-section {
+    margin-bottom: 0;
+}
+
+.modal-content #account-tab .user-profile {
+    margin-bottom: 2px;
+}
+
+.modal-content #account-tab .plan-status {
+    padding: 6px;
+    margin-bottom: 4px;
+}
+
+.modal-content #account-tab .usage-counter {
+    margin: 4px 0;
+    padding: 6px;
+}
+
+.modal-content #account-tab .account-actions {
+    margin-top: 2px;
+    padding-top: 0;
+}
+
 .user-profile {
     display: flex;
     align-items: center;
@@ -782,16 +836,17 @@ body.popup-container {
 }
 
 .plan-label {
-    font-size: 0.85em;
-    color: #aaa;
+    font-size: 0.95em;
+    color: #cfcfcf;
+    font-weight: 500;
 }
 
 .plan-badge {
     background: #8A2BE2;
     color: white;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 4px;
-    font-size: 0.75em;
+    font-size: 0.85em;
     font-weight: 600;
 }
 
@@ -875,14 +930,14 @@ body.popup-container {
 }
 
 .usage-label {
-    font-size: 0.8em;
-    font-weight: 500;
-    color: #b7b7b7;
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #dcdcdc;
 }
 
 .usage-text {
-    font-size: 0.75em;
-    color: #9d86c3;
+    font-size: 0.9em;
+    color: #b9a3e0;
     font-weight: 600;
 }
 
@@ -908,8 +963,8 @@ body.popup-container {
 }
 
 .usage-reset small {
-    font-size: 0.65em;
-    color: #888;
+    font-size: 0.8em;
+    color: #a5a5a5;
     font-style: italic;
 }
 
@@ -979,7 +1034,8 @@ body.popup-container {
     margin: 20px 0;
 }
 
-#codeInput {
+#codeInput,
+#registerCodeInput {
     width: 200px;
     text-align: center;
     letter-spacing: 4px;
@@ -990,6 +1046,15 @@ body.popup-container {
     border-radius: 4px;
     background-color: #2a2a2a;
     color: white;
+    margin: 0;
+    box-sizing: content-box;
+}
+
+#codeInput::placeholder,
+#registerCodeInput::placeholder {
+    color: #6a6a6a;
+    font-weight: normal;
+    letter-spacing: 4px;
 }
 
 /* Code form header with back button */
@@ -1097,13 +1162,27 @@ body.popup-container {
 }
 
 .button.secondary {
-    background-color: #f0f0f0;
-    color: #333;
+    background: transparent;
+    color: #b7b7b7;
+    border: 1px solid #555;
     margin-top: 10px;
+    font-weight: 500;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
 }
 
 .button.secondary:hover {
-    background-color: #e0e0e0;
+    background: rgba(138, 43, 226, 0.1);
+    border-color: #8A2BE2;
+    color: white;
+    animation: none;
+    box-shadow: none;
+}
+
+.button.secondary:disabled {
+    background: transparent;
+    border-color: #3a3a3a;
+    color: #666;
+    opacity: 0.6;
 }
 
 .button:disabled {

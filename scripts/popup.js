@@ -410,6 +410,17 @@ async function updateMembershipStatus() {
             
             const planType = data.plan_type || 'free';
             console.log('Plan type:', planType);
+
+            try {
+                chrome.storage.sync.set({
+                    membershipStatus: {
+                        planType: planType.toLowerCase(),
+                        usage: data.usage ?? 0,
+                        limit: data.limit ?? 5,
+                        updatedAt: Date.now()
+                    }
+                });
+            } catch (_) { /* ignore */ }
             
             const planBadge = document.querySelector('.plan-badge');
             
@@ -552,79 +563,42 @@ function updatePremiumLocks(planType) {
 }
 
 // Function to add click handlers for locked features
+// NOTE: this used to clone the rows (destroying the existing change/input listeners
+// attached in initializeEventListeners) and then try to re-bind them — with a typo
+// (`newSilentChWeckbox`) that threw a ReferenceError, leaving the Silent mode checkbox
+// with no change handler at all (so toggling never persisted). We now only attach the
+// upgrade-prompt click handler once via a dataset flag, and never touch the real inputs.
 function addLockedFeatureClickHandlers(plan) {
-    // Handle clicks on locked silent mode
     const silentModeRow = document.querySelector('[data-plan="ultra"]');
+    const answerDelayRow = document.querySelector('[data-plan="premium"]');
+
     if (silentModeRow) {
-        // Remove existing listeners
-        const newSilentModeRow = silentModeRow.cloneNode(true);
-        silentModeRow.parentNode.replaceChild(newSilentModeRow, silentModeRow);
-        
-        if (plan !== 'enterprise' && plan !== 'ultra') {
-            newSilentModeRow.addEventListener('click', (e) => {
+        silentModeRow.dataset.currentPlan = plan;
+        if (!silentModeRow.dataset.upgradeHandlerAttached) {
+            silentModeRow.addEventListener('click', (e) => {
+                const p = silentModeRow.dataset.currentPlan || 'free';
+                if (p === 'enterprise' || p === 'ultra') return; // unlocked, let the real toggle through
                 e.preventDefault();
                 e.stopPropagation();
                 showUpgradePrompt('Ultra', 'Silent mode is an Ultra exclusive feature that disables all overlays for a cleaner experience.');
             });
+            silentModeRow.dataset.upgradeHandlerAttached = 'true';
         }
     }
-    
-    // Handle clicks on locked answer delay
-    const answerDelayRow = document.querySelector('[data-plan="premium"]');
+
     if (answerDelayRow) {
-        if (plan !== 'premium' && plan !== 'enterprise' && plan !== 'ultra') {
-            // Remove existing listeners and add upgrade prompt
-            const newAnswerDelayRow = answerDelayRow.cloneNode(true);
-            answerDelayRow.parentNode.replaceChild(newAnswerDelayRow, answerDelayRow);
-            
-            newAnswerDelayRow.addEventListener('click', (e) => {
+        answerDelayRow.dataset.currentPlan = plan;
+        if (!answerDelayRow.dataset.upgradeHandlerAttached) {
+            answerDelayRow.addEventListener('click', (e) => {
+                const p = answerDelayRow.dataset.currentPlan || 'free';
+                if (p === 'premium' || p === 'enterprise' || p === 'ultra') return; // unlocked
+                // Let interactions with the slider itself bubble normally (it will be .disabled anyway)
+                if (e.target && e.target.closest && e.target.closest('input[type="range"]')) return;
                 e.preventDefault();
                 e.stopPropagation();
                 showUpgradePrompt('Premium', 'Answer delay is a Premium feature that lets you customize the timing for a more natural experience.');
             });
-        }
-        
-        // Re-add silent mode event listener after any DOM manipulation
-        const silentModeCheckbox = document.getElementById('silentMode');
-        if (silentModeCheckbox) {
-            // Remove any existing listeners by cloning the checkbox
-            const newSilentCheckbox = silentModeCheckbox.cloneNode(true);
-            silentModeCheckbox.parentNode.replaceChild(newSilentCheckbox, silentModeCheckbox);
-            
-            // Add fresh event listener
-            newSilentChWeckbox.addEventListener('change', async () => {
-                // Check if user has permission to use this feature
-                if (newSilentCheckbox.disabled) {
-                    newSilentCheckbox.checked = false;
-                    return;
-                }
-                console.log('Silent mode checkbox changed to:', newSilentCheckbox.checked);
-                await chrome.storage.sync.set({ silentMode: newSilentCheckbox.checked });
-                console.log('Silent mode saved to storage:', newSilentCheckbox.checked);
-            });
-        }
-
-        // Re-add slider event listener after any DOM manipulation
-        const slider = document.getElementById('answerDelay');
-        const display = document.getElementById('delayValue');
-        if (slider && display) {
-            // Remove any existing listeners by cloning the slider
-            const newSlider = slider.cloneNode(true);
-            slider.parentNode.replaceChild(newSlider, slider);
-            
-            // Add fresh event listener
-            newSlider.addEventListener('input', async () => {
-                // Check if user has permission to use this feature
-                if (newSlider.disabled) {
-                    newSlider.value = 0;
-                    display.textContent = "0";
-                    return;
-                }
-                
-                const value = newSlider.value;
-                display.textContent = value;
-                await chrome.storage.sync.set({ answerDelay: parseFloat(value) });
-            });
+            answerDelayRow.dataset.upgradeHandlerAttached = 'true';
         }
     }
 }
