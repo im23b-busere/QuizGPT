@@ -38,63 +38,95 @@ body.upgrade-centered {
 
 .upgrade-centered .navbar {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    top: 0.65rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
     z-index: 1000;
-    background: white;
-    box-shadow: none;
-    border: none;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: 0 2px 14px rgba(45, 52, 54, 0.07);
 }
 .upgrade-centered .navbar-content {
     justify-content: flex-start;
-    padding-left: 0;
+    padding-left: 1rem;
 }
 
 .navbar {
-    background: white;
-    padding: 0.6rem 0;
+    background: var(--card-background);
+    margin: 0.65rem 1rem 0;
+    padding: 0.72rem 0;
     position: sticky;
-    top: 0;
+    top: 0.65rem;
     z-index: 1000;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 2px 14px rgba(45, 52, 54, 0.06);
 }
 
 .navbar-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.35rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
 }
 
 .navbar a {
-    color: #333;
+    color: var(--text-color);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: color 0.2s ease, filter 0.2s ease, border-color 0.2s ease;
     position: relative;
-    padding: 0.5rem 1rem;
 }
 
-.navbar a:hover {
-    color: var(--primary-color);
-}
-
-.navbar a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2px;
+.navbar a[aria-label="QuizGPT Home"] {
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: -0.035em;
+    padding: 0.2rem 0;
     background: var(--header-gradient);
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
 }
 
-.navbar a:hover::after {
-    width: 80%;
+.navbar a[aria-label="QuizGPT Home"]:hover {
+    filter: brightness(1.06) saturate(1.05);
+}
+
+.navbar a[aria-label="QuizGPT Home"]:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 4px;
+    border-radius: 6px;
+}
+
+/* Standalone nav actions (e.g. upgrade page back link) */
+.navbar-content > a:not([aria-label="QuizGPT Home"]) {
+    color: var(--text-light);
+    padding: 0.35rem 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    background: none;
+    border-radius: 0;
+    border-bottom: 1px solid transparent;
+}
+
+.navbar-content > a:not([aria-label="QuizGPT Home"]):hover {
+    color: var(--primary-color);
+    border-bottom-color: rgba(255, 107, 107, 0.45);
+    background: none;
+}
+
+.navbar-content > a:not([aria-label="QuizGPT Home"]):focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+    border-radius: 4px;
 }
 
 /* Burger menu styles */
@@ -107,11 +139,11 @@ body.upgrade-centered {
 }
 
 .burger-menu span {
-    width: 25px;
-    height: 3px;
-    background: #333;
-    margin: 3px 0;
-    transition: 0.3s;
+    width: 22px;
+    height: 2px;
+    background: var(--text-color);
+    margin: 4px 0;
+    transition: 0.25s ease;
     border-radius: 2px;
 }
 
@@ -130,7 +162,66 @@ body.upgrade-centered {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem 2.15rem;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+.nav-links a {
+    color: var(--text-light);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    letter-spacing: 0.01em;
+    padding: 0.35rem 0;
+    border-radius: 0;
+    border: none;
+}
+
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.15rem;
+    height: 1px;
+    background: var(--primary-color);
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+    transform-origin: center;
+    opacity: 0.85;
+}
+
+.nav-links a:hover {
+    color: var(--text-color);
+    background: none;
+}
+
+.nav-links a:hover::after {
+    transform: scaleX(1);
+}
+
+.nav-links a:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav-links a::after {
+        transition: none;
+    }
+    .nav-links a::after,
+    .nav-links a:hover::after {
+        transform: scaleX(0);
+    }
+    .nav-links a:hover {
+        color: var(--primary-color);
+    }
 }
 
 .container {
@@ -281,24 +372,95 @@ code {
 }
 
 footer {
-    margin-top: 4rem;
-    padding: 2rem;
+    margin: 3.5rem 1rem 1.5rem;
+    padding: 2rem 1.35rem 2.25rem;
     font-size: 0.9rem;
     color: var(--text-light);
-    border-top: 1px solid var(--border-color);
-    background: var(--card-background);
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    border: 1px solid var(--border-color);
+    background: var(--secondary-background);
+    border-radius: 16px;
+    box-shadow: 0 2px 14px rgba(45, 52, 54, 0.05);
+}
+
+footer > p:first-of-type {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 1.75rem;
+    margin: 0 0 1.35rem;
+}
+
+footer > p:first-of-type a {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-light);
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(99, 110, 114, 0.35);
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+footer > p:first-of-type a:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-light);
+    transform: none;
+    box-shadow: none;
+}
+
+footer > p:first-of-type a:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+.footer-copyright {
+    margin: 0 0 0.4rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.footer-attribution {
+    margin: 0.85rem 0 0;
+    font-size: 0.875rem;
+    color: var(--text-light);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+}
+
+.footer-attribution a {
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 107, 107, 0.35);
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.footer-attribution a:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-light);
+}
+
+.footer-attribution a:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+    border-radius: 2px;
 }
 
 footer a {
-    color: var(--text-light);
-    margin: 0 0.5rem;
-    transition: all 0.3s ease;
-}
-
-footer a:hover {
-    color: var(--primary-color);
+    color: inherit;
+    transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Floating Social Media Bar */
@@ -418,16 +580,20 @@ footer a:hover {
     
     /* Fix navbar */
     .navbar {
-        background: white;
-        padding: 0.5rem 0;
+        background: var(--card-background);
+        margin: 0;
+        padding: 0.55rem 0;
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-width: 100vw;
+        top: 0.55rem;
+        left: 0.65rem;
+        right: 0.65rem;
+        width: auto;
+        max-width: none;
         z-index: 1000;
         overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        box-shadow: 0 2px 16px rgba(45, 52, 54, 0.08);
     }
     
     .navbar-content {
@@ -447,19 +613,22 @@ footer a:hover {
         position: fixed;
         top: 0;
         right: -100%;
-        width: 250px;
+        width: min(280px, 88vw);
         height: 100vh;
-        background: white;
-        backdrop-filter: blur(20px);
+        height: 100dvh;
+        background: var(--card-background);
         flex-direction: column;
         justify-content: flex-start;
-        align-items: flex-start;
-        padding: 80px 2rem 2rem 2rem;
-        transition: right 0.3s ease;
+        align-items: stretch;
+        padding: 5.25rem 0 2rem;
+        transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1000;
-        border-left: 1px solid rgba(0, 0, 0, 0.1);
+        border-left: 1px solid var(--border-color);
+        box-shadow: -8px 0 32px rgba(45, 52, 54, 0.08);
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: hidden auto;
+        gap: 0;
+        border-radius: 0;
     }
     
     .nav-links.active {
@@ -468,13 +637,25 @@ footer a:hover {
     
     .nav-links a {
         width: 100%;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        font-size: 1.1rem;
-        color: #333;
+        padding: 0.95rem 1.35rem;
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-color);
         box-sizing: border-box;
         word-wrap: break-word;
         overflow-wrap: break-word;
+    }
+
+    .nav-links a::after {
+        display: none;
+    }
+
+    .nav-links a:hover {
+        background: var(--secondary-background);
+        color: var(--primary-color);
     }
     
     .nav-links a:last-child {
@@ -482,14 +663,21 @@ footer a:hover {
     }
     
     .navbar a[aria-label="QuizGPT Home"] {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.35rem;
+        font-weight: 800;
         margin-left: 0;
-        color: #333;
+        padding: 0.35rem 0.5rem 0.35rem 0;
+        background: var(--header-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
     }
     
     .navbar a[aria-label="QuizGPT Home"]:hover {
-        color: var(--primary-color);
+        filter: brightness(1.08);
+        color: transparent;
+        -webkit-text-fill-color: transparent;
     }
     
     .navbar a[aria-label="QuizGPT Home"]::after {
@@ -737,12 +925,16 @@ footer a:hover {
     
     /* Fix footer */
     footer {
-        padding: 2rem 1rem;
-        width: 100%;
-        max-width: 100%;
+        margin: 3rem 0.65rem 1.25rem;
+        padding: 1.75rem 1rem 2rem;
+        width: auto;
+        max-width: none;
         box-sizing: border-box;
         text-align: center;
         overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        box-shadow: 0 2px 14px rgba(45, 52, 54, 0.06);
     }
     
     footer p {
@@ -753,10 +945,20 @@ footer a:hover {
         max-width: 100%;
         box-sizing: border-box;
     }
+
+    footer > p:first-of-type {
+        gap: 0.75rem 1.25rem;
+        margin-bottom: 1.1rem;
+    }
+
+    footer > p:first-of-type a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0.35rem 0.2rem;
+    }
     
     footer a {
-        display: inline-block;
-        margin: 0 0.5rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
         max-width: 100%;
@@ -866,7 +1068,8 @@ html {
     max-width: 800px;
 }
 
-.legal h1 {
+/* Scope typography to main content only — footer must match global footer styles */
+.legal .container h1 {
     color: var(--text-color);
     background: none;
     -webkit-text-fill-color: initial;
@@ -877,26 +1080,26 @@ html {
     padding-bottom: 1rem;
 }
 
-.legal h2 {
+.legal .container h2 {
     color: var(--text-color);
     font-size: 1.5rem;
     margin: 2.5rem 0 1rem;
     font-weight: 600;
 }
 
-.legal p {
+.legal .container p {
     color: var(--text-color);
     font-size: 1rem;
     line-height: 1.8;
     margin-bottom: 1.5rem;
 }
 
-.legal strong {
+.legal .container strong {
     color: var(--text-color);
     font-weight: 600;
 }
 
-.legal code {
+.legal .container code {
     background: var(--secondary-background);
     padding: 0.2em 0.4em;
     border-radius: 4px;
@@ -932,37 +1135,16 @@ html {
     line-height: 1;
 }
 
-.legal footer {
-    margin-top: 4rem;
-    padding: 2rem;
-    font-size: 0.9rem;
-    color: var(--text-light);
-    border-top: 1px solid var(--border-color);
-    background: var(--background-color);
-    border-radius: 0;
-    box-shadow: none;
-}
-
-.legal footer a {
-    color: var(--text-light);
-    margin: 0 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.legal footer a:hover {
-    color: var(--primary-color);
-}
-
 @media (max-width: 768px) {
-    .legal h1 {
+    .legal .container h1 {
         font-size: 2rem;
     }
     
-    .legal h2 {
+    .legal .container h2 {
         font-size: 1.3rem;
     }
     
-    .legal p {
+    .legal .container p {
         font-size: 0.95rem;
     }
 }
@@ -1756,7 +1938,7 @@ html {
 }
 
 .pricing .navbar {
-    background: white;
+    background: var(--card-background);
 }
 
 .pricing-header {
@@ -2183,16 +2365,20 @@ html {
     
     /* Fix navbar */
     .navbar {
-        background: white;
-        padding: 0.5rem 0;
+        background: var(--card-background);
+        margin: 0;
+        padding: 0.55rem 0;
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        max-width: 100vw;
+        top: 0.55rem;
+        left: 0.65rem;
+        right: 0.65rem;
+        width: auto;
+        max-width: none;
         z-index: 1000;
         overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        box-shadow: 0 2px 16px rgba(45, 52, 54, 0.08);
     }
     
     .navbar-content {
@@ -2212,19 +2398,22 @@ html {
         position: fixed;
         top: 0;
         right: -100%;
-        width: 250px;
+        width: min(280px, 88vw);
         height: 100vh;
-        background: white;
-        backdrop-filter: blur(20px);
+        height: 100dvh;
+        background: var(--card-background);
         flex-direction: column;
         justify-content: flex-start;
-        align-items: flex-start;
-        padding: 80px 2rem 2rem 2rem;
-        transition: right 0.3s ease;
+        align-items: stretch;
+        padding: 5.25rem 0 2rem;
+        transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1000;
-        border-left: 1px solid rgba(0, 0, 0, 0.1);
+        border-left: 1px solid var(--border-color);
+        box-shadow: -8px 0 32px rgba(45, 52, 54, 0.08);
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: hidden auto;
+        gap: 0;
+        border-radius: 0;
     }
     
     .nav-links.active {
@@ -2233,13 +2422,25 @@ html {
     
     .nav-links a {
         width: 100%;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        font-size: 1.1rem;
-        color: #333;
+        padding: 0.95rem 1.35rem;
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text-color);
         box-sizing: border-box;
         word-wrap: break-word;
         overflow-wrap: break-word;
+    }
+
+    .nav-links a::after {
+        display: none;
+    }
+
+    .nav-links a:hover {
+        background: var(--secondary-background);
+        color: var(--primary-color);
     }
     
     .nav-links a:last-child {
@@ -2247,14 +2448,21 @@ html {
     }
     
     .navbar a[aria-label="QuizGPT Home"] {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.35rem;
+        font-weight: 800;
         margin-left: 0;
-        color: #333;
+        padding: 0.35rem 0.5rem 0.35rem 0;
+        background: var(--header-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
     }
     
     .navbar a[aria-label="QuizGPT Home"]:hover {
-        color: var(--primary-color);
+        filter: brightness(1.08);
+        color: transparent;
+        -webkit-text-fill-color: transparent;
     }
     
     .navbar a[aria-label="QuizGPT Home"]::after {
@@ -2502,12 +2710,16 @@ html {
     
     /* Fix footer */
     footer {
-        padding: 2rem 1rem;
-        width: 100%;
-        max-width: 100%;
+        margin: 3rem 0.65rem 1.25rem;
+        padding: 1.75rem 1rem 2rem;
+        width: auto;
+        max-width: none;
         box-sizing: border-box;
         text-align: center;
         overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        box-shadow: 0 2px 14px rgba(45, 52, 54, 0.06);
     }
     
     footer p {
@@ -2518,10 +2730,20 @@ html {
         max-width: 100%;
         box-sizing: border-box;
     }
+
+    footer > p:first-of-type {
+        gap: 0.75rem 1.25rem;
+        margin-bottom: 1.1rem;
+    }
+
+    footer > p:first-of-type a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0.35rem 0.2rem;
+    }
     
     footer a {
-        display: inline-block;
-        margin: 0 0.5rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
         max-width: 100%;
