@@ -35,7 +35,10 @@
 <body class="pricing">
   <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="navbar-content">
-      <a href="index.html" style="margin-left: 0;" aria-label="QuizGPT Home">QuizGPT</a>
+      <a href="index.html" class="navbar-brand" aria-label="QuizGPT Home">
+        <img src="images/logo.png" alt="" class="navbar-logo" width="32" height="32">
+        <span class="navbar-brand-text">QuizGPT</span>
+      </a>
       <div class="burger-menu" id="burgerMenu">
         <span></span>
         <span></span>
@@ -145,7 +148,7 @@
               <span class="amount">2.99</span>
               <span class="period">/month</span>
             </div>
-            <div class="discount-label" style="color: #ff6b6b; font-size: 1em; font-weight: 600; margin-top: 2px;">Limited Time Discount!</div>
+            <div class="discount-label">Limited Time Discount!</div>
           </div>
           
           <div class="card-features">
@@ -196,16 +199,16 @@
         </div>
 
         <div class="pricing-card featured">
-          <div class="discount-badge">-67%</div>
+          <div class="discount-badge">-75%</div>
           <div class="card-header">
             <h2>Ultra</h2>
             <div class="price">
               <span class="currency">€</span>
-              <span class="old-price">14.99</span>
+              <span class="old-price">19.99</span>
               <span class="amount">4.99</span>
               <span class="period">/month</span>
             </div>
-            <div class="discount-label" style="color: #ff6b6b; font-size: 1em; font-weight: 600; margin-top: 2px;">Limited Time Discount!</div>
+            <div class="discount-label">Limited Time Discount!            </div>
           </div>
           
           <div class="card-features">
@@ -215,7 +218,14 @@
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
-                1'000 answers per month
+                <span>1,000 answers per month</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Incognito Mode (No Overlays)
               </li>
               <li>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -236,13 +246,6 @@
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                   <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
-                Silent mode (no overlays)
-              </li>
-              <li>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
                 Cancel anytime
               </li>
             </ul>
@@ -256,8 +259,8 @@
         </div>
       </div>
 
-      <div class="stripe-powered" style="margin: 30px auto; text-align: center; font-size: 1.2em; color: #b7b7b7; max-width: 400px;">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" style="height: 32px; margin-right: 10px; vertical-align: middle;" />
+      <div class="stripe-powered">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" />
         <span>Secure payment powered by Stripe</span>
       </div>
 
@@ -290,7 +293,7 @@
           
           <div class="feature-item">
             <div class="feature-icon">🔇</div>
-            <h3>Silent Mode</h3>
+            <h3>Incognito Mode</h3>
             <p>Disable all visual overlays for a clean, undetectable experience. <strong>Ultra exclusive</strong> stealth mode.</p>
           </div>
           

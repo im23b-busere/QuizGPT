@@ -47,6 +47,7 @@ body.upgrade-centered {
     border: 1px solid var(--border-color);
     border-radius: 14px;
     box-shadow: 0 2px 14px rgba(45, 52, 54, 0.07);
+    --navbar-logo-radius: 10px;
 }
 .upgrade-centered .navbar-content {
     justify-content: flex-start;
@@ -63,6 +64,7 @@ body.upgrade-centered {
     border: 1px solid var(--border-color);
     border-radius: 16px;
     box-shadow: 0 2px 14px rgba(45, 52, 54, 0.06);
+    --navbar-logo-radius: 12px;
 }
 
 .navbar-content {
@@ -104,11 +106,20 @@ body.upgrade-centered {
     width: 80%;
 }
 
-.navbar a[aria-label="QuizGPT Home"] {
+.navbar a[aria-label="QuizGPT Home"],
+.navbar a.navbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-left: 0;
+    padding: 0.2rem 0;
     font-weight: 800;
     font-size: 1.2rem;
     letter-spacing: -0.035em;
-    padding: 0.2rem 0;
+    text-decoration: none;
+}
+
+.navbar-brand-text {
     background: var(--header-gradient);
     -webkit-background-clip: text;
     background-clip: text;
@@ -116,17 +127,37 @@ body.upgrade-centered {
     color: transparent;
 }
 
-.navbar a[aria-label="QuizGPT Home"]:hover {
+.navbar-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--navbar-logo-radius);
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block;
+}
+
+.navbar a[aria-label="QuizGPT Home"]:not(.navbar-brand) {
+    background: var(--header-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.navbar a[aria-label="QuizGPT Home"]:hover,
+.navbar a.navbar-brand:hover .navbar-brand-text {
     filter: brightness(1.06) saturate(1.05);
     color: transparent;
     -webkit-text-fill-color: transparent;
 }
 
-.navbar a[aria-label="QuizGPT Home"]::after {
+.navbar a[aria-label="QuizGPT Home"]::after,
+.navbar a.navbar-brand::after {
     display: none;
 }
 
-.navbar a[aria-label="QuizGPT Home"]:focus-visible {
+.navbar a[aria-label="QuizGPT Home"]:focus-visible,
+.navbar a.navbar-brand:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 4px;
     border-radius: 6px;
@@ -591,6 +622,7 @@ footer a {
         border: 1px solid var(--border-color);
         border-radius: 14px;
         box-shadow: 0 2px 16px rgba(45, 52, 54, 0.08);
+        --navbar-logo-radius: 10px;
     }
     
     .navbar-content {
@@ -659,11 +691,15 @@ footer a {
         border-bottom: none;
     }
     
-    .navbar a[aria-label="QuizGPT Home"] {
+    .navbar a[aria-label="QuizGPT Home"],
+    .navbar a.navbar-brand {
         font-size: 1.35rem;
         font-weight: 800;
         margin-left: 0;
         padding: 0.35rem 0.5rem 0.35rem 0;
+    }
+    
+    .navbar a[aria-label="QuizGPT Home"]:not(.navbar-brand) {
         background: var(--header-gradient);
         -webkit-background-clip: text;
         background-clip: text;
@@ -671,13 +707,15 @@ footer a {
         color: transparent;
     }
     
-    .navbar a[aria-label="QuizGPT Home"]:hover {
+    .navbar a[aria-label="QuizGPT Home"]:hover,
+    .navbar a.navbar-brand:hover .navbar-brand-text {
         filter: brightness(1.08);
         color: transparent;
         -webkit-text-fill-color: transparent;
     }
     
-    .navbar a[aria-label="QuizGPT Home"]::after {
+    .navbar a[aria-label="QuizGPT Home"]::after,
+    .navbar a.navbar-brand::after {
         display: none;
     }
     
@@ -850,21 +888,22 @@ footer a {
     
     .pricing-cards {
         grid-template-columns: 1fr;
+        justify-content: center;
         gap: 2rem;
-        padding: 0 1rem;
+        padding: 0.75rem 1rem 1.5rem;
         width: 100%;
-        max-width: 100%;
+        max-width: 360px;
         box-sizing: border-box;
-        margin: 2rem 0;
-        overflow: hidden;
+        margin: 2rem auto 3rem;
+        overflow: visible;
     }
     
     .pricing-card {
         width: 100%;
-        max-width: 100%;
-        margin: 0;
+        max-width: 360px;
+        justify-self: center;
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: visible;
     }
     
     .card-action {
@@ -1605,8 +1644,12 @@ html {
     
     .pricing-cards {
         grid-template-columns: 1fr;
+        justify-content: center;
+        max-width: 360px;
         gap: 1.5rem;
         padding: 0 1rem;
+        margin-left: auto;
+        margin-right: auto;
     }
     
     .pricing-card.premium {
@@ -1623,9 +1666,18 @@ html {
     }
     
     .discount-badge {
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
+        top: -12px;
+        font-size: 1rem;
+        padding: 0.55rem 1.25rem;
+        border-radius: 22px;
+        animation: none;
+        transform: translateX(-50%);
+        z-index: 2;
+        white-space: nowrap;
+    }
+
+    .discount-badge::after {
+        animation: none;
     }
     
     .features-grid {
@@ -1934,6 +1986,10 @@ html {
     min-height: 100vh;
 }
 
+.pricing .content-wrapper {
+    max-width: 1200px;
+}
+
 .pricing .navbar {
     background: var(--card-background);
 }
@@ -1965,14 +2021,15 @@ html {
 
 .pricing-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 340px);
+    justify-content: center;
+    align-items: stretch;
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto 3rem;
-    padding: 0 2rem;
-    justify-items: center;
-    justify-content: center;
-    place-items: center;
+    padding: 0 2rem 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .pricing-card {
@@ -1986,7 +2043,10 @@ html {
     display: flex;
     flex-direction: column;
     min-height: 520px;
-    width: 320px;
+    width: 340px;
+    max-width: 100%;
+    justify-self: center;
+    box-sizing: border-box;
 }
 
 .pricing-card:hover {
@@ -2000,20 +2060,39 @@ html {
     border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.pricing-card.premium:hover {
-    box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
-}
-
 .pricing-card.featured {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #7b2ff7 0%, #6a5af9 50%, #764ba2 100%);
     color: white;
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 215, 128, 0.6);
+    animation: ultraGlow 3.5s ease-in-out infinite;
 }
 
-.pricing-card.featured:hover {
-    box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
+@keyframes ultraGlow {
+    0%, 100% {
+        box-shadow: 0 18px 45px rgba(123, 47, 247, 0.45), 0 0 0 rgba(255, 215, 128, 0);
+    }
+    50% {
+        box-shadow: 0 22px 55px rgba(123, 47, 247, 0.6), 0 0 26px rgba(255, 215, 128, 0.4);
+    }
 }
+
+/* Gold accents that make the Ultra plan pop */
+.pricing-card.featured .card-features svg {
+    stroke: #ffd27d;
+}
+
+.pricing-card.featured .btn-primary {
+    background: linear-gradient(135deg, #ffd27d 0%, #ffb347 50%, #ff8c42 100%);
+    color: #4a2500;
+    box-shadow: 0 6px 18px rgba(255, 165, 71, 0.5);
+}
+
+.pricing-card.featured .btn-primary:hover {
+    background: linear-gradient(135deg, #ffdb8f 0%, #ffa733 50%, #ff7a28 100%);
+    color: #4a2500;
+    box-shadow: 0 8px 22px rgba(255, 165, 71, 0.65);
+}
+
 
 .pricing-card.ultra {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -2022,43 +2101,33 @@ html {
     border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.pricing-card.ultra:hover {
-    box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
-}
-
-/* Small desktop screens - reduce gap further */
+/* Small desktop screens */
 @media (max-width: 1200px) and (min-width: 1025px) {
     .pricing-cards {
+        grid-template-columns: repeat(3, 300px);
         gap: 1.5rem;
-        padding: 0 1rem;
-        justify-content: center;
-        place-items: center;
+        padding: 0 1rem 1.5rem;
     }
-    
+
     .pricing-card {
-        width: 280px;
+        width: 300px;
     }
 }
 
-/* Medium screens - 2 cards per row with centered ultra */
+/* Tablet: 2 on top, Ultra centered below */
 @media (max-width: 1024px) and (min-width: 769px) {
     .pricing-cards {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 320px);
         max-width: 800px;
-        gap: 2rem;
-        justify-items: center;
         justify-content: center;
-        place-items: center;
     }
-    
+
     .pricing-card {
-        width: 300px;
+        width: 320px;
     }
-    
+
     .pricing-card.featured {
         grid-column: 1 / -1;
-        width: 300px;
-        margin: 0 auto;
         justify-self: center;
     }
 }
@@ -2068,7 +2137,29 @@ html {
     .pricing-card.featured,
     .pricing-card.ultra {
         transform: none !important;
+        grid-column: auto;
     }
+
+    .pricing-card.featured {
+        animation: none;
+    }
+}
+
+.stripe-powered {
+    position: relative;
+    z-index: 1;
+    clear: both;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    font-size: 1.2em;
+    color: #b7b7b7;
+    max-width: 400px;
+}
+
+.stripe-powered img {
+    height: 32px;
+    margin-right: 10px;
+    vertical-align: middle;
 }
 
 .popular-badge {
@@ -2087,14 +2178,14 @@ html {
 
 .discount-badge {
     position: absolute;
-    top: -12px;
+    top: -16px;
     left: 50%;
     transform: translateX(-50%);
     background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 50%, #ff3838 100%);
     color: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 25px;
-    font-size: 0.95rem;
+    padding: 0.75rem 1.6rem;
+    border-radius: 28px;
+    font-size: 1.25rem;
     font-weight: 800;
     letter-spacing: 0.5px;
     box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4), 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -2102,6 +2193,56 @@ html {
     backdrop-filter: blur(10px);
     animation: float 3s ease-in-out infinite;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.discount-badge::after {
+    content: "";
+    position: absolute;
+    top: -25%;
+    left: -70%;
+    width: 42%;
+    height: 150%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 35%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0.15) 65%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    opacity: 0;
+    animation: discountSlash 6s linear infinite;
+    pointer-events: none;
+    will-change: left, opacity;
+}
+
+@keyframes discountSlash {
+    0%, 14%, 100% {
+        left: -70%;
+        opacity: 0;
+    }
+    2% {
+        opacity: 1;
+    }
+    10% {
+        left: 130%;
+        opacity: 1;
+    }
+    11% {
+        opacity: 0;
+    }
+}
+
+.pricing-card.featured .discount-badge::after {
+    animation-delay: 0.35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .discount-badge::after {
+        animation: none;
+    }
 }
 
 @keyframes float {
@@ -2161,12 +2302,42 @@ html {
     font-weight: 500;
 }
 
+.discount-label {
+    font-size: 1em;
+    font-weight: 700;
+    margin-top: 0.25rem;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+}
+
+.pricing-card.premium .discount-label,
+.pricing-card.featured .discount-label {
+    color: #ffd27d;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
 .price-description {
     color: black;
     font-size: 1.1rem;
     opacity: 0.9;
     margin: 0;
     font-weight: 500;   
+}
+
+.value-tag {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.12rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: rgba(255, 210, 125, 0.2);
+    color: #ffd27d;
+    border: 1px solid rgba(255, 210, 125, 0.45);
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 .card-features {
@@ -2376,6 +2547,7 @@ html {
         border: 1px solid var(--border-color);
         border-radius: 14px;
         box-shadow: 0 2px 16px rgba(45, 52, 54, 0.08);
+        --navbar-logo-radius: 10px;
     }
     
     .navbar-content {
@@ -2444,11 +2616,15 @@ html {
         border-bottom: none;
     }
     
-    .navbar a[aria-label="QuizGPT Home"] {
+    .navbar a[aria-label="QuizGPT Home"],
+    .navbar a.navbar-brand {
         font-size: 1.35rem;
         font-weight: 800;
         margin-left: 0;
         padding: 0.35rem 0.5rem 0.35rem 0;
+    }
+    
+    .navbar a[aria-label="QuizGPT Home"]:not(.navbar-brand) {
         background: var(--header-gradient);
         -webkit-background-clip: text;
         background-clip: text;
@@ -2456,13 +2632,15 @@ html {
         color: transparent;
     }
     
-    .navbar a[aria-label="QuizGPT Home"]:hover {
+    .navbar a[aria-label="QuizGPT Home"]:hover,
+    .navbar a.navbar-brand:hover .navbar-brand-text {
         filter: brightness(1.08);
         color: transparent;
         -webkit-text-fill-color: transparent;
     }
     
-    .navbar a[aria-label="QuizGPT Home"]::after {
+    .navbar a[aria-label="QuizGPT Home"]::after,
+    .navbar a.navbar-brand::after {
         display: none;
     }
     
@@ -2635,21 +2813,22 @@ html {
     
     .pricing-cards {
         grid-template-columns: 1fr;
+        justify-content: center;
         gap: 2rem;
-        padding: 0 1rem;
+        padding: 0.75rem 1rem 1.5rem;
         width: 100%;
-        max-width: 100%;
+        max-width: 360px;
         box-sizing: border-box;
-        margin: 2rem 0;
-        overflow: hidden;
+        margin: 2rem auto 3rem;
+        overflow: visible;
     }
     
     .pricing-card {
         width: 100%;
-        max-width: 100%;
-        margin: 0;
+        max-width: 360px;
+        justify-self: center;
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: visible;
     }
     
     .card-action {
