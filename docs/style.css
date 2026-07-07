@@ -2081,20 +2081,6 @@ html {
     stroke: #ffd27d;
 }
 
-.pricing-card.featured .btn-primary {
-    background: linear-gradient(135deg, #e8941f 0%, #ffb347 50%, #ff8c42 100%);
-    color: #fff;
-    border: none;
-    box-shadow: 0 6px 18px rgba(255, 165, 71, 0.5);
-}
-
-.pricing-card.featured .btn-primary:hover {
-    background: linear-gradient(135deg, #f0a028 0%, #ffa733 50%, #ff7a28 100%);
-    color: #fff;
-    border: none;
-    box-shadow: 0 8px 22px rgba(255, 165, 71, 0.65);
-}
-
 
 .pricing-card.ultra {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
