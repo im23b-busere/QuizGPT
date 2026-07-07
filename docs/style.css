@@ -2082,14 +2082,16 @@ html {
 }
 
 .pricing-card.featured .btn-primary {
-    background: linear-gradient(135deg, #ffd27d 0%, #ffb347 50%, #ff8c42 100%);
-    color: #4a2500;
+    background: linear-gradient(135deg, #e8941f 0%, #ffb347 50%, #ff8c42 100%);
+    color: #fff;
+    border: none;
     box-shadow: 0 6px 18px rgba(255, 165, 71, 0.5);
 }
 
 .pricing-card.featured .btn-primary:hover {
-    background: linear-gradient(135deg, #ffdb8f 0%, #ffa733 50%, #ff7a28 100%);
-    color: #4a2500;
+    background: linear-gradient(135deg, #f0a028 0%, #ffa733 50%, #ff7a28 100%);
+    color: #fff;
+    border: none;
     box-shadow: 0 8px 22px rgba(255, 165, 71, 0.65);
 }
 
@@ -2398,16 +2400,16 @@ html {
 }
 
 .btn-primary {
-    background: #ff6b6b;
+    background: #e04545;
     color: white;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 4px 12px rgba(224, 69, 69, 0.45);
     font-weight: 700;
 }
 
 .btn-primary:hover {
-    background: #ff5252;
+    background: #c73636;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.5);
+    box-shadow: 0 6px 16px rgba(199, 54, 54, 0.5);
     color: white;
 }
 
