@@ -1,11 +1,19 @@
-// Inject the WebSocket hook script
-const script = document.createElement('script');
-script.src = chrome.runtime.getURL('scripts/injected.js');
-script.onload = () => {
-    console.log('[Content] Injected script loaded');
-    script.remove(); // Clean up after injection
-};
-(document.head || document.documentElement).appendChild(script);
+// Inject the WebSocket hook script once per document
+(function injectPageHook() {
+    try {
+        const root = document.documentElement;
+        if (root && root.dataset.quizgptHook === '1') return;
+        if (root) root.dataset.quizgptHook = '1';
+    } catch (_) { /* ignore */ }
+
+    const script = document.createElement('script');
+    script.src = chrome.runtime.getURL('scripts/injected.js');
+    script.onload = () => {
+        console.log('[Content] Injected script loaded');
+        script.remove();
+    };
+    (document.head || document.documentElement).appendChild(script);
+})();
 
 // Store the current question
 let currentQuestion = null;
@@ -16,7 +24,8 @@ let currentQuestion = null;
 
 const QGPT_PANEL_ID = 'quizgpt-panel';
 const QGPT_STYLE_ID = 'quizgpt-panel-styles';
-const QGPT_API_URL = 'https://api.quizgpt.site/api';
+// Never fetch the API from this content script (CORS blocks kahoot.it).
+// Membership always goes: content → background service worker → api.quizgpt.site
 
 const qgptState = {
     mounted: false,
@@ -28,6 +37,7 @@ const qgptState = {
     limit: 5,
     status: 'Ready',
     statusTone: 'idle',
+    limitPopupDismissed: false,
     settings: {
         highlight: true,
         autoClick: true,
@@ -106,6 +116,104 @@ function injectPanelStyles() {
         #${QGPT_PANEL_ID} .qgpt-card {
             width: 270px;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* Free-limit overlay (GeoGPT-style) */
+        #${QGPT_PANEL_ID} .qgpt-limit-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            pointer-events: auto;
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-overlay[hidden] { display: none !important; }
+        #${QGPT_PANEL_ID} .qgpt-limit-backdrop {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: rgba(8, 8, 12, 0.52);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-popup {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 230px;
+            padding: 22px 16px 18px;
+            border-radius: 14px;
+            text-align: center;
+            background: rgba(22, 22, 28, 0.97);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.55);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-close {
+            position: absolute; top: 8px; right: 8px;
+            width: 26px; height: 26px; padding: 0; margin: 0;
+            border: 0; border-radius: 8px;
+            background: transparent; color: rgba(255,255,255,0.55);
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 18px; line-height: 1;
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-close:hover {
+            color: #fff; background: rgba(255,255,255,0.08);
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-title {
+            margin-top: 4px;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+            color: #ff7b7b;
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-copy {
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 1.4;
+            color: rgba(255,255,255,0.88);
+            max-width: 190px;
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-upgrade {
+            margin-top: 4px;
+            width: 100%;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #8A2BE2, #DA70D6);
+            color: #fff;
+            font: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            line-height: 1.25;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            box-shadow: 0 8px 18px rgba(138, 43, 226, 0.28);
+            transition: 300ms;
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-upgrade:hover {
+            animation: qgptPulseBtn 1.5s infinite;
+        }
+        @keyframes qgptPulseBtn {
+            0% { box-shadow: 0 0 0 0 #8A2BE266; }
+            70% { box-shadow: 0 0 0 10px #DA70D600; }
+            100% { box-shadow: 0 0 0 0 #DA70D600; }
+        }
+        #${QGPT_PANEL_ID} .qgpt-limit-upgrade svg {
+            width: 14px; height: 14px; flex: 0 0 auto;
         }
         #${QGPT_PANEL_ID} .qgpt-header {
             display: flex;
@@ -147,37 +255,69 @@ function injectPanelStyles() {
 
         #${QGPT_PANEL_ID} .qgpt-icon-btn {
             all: unset;
-            width: 22px; height: 22px;
+            box-sizing: border-box;
+            width: 28px; height: 28px;
             display: flex; align-items: center; justify-content: center;
             border-radius: 6px;
             cursor: pointer;
             color: #b0b0b0;
             transition: background .15s ease, color .15s ease;
             flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+            pointer-events: auto;
         }
         #${QGPT_PANEL_ID} .qgpt-icon-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        #${QGPT_PANEL_ID} .qgpt-header { position: relative; z-index: 2; }
 
         #${QGPT_PANEL_ID} .qgpt-section { padding: 10px 12px; }
         #${QGPT_PANEL_ID} .qgpt-section + .qgpt-section { border-top: 1px solid rgba(255,255,255,0.05); }
 
         #${QGPT_PANEL_ID} .qgpt-usage-row {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 11.5px; color: #bdbdbd; margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
+            font-size: 11px;
+            margin-bottom: 7px;
         }
-        #${QGPT_PANEL_ID} .qgpt-usage-label { font-weight: 500; }
-        #${QGPT_PANEL_ID} .qgpt-usage-value { color: #fff; font-weight: 600; }
+        #${QGPT_PANEL_ID} .qgpt-usage-label {
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: #9aa3ae;
+        }
+        #${QGPT_PANEL_ID} .qgpt-usage-value {
+            color: rgba(255, 255, 255, 0.78);
+            font-weight: 700;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
         #${QGPT_PANEL_ID} .qgpt-usage-bar {
-            height: 5px; background: rgba(255,255,255,0.08);
-            border-radius: 999px; overflow: hidden;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
         }
         #${QGPT_PANEL_ID} .qgpt-usage-fill {
             height: 100%;
+            width: 0%;
+            border-radius: inherit;
             background: linear-gradient(90deg, #8A2BE2, #DA70D6);
-            border-radius: 999px;
-            transition: width .3s ease, background .2s ease;
+            transition: width 0.35s ease;
         }
-        #${QGPT_PANEL_ID} .qgpt-usage-fill--warn { background: linear-gradient(90deg, #ffa726, #ffb74d); }
-        #${QGPT_PANEL_ID} .qgpt-usage-fill--danger { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }
+        #${QGPT_PANEL_ID} .qgpt-usage-bar--limit .qgpt-usage-fill {
+            background: linear-gradient(90deg, #e25b5b, #ff7b7b);
+        }
+        #${QGPT_PANEL_ID} .qgpt-usage-note {
+            margin: 7px 0 0;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.35;
+            color: #9aa3ae;
+        }
+        #${QGPT_PANEL_ID} .qgpt-usage-note[hidden] {
+            display: none !important;
+        }
 
         /* Settings rows */
         #${QGPT_PANEL_ID} .qgpt-row {
@@ -201,17 +341,17 @@ function injectPanelStyles() {
         #${QGPT_PANEL_ID} .qgpt-lock--ultra { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
         #${QGPT_PANEL_ID} .qgpt-lock svg { width: 9px; height: 9px; }
 
-        /* Toggle switch */
+        /* Toggle switch (GeoGPT-style) */
         #${QGPT_PANEL_ID} .qgpt-toggle {
             appearance: none;
             -webkit-appearance: none;
             margin: 0;
-            width: 30px; height: 16px;
-            background: #3a3a3a;
+            width: 42px; height: 24px;
+            background: #3a3f48;
             border-radius: 999px;
             position: relative;
             cursor: pointer;
-            transition: background .2s ease;
+            transition: background .15s ease;
             flex-shrink: 0;
             border: none;
             outline: none;
@@ -219,17 +359,17 @@ function injectPanelStyles() {
         #${QGPT_PANEL_ID} .qgpt-toggle::after {
             content: '';
             position: absolute;
-            top: 2px; left: 2px;
-            width: 12px; height: 12px;
+            top: 3px; left: 3px;
+            width: 18px; height: 18px;
             border-radius: 50%;
             background: #fff;
-            transition: transform .2s ease;
+            transition: transform .15s ease;
             box-shadow: 0 1px 2px rgba(0,0,0,0.35);
         }
         #${QGPT_PANEL_ID} .qgpt-toggle:checked {
-            background: linear-gradient(90deg, #8A2BE2, #DA70D6);
+            background: linear-gradient(135deg, #8A2BE2, #DA70D6);
         }
-        #${QGPT_PANEL_ID} .qgpt-toggle:checked::after { transform: translateX(14px); }
+        #${QGPT_PANEL_ID} .qgpt-toggle:checked::after { transform: translateX(18px); }
         #${QGPT_PANEL_ID} .qgpt-toggle:disabled { opacity: 0.45; }
 
         #${QGPT_PANEL_ID} .qgpt-row--locked { cursor: pointer; }
@@ -312,6 +452,7 @@ function injectPanelStyles() {
             flex: 1; min-width: 0;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
+
         @keyframes qgptPulse { 0%,100%{opacity:1} 50%{opacity:.45} }
 
         /* Signed-out CTA */
@@ -338,10 +479,10 @@ function injectPanelStyles() {
             background: linear-gradient(90deg, #8A2BE2, #DA70D6);
             color: #fff; font-weight: 600; font-size: 12.5px;
             cursor: pointer;
-            transition: filter .15s ease, transform .15s ease;
+            transition: 300ms;
             box-shadow: 0 4px 12px rgba(138,43,226,0.35);
         }
-        #${QGPT_PANEL_ID} .qgpt-signin-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        #${QGPT_PANEL_ID} .qgpt-signin-btn:hover { animation: qgptPulseBtn 1.5s infinite; }
         #${QGPT_PANEL_ID} .qgpt-signin-btn svg { width: 12px; height: 12px; }
         #${QGPT_PANEL_ID} .qgpt-empty-hint {
             margin-top: 10px;
@@ -363,8 +504,42 @@ function formatPlanLabel(plan) {
 
 function planClass(plan) {
     const p = (plan || 'free').toLowerCase();
-    if (p === 'enterprise') return 'qgpt-plan--ultra';
-    return `qgpt-plan--${p}`;
+    if (p === 'enterprise' || p === 'ultra') return 'qgpt-plan--ultra';
+    if (p === 'premium') return 'qgpt-plan--premium';
+    return 'qgpt-plan--free';
+}
+
+function isPaidPlanName(plan) {
+    const p = String(plan || '').toLowerCase();
+    return p === 'premium' || p === 'enterprise' || p === 'ultra';
+}
+
+/** Apply membership to panel state — never let a stale free cache wipe Ultra/Premium. */
+function applyMembershipState(ms, { source = 'unknown', allowDowngrade = false } = {}) {
+    if (!ms || typeof ms !== 'object') return false;
+    const nextPlan = String(ms.planType || ms.plan_type || 'free').toLowerCase();
+    const nextUsage = ms.usage ?? ms.used ?? 0;
+    const nextLimit = ms.limit ?? ms.monthly_limit ?? (isPaidPlanName(nextPlan) ? 1000 : 5);
+
+    const curPlan = String(qgptState.plan || 'free').toLowerCase();
+    // Live API refresh may downgrade; storage/cache must not.
+    const fromLiveApi = allowDowngrade || source === 'refresh';
+    if (isPaidPlanName(curPlan) && !isPaidPlanName(nextPlan) && !fromLiveApi) {
+        console.warn('[QuizGPT] Ignoring free membership overwrite of', curPlan, 'from', source);
+        // Still allow usage/limit refresh for the paid plan
+        if (typeof nextUsage === 'number' && nextUsage >= (qgptState.usage || 0)) {
+            qgptState.usage = nextUsage;
+        }
+        if (typeof nextLimit === 'number' && nextLimit > (isPaidPlanName(curPlan) ? 5 : 0)) {
+            qgptState.limit = nextLimit;
+        }
+        return true;
+    }
+
+    qgptState.plan = nextPlan;
+    qgptState.usage = nextUsage;
+    qgptState.limit = nextLimit;
+    return true;
 }
 
 function qgptLogoUrl() {
@@ -395,8 +570,8 @@ function mountPanel() {
                     <span class="qgpt-name" data-qgpt="name">QuizGPT</span>
                     <span class="qgpt-plan qgpt-plan--free" data-qgpt="plan">Free</span>
                 </div>
-                <button class="qgpt-icon-btn" data-qgpt="collapse" title="Collapse">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>
+                <button type="button" class="qgpt-icon-btn" data-qgpt="collapse" title="Collapse" aria-label="Collapse QuizGPT">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="pointer-events:none"><path d="M5 12h14"/></svg>
                 </button>
             </div>
 
@@ -414,10 +589,13 @@ function mountPanel() {
 
             <div class="qgpt-section" data-qgpt="usage-section">
                 <div class="qgpt-usage-row">
-                    <span class="qgpt-usage-label">Usage</span>
+                    <span class="qgpt-usage-label">Monthly usage</span>
                     <span class="qgpt-usage-value" data-qgpt="usage-value">0 / 5</span>
                 </div>
-                <div class="qgpt-usage-bar"><div class="qgpt-usage-fill" data-qgpt="usage-fill" style="width:0%"></div></div>
+                <div class="qgpt-usage-bar" data-qgpt="usage-bar" aria-hidden="true">
+                    <div class="qgpt-usage-fill" data-qgpt="usage-fill"></div>
+                </div>
+                <p class="qgpt-usage-note" data-qgpt="usage-note">Upgrade for more answers each month.</p>
             </div>
             <div class="qgpt-section" data-qgpt="settings-section">
                 <label class="qgpt-row" data-qgpt="row-highlight">
@@ -429,7 +607,7 @@ function mountPanel() {
                     <input type="checkbox" class="qgpt-toggle" data-qgpt="t-autoclick"/>
                 </label>
                 <label class="qgpt-row" data-qgpt="row-silent">
-                    <span class="qgpt-row-label">Silent mode</span>
+                    <span class="qgpt-row-label">Incognito mode</span>
                     <span class="qgpt-lock qgpt-lock--ultra" data-qgpt="lock-silent" style="display:none">${lockSvg} Ultra</span>
                     <input type="checkbox" class="qgpt-toggle" data-qgpt="t-silent"/>
                 </label>
@@ -446,14 +624,56 @@ function mountPanel() {
                     <span class="qgpt-status-text" data-qgpt="status-text">Ready</span>
                 </div>
             </div>
+
+            <div class="qgpt-limit-overlay" data-qgpt="limit-overlay" hidden>
+                <div class="qgpt-limit-backdrop" data-qgpt="limit-backdrop" aria-hidden="true"></div>
+                <div class="qgpt-limit-popup" role="dialog" aria-modal="true" aria-label="Free limit reached">
+                    <button type="button" class="qgpt-limit-close" data-qgpt="limit-close" aria-label="Close">&times;</button>
+                    <div class="qgpt-limit-title">Free Limit Reached!</div>
+                    <div class="qgpt-limit-copy">Upgrade to Premium now for more answers.</div>
+                    <button type="button" class="qgpt-limit-upgrade" data-qgpt="limit-upgrade">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7Z"/>
+                            <path d="M5 20h14"/>
+                        </svg>
+                        Upgrade to Premium
+                    </button>
+                </div>
+            </div>
         </div>
     `;
 
     document.body.appendChild(root);
 
-    // Collapse/expand
-    root.querySelector('.qgpt-pill').addEventListener('click', () => setCollapsed(false));
-    root.querySelector('[data-qgpt="collapse"]').addEventListener('click', () => setCollapsed(true));
+    // Collapse/expand — capture + stop so Kahoot doesn't steal the event.
+    // Use click only (not pointerdown): collapsing on pointerdown can make the
+    // subsequent click land on the expand pill and immediately re-open the panel.
+    const collapseBtn = root.querySelector('[data-qgpt="collapse"]');
+    const expandPill = root.querySelector('.qgpt-pill');
+    let collapseGuardUntil = 0;
+    const onCollapse = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        collapseGuardUntil = Date.now() + 400;
+        setCollapsed(true);
+    };
+    const onExpand = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        if (Date.now() < collapseGuardUntil) return;
+        setCollapsed(false);
+    };
+    collapseBtn.addEventListener('click', onCollapse, true);
+    expandPill.addEventListener('click', onExpand, true);
+
+    // Free-limit overlay (GeoGPT-style)
+    root.querySelector('[data-qgpt="limit-close"]')?.addEventListener('click', hideFreeLimitOverlay);
+    root.querySelector('[data-qgpt="limit-backdrop"]')?.addEventListener('click', hideFreeLimitOverlay);
+    root.querySelector('[data-qgpt="limit-upgrade"]')?.addEventListener('click', () => {
+        openUpgrade();
+    });
 
     // Sign-in button: ask the background service worker to open the extension popup,
     // falling back to opening the login page as a tab (both avoid the page's popup blocker).
@@ -471,12 +691,12 @@ function mountPanel() {
     const tHighlight = root.querySelector('[data-qgpt="t-highlight"]');
     tHighlight.addEventListener('change', () => {
         qgptState.settings.highlight = tHighlight.checked;
-        chrome.storage.sync.set({ highlightOption: tHighlight.checked });
+        chrome.storage.sync.set({ highlightOption: tHighlight.checked }).catch(() => {});
     });
     const tAutoclick = root.querySelector('[data-qgpt="t-autoclick"]');
     tAutoclick.addEventListener('change', () => {
         qgptState.settings.autoClick = tAutoclick.checked;
-        chrome.storage.sync.set({ autoClickOption: tAutoclick.checked });
+        chrome.storage.sync.set({ autoClickOption: tAutoclick.checked }).catch(() => {});
     });
 
     // Silent (Ultra-locked)
@@ -484,7 +704,7 @@ function mountPanel() {
     tSilent.addEventListener('change', () => {
         if (tSilent.disabled) { tSilent.checked = false; return; }
         qgptState.settings.silentMode = tSilent.checked;
-        chrome.storage.sync.set({ silentMode: tSilent.checked });
+        chrome.storage.sync.set({ silentMode: tSilent.checked }).catch(() => {});
     });
     root.querySelector('[data-qgpt="row-silent"]').addEventListener('click', (e) => {
         if (isPlanUnlocked('ultra')) return;
@@ -500,7 +720,7 @@ function mountPanel() {
         const v = parseFloat(slider.value);
         qgptState.settings.answerDelay = v;
         delayValue.textContent = `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}s`;
-        chrome.storage.sync.set({ answerDelay: v });
+        chrome.storage.sync.set({ answerDelay: v }).catch(() => {});
     });
     root.querySelector('[data-qgpt="row-delay"]').addEventListener('click', (e) => {
         if (isPlanUnlocked('premium')) return;
@@ -531,6 +751,40 @@ function openUpgrade() {
     });
 }
 
+function showFreeLimitOverlay({ force = false } = {}) {
+    if (!QGPT_IS_TOP_FRAME) return;
+    if (qgptState.settings.silentMode) return;
+    if (qgptState.limitPopupDismissed && !force) return;
+    ensurePanel(true);
+    setCollapsed(false);
+    const root = document.getElementById(QGPT_PANEL_ID);
+    const overlay = root?.querySelector('[data-qgpt="limit-overlay"]');
+    if (overlay) overlay.hidden = false;
+}
+
+function hideFreeLimitOverlay() {
+    const root = document.getElementById(QGPT_PANEL_ID);
+    const overlay = root?.querySelector('[data-qgpt="limit-overlay"]');
+    if (overlay) overlay.hidden = true;
+    qgptState.limitPopupDismissed = true;
+}
+
+function maybeShowFreeLimitFromState() {
+    const plan = String(qgptState.plan || 'free').toLowerCase();
+    const isFree = plan === 'free';
+    const usage = Number(qgptState.usage || 0);
+    const limit = Number(qgptState.limit || 5);
+    if (isFree && limit > 0 && usage >= limit) {
+        showFreeLimitOverlay();
+        return;
+    }
+    // Not at limit — clear overlay without marking dismissed
+    const root = document.getElementById(QGPT_PANEL_ID);
+    const overlay = root?.querySelector('[data-qgpt="limit-overlay"]');
+    if (overlay) overlay.hidden = true;
+    qgptState.limitPopupDismissed = false;
+}
+
 function destroyPanel() {
     const root = document.getElementById(QGPT_PANEL_ID);
     if (root) root.remove();
@@ -542,7 +796,9 @@ function setCollapsed(collapsed) {
     qgptState.collapsed = !!collapsed;
     const root = document.getElementById(QGPT_PANEL_ID);
     if (root) root.setAttribute('data-collapsed', qgptState.collapsed ? 'true' : 'false');
-    try { chrome.storage.sync.set({ quizgptPanelCollapsed: qgptState.collapsed }); } catch (_) {}
+    try {
+        chrome.storage.local.set({ quizgptPanelCollapsed: qgptState.collapsed }).catch(() => {});
+    } catch (_) {}
 }
 
 function renderPanel() {
@@ -550,20 +806,27 @@ function renderPanel() {
     const root = document.getElementById(QGPT_PANEL_ID);
     if (!root) return;
 
+    // Keep collapse attribute in sync even when only membership re-renders
+    root.setAttribute('data-collapsed', qgptState.collapsed ? 'true' : 'false');
+
     const $ = (sel) => root.querySelector(`[data-qgpt="${sel}"]`);
 
     const name = qgptState.signedIn && qgptState.user && qgptState.user.username
         ? qgptState.user.username
         : 'QuizGPT';
-    $('name').textContent = name;
+    const nameEl = $('name');
+    if (nameEl) nameEl.textContent = name;
 
     const planEl = $('plan');
-    if (qgptState.signedIn) {
-        planEl.hidden = false;
-        planEl.textContent = formatPlanLabel(qgptState.plan);
-        planEl.className = `qgpt-plan ${planClass(qgptState.plan)}`;
-    } else {
-        planEl.hidden = true;
+    if (planEl) {
+        if (qgptState.signedIn) {
+            planEl.hidden = false;
+            planEl.removeAttribute('hidden');
+            planEl.textContent = formatPlanLabel(qgptState.plan);
+            planEl.className = `qgpt-plan ${planClass(qgptState.plan)}`;
+        } else {
+            planEl.hidden = true;
+        }
     }
 
     // Signed-out: show only the CTA, hide usage/settings/status
@@ -573,69 +836,137 @@ function renderPanel() {
     const statusSection = $('status-section');
 
     if (!qgptState.signedIn) {
-        emptyState.style.display = '';
-        usageSection.style.display = 'none';
-        settingsSection.style.display = 'none';
-        statusSection.style.display = 'none';
+        if (emptyState) emptyState.style.display = '';
+        if (usageSection) usageSection.style.display = 'none';
+        if (settingsSection) settingsSection.style.display = 'none';
+        if (statusSection) statusSection.style.display = 'none';
         return;
     }
 
-    emptyState.style.display = 'none';
-    usageSection.style.display = '';
-    settingsSection.style.display = '';
-    statusSection.style.display = '';
+    if (emptyState) emptyState.style.display = 'none';
+    if (usageSection) usageSection.style.display = '';
+    if (settingsSection) settingsSection.style.display = '';
+    if (statusSection) statusSection.style.display = '';
 
-    // Usage
+    // Usage — match extension bar + animate fill width
     const limit = qgptState.limit;
     const unlimited = !limit || limit > 9999;
     const usage = qgptState.usage || 0;
-    $('usage-value').textContent = unlimited ? `${usage} / ∞` : `${usage} / ${limit}`;
+    const isPaid = isPaidPlanName(qgptState.plan);
+    const pct = unlimited ? 0 : Math.min((usage / Math.max(limit, 1)) * 100, 100);
+    const usageValue = $('usage-value');
+    if (usageValue) usageValue.textContent = unlimited ? `${usage} / ∞` : `${usage} / ${limit}`;
+
     const fill = $('usage-fill');
-    const pct = unlimited ? 0 : Math.min((usage / limit) * 100, 100);
-    fill.style.width = `${pct}%`;
-    fill.classList.remove('qgpt-usage-fill--warn', 'qgpt-usage-fill--danger');
-    if (!unlimited) {
-        if (pct >= 90) fill.classList.add('qgpt-usage-fill--danger');
-        else if (pct >= 75) fill.classList.add('qgpt-usage-fill--warn');
+    const bar = $('usage-bar');
+    const note = $('usage-note');
+    if (bar) {
+        bar.classList.toggle('qgpt-usage-bar--limit', !isPaid && !unlimited && pct >= 90);
+    }
+    if (note) {
+        if (isPaid || unlimited) {
+            note.hidden = true;
+        } else {
+            note.hidden = false;
+            note.textContent = pct >= 90
+                ? 'Free limit nearly reached — upgrade for more answers.'
+                : 'Upgrade for more answers each month.';
+        }
+    }
+    if (fill) {
+        const target = unlimited ? '0%' : `${pct}%`;
+        const playIntro = !fill.dataset.qgptUsageReady;
+        if (playIntro) {
+            fill.dataset.qgptUsageReady = '1';
+            fill.style.transition = 'none';
+            fill.style.width = '0%';
+            // Double rAF so the 0% paint lands before the animated width.
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    fill.style.transition = '';
+                    fill.style.width = target;
+                });
+            });
+        } else {
+            fill.style.width = target;
+        }
     }
 
     // Toggles reflect current settings
-    $('t-highlight').checked = !!qgptState.settings.highlight;
-    $('t-autoclick').checked = !!qgptState.settings.autoClick;
+    const tHighlight = $('t-highlight');
+    const tAutoclick = $('t-autoclick');
+    if (tHighlight) tHighlight.checked = !!qgptState.settings.highlight;
+    if (tAutoclick) tAutoclick.checked = !!qgptState.settings.autoClick;
 
     // Silent (Ultra-locked)
     const silentUnlocked = isPlanUnlocked('ultra');
     const tSilent = $('t-silent');
-    tSilent.checked = silentUnlocked ? !!qgptState.settings.silentMode : false;
-    tSilent.disabled = !silentUnlocked;
-    $('lock-silent').style.display = silentUnlocked ? 'none' : 'inline-flex';
-    $('row-silent').classList.toggle('qgpt-row--locked', !silentUnlocked);
+    if (tSilent) {
+        tSilent.checked = silentUnlocked ? !!qgptState.settings.silentMode : false;
+        tSilent.disabled = !silentUnlocked;
+    }
+    const lockSilent = $('lock-silent');
+    if (lockSilent) lockSilent.style.display = silentUnlocked ? 'none' : 'inline-flex';
+    const rowSilent = $('row-silent');
+    if (rowSilent) rowSilent.classList.toggle('qgpt-row--locked', !silentUnlocked);
 
     // Delay (Premium-locked)
     const delayUnlocked = isPlanUnlocked('premium');
     const slider = $('delay-slider');
     const delayValue = $('delay-value');
     const v = delayUnlocked ? (qgptState.settings.answerDelay || 0) : 0;
-    slider.value = String(v);
-    slider.disabled = !delayUnlocked;
-    delayValue.textContent = `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}s`;
-    $('lock-delay').style.display = delayUnlocked ? 'none' : 'inline-flex';
-    $('row-delay').classList.toggle('qgpt-row--locked', !delayUnlocked);
+    if (slider) {
+        slider.value = String(v);
+        slider.disabled = !delayUnlocked;
+    }
+    if (delayValue) delayValue.textContent = `${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}s`;
+    const lockDelay = $('lock-delay');
+    if (lockDelay) lockDelay.style.display = delayUnlocked ? 'none' : 'inline-flex';
+    const rowDelay = $('row-delay');
+    if (rowDelay) rowDelay.classList.toggle('qgpt-row--locked', !delayUnlocked);
 
     // Status
     const statusEl = $('status');
-    statusEl.setAttribute('data-tone', qgptState.statusTone || 'idle');
-    $('status-text').textContent = qgptState.status || 'Ready';
+    if (statusEl) statusEl.setAttribute('data-tone', qgptState.statusTone || 'idle');
+    const statusText = $('status-text');
+    if (statusText) statusText.textContent = qgptState.status || 'Ready';
+
+    maybeShowFreeLimitFromState();
 }
 
 async function loadPanelData() {
+    // Only the top frame owns the on-page panel / membership UI
+    if (!QGPT_IS_TOP_FRAME) return;
+
     const data = await new Promise(res =>
         chrome.storage.sync.get([
             'token', 'user',
             'highlightOption', 'autoClickOption', 'silentMode', 'answerDelay',
-            'quizgptPanelCollapsed', 'membershipStatus'
+            'quizgptPanelCollapsed'
         ], res)
     );
+
+    // Membership lives in local storage now (avoids sync write-quota storms)
+    let membershipStatus = null;
+    try {
+        const local = await chrome.storage.local.get(['membershipStatus', 'quizgptPanelCollapsed']);
+        membershipStatus = local.membershipStatus || null;
+        if (typeof local.quizgptPanelCollapsed === 'boolean') {
+            data.quizgptPanelCollapsed = local.quizgptPanelCollapsed;
+        }
+    } catch (_) { /* ignore */ }
+    try {
+        const syncMs = await chrome.storage.sync.get(['membershipStatus']);
+        const syncMembership = syncMs.membershipStatus || null;
+        if (!membershipStatus) {
+            membershipStatus = syncMembership;
+        } else if (syncMembership) {
+            // Freshest snapshot wins (API free downgrade must beat stale paid sync)
+            if ((syncMembership.updatedAt || 0) > (membershipStatus.updatedAt || 0)) {
+                membershipStatus = syncMembership;
+            }
+        }
+    } catch (_) { /* ignore */ }
 
     qgptState.user = data.user || null;
     qgptState.signedIn = !!data.token && !!data.user;
@@ -648,10 +979,8 @@ async function loadPanelData() {
     if (typeof data.quizgptPanelCollapsed === 'boolean') {
         qgptState.collapsed = data.quizgptPanelCollapsed;
     }
-    if (data.membershipStatus) {
-        qgptState.plan = data.membershipStatus.planType || 'free';
-        qgptState.usage = data.membershipStatus.usage ?? 0;
-        qgptState.limit = data.membershipStatus.limit ?? 5;
+    if (membershipStatus) {
+        applyMembershipState(membershipStatus, { source: 'loadPanelData' });
     }
 
     // Silent mode is authoritative: unmount if on, mount if off.
@@ -664,70 +993,75 @@ async function loadPanelData() {
         });
     }
 
+    // Soft membership refresh via background only (never page-origin fetch — CORS)
     if (qgptState.signedIn) {
-        refreshMembership(data.token);
+        scheduleUsageRefresh(400, { force: true });
     }
 }
 
-async function refreshMembership(token) {
+async function refreshMembership({ force = false } = {}) {
+    if (!QGPT_IS_TOP_FRAME) return;
     try {
-        let t = token;
-        if (!t) {
-            const data = await new Promise(res => chrome.storage.sync.get(['token'], res));
-            t = data.token;
-        }
-        if (!t) {
-            console.log('[QuizGPT] refreshMembership: no token, skipping');
-            return;
-        }
-        const r = await fetch(`${QGPT_API_URL}/membership/status`, {
-            headers: { 'Authorization': `Bearer ${t}` }
+        const result = await new Promise((resolve) => {
+            // MUST go through the service worker — content-script fetch from kahoot.it is CORS-blocked
+            chrome.runtime.sendMessage({ action: 'getMembershipStatus', force }, (response) => {
+                if (chrome.runtime.lastError) {
+                    resolve({ ok: false, error: chrome.runtime.lastError.message });
+                    return;
+                }
+                resolve(response || { ok: false });
+            });
         });
-        if (!r.ok) {
-            console.warn('[QuizGPT] refreshMembership: HTTP', r.status);
+
+        if (!result.ok || !result.membership) {
+            // Keep showing last known values from storage — don't blank the plan
+            console.warn('[QuizGPT] refreshMembership failed (using cache if any):', result);
             return;
         }
-        const data = await r.json();
-        const ms = {
-            planType: (data.plan_type || 'free').toLowerCase(),
-            usage: data.usage ?? 0,
-            limit: data.limit ?? 5,
-            updatedAt: Date.now()
-        };
-        console.log('[QuizGPT] refreshMembership:', ms);
-        qgptState.plan = ms.planType;
-        qgptState.usage = ms.usage;
-        qgptState.limit = ms.limit;
-        try { chrome.storage.sync.set({ membershipStatus: ms }); } catch (_) {}
+
+        const ms = result.membership;
+        if (!result.cached) console.log('[QuizGPT] refreshMembership:', ms);
+        // Cached may still be stale free — only trust non-cached API for downgrades
+        applyMembershipState(ms, {
+            source: result.cached ? 'refresh-cached' : 'refresh',
+            allowDowngrade: !result.cached
+        });
         renderPanel();
     } catch (err) {
         console.warn('[QuizGPT] refreshMembership error:', err);
     }
 }
 
-// Debounced refresh to avoid hammering the API during quick question bursts
+// Debounced refresh — goes through background cache (min 60s / 429 backoff)
 let qgptRefreshTimer = null;
-function scheduleUsageRefresh(delay = 400) {
+let qgptMembershipFetchedOnce = false;
+function scheduleUsageRefresh(delay = 800, { force = false } = {}) {
     if (qgptRefreshTimer) clearTimeout(qgptRefreshTimer);
     qgptRefreshTimer = setTimeout(() => {
         qgptRefreshTimer = null;
-        refreshMembership();
+        refreshMembership({ force });
     }, delay);
 }
 
-// Periodic fallback: poll membership/status every 10s while the panel is mounted,
-// the user is signed in, and the tab is visible. This keeps the usage bar in sync
-// even if the explicit event-based refresh (background message, highlightAnswer)
-// gets dropped for any reason.
-const QGPT_POLL_INTERVAL_MS = 10000;
+// Slow poll only in the top frame — all_frames×10s was causing 429s
+const QGPT_POLL_INTERVAL_MS = 90_000;
 let qgptPollTimer = null;
+function isTopFrame() {
+    try { return window === window.top; } catch (_) { return true; }
+}
 function startUsagePolling() {
+    if (!isTopFrame()) return;
     if (qgptPollTimer) return;
     qgptPollTimer = setInterval(() => {
         if (!qgptState.mounted || !qgptState.signedIn) return;
         if (typeof document !== 'undefined' && document.hidden) return;
-        refreshMembership();
+        refreshMembership({ force: false });
     }, QGPT_POLL_INTERVAL_MS);
+    // One initial fetch after mount (cached if recent)
+    if (!qgptMembershipFetchedOnce && qgptState.signedIn) {
+        qgptMembershipFetchedOnce = true;
+        scheduleUsageRefresh(500);
+    }
 }
 function stopUsagePolling() {
     if (qgptPollTimer) {
@@ -736,14 +1070,14 @@ function stopUsagePolling() {
     }
 }
 
-// Refresh immediately when the user returns to the tab after it was hidden
 document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && qgptState.mounted && qgptState.signedIn) {
-        scheduleUsageRefresh(0);
+    if (!document.hidden && qgptState.mounted && qgptState.signedIn && isTopFrame()) {
+        scheduleUsageRefresh(300);
     }
 });
 
 function ensurePanel(forceShow = false) {
+    if (!QGPT_IS_TOP_FRAME) return false;
     if (qgptState.settings.silentMode && !forceShow) {
         destroyPanel();
         return false;
@@ -756,8 +1090,10 @@ function ensurePanel(forceShow = false) {
 function deriveStatusTone(message) {
     const m = (message || '').toLowerCase();
     if (m.includes('error') || m.includes('invalid') || m.includes('auth error')) return 'error';
-    if (m.includes('sending') || m.includes('highlight') || m.includes('detect')) return 'busy';
-    if (m.includes('sent') || m.includes('ready')) return 'success';
+    if (m.includes('sending') || m.includes('highlight') || m.includes('detect') || m.includes('restored') || m.includes('looking') || m.includes('reconnect')) return 'busy';
+    if (m.includes('sent') || m.includes('loaded') || m.includes('answer from')) return 'success';
+    // Don't treat the idle label "Ready" specially via substring of other messages
+    if (m === 'ready') return 'idle';
     return 'idle';
 }
 
@@ -789,10 +1125,26 @@ whenBodyReady(() => {
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
+    // Membership updates from background (local) — keep Kahoot panel usage counter live
+    if (changes.membershipStatus && (namespace === 'local' || namespace === 'sync')) {
+        const ms = changes.membershipStatus.newValue;
+        if (ms) {
+            // Stale sync "free" must never wipe Ultra/Premium after a live refresh
+            applyMembershipState(ms, { source: `storage.${namespace}` });
+            if (qgptState.mounted) renderPanel();
+        }
+    }
+
+    if (namespace === 'local' && changes.quizgptPanelCollapsed) {
+        if (typeof changes.quizgptPanelCollapsed.newValue === 'boolean') {
+            setCollapsed(changes.quizgptPanelCollapsed.newValue);
+        }
+    }
+
     if (namespace !== 'sync') return;
 
     const relevant = ['token', 'user', 'highlightOption', 'autoClickOption',
-                      'silentMode', 'answerDelay', 'membershipStatus', 'quizgptPanelCollapsed'];
+                      'silentMode', 'answerDelay'];
     if (!relevant.some(k => k in changes)) return;
 
     loadPanelData();
@@ -800,19 +1152,68 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 // Add this variable to track the last sent question
 let lastSentQuestionHash = null;
+let lastQuestionPayload = null;
+let lastSentQuestionIndex = null;
+let lastSentHadText = false;
 
-// Listen for messages from the popup
+function scrapeQuestionFromDom() {
+    const titleSelectors = [
+        '[data-functional-selector="question-title"]',
+        '[data-functional-selector="block-title"]',
+        '[data-functional-selector="question-title-text"]',
+        '[data-functional-selector*="question-title"]',
+        'h1[data-functional-selector]',
+        '[class*="question-title"]'
+    ];
+    let title = null;
+    for (const sel of titleSelectors) {
+        const el = document.querySelector(sel);
+        const text = el && el.textContent && el.textContent.replace(/\s+/g, ' ').trim();
+        if (!text || text.length < 2) continue;
+        if (/^questions?\s*\d+$/i.test(text)) continue;
+        title = text;
+        break;
+    }
+
+    const choiceEls = findAnswerElements();
+    const choices = choiceEls.map((el) => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean);
+
+    if (!title || choices.length < 2) return null;
+    return { title, choices };
+}
+
+// Listen for messages from the popup / background
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[Content] Received message:', request);
     if (request.action === "highlightAnswer") {
+        const source = request.options?.source || 'ai';
         updateStatus('Highlighting answer...');
-        highlightAnswer(request.answer, request.options);
-        // Backend has now consumed one request — refresh usage live
-        scheduleUsageRefresh(1500);
+        highlightAnswer(request.answer, {
+            ...request.options,
+            questionIndex: request.questionIndex,
+            answerText: request.answer,
+            choiceIndex: request.choiceIndex
+        }, 40, request.choiceIndex);
+        // AI answers: background already bumps local usage; don't force another status poll immediately
+        if (source === 'ai') scheduleUsageRefresh(8000, { force: false });
         sendResponse({ success: true });
+    } else if (request.action === "clearAnsweredQuestion") {
+        const msg = {
+            source: 'quizgpt',
+            type: 'clearAnsweredQuestion',
+            questionIndex: request.questionIndex
+        };
+        try { window.postMessage(msg, '*'); } catch (_) { /* ignore */ }
+        try { if (window.top) window.top.postMessage(msg, '*'); } catch (_) { /* ignore */ }
+        sendResponse({ ok: true });
     } else if (request.action === "updateUsage") {
-        // Background explicitly tells us to re-fetch membership/usage
-        scheduleUsageRefresh(0);
+        // Prefer the membership snapshot from the background (instant live counter)
+        if (request.membership && typeof request.membership === 'object') {
+            applyMembershipState(request.membership, { source: 'updateUsage' });
+            if (qgptState.mounted) renderPanel();
+        }
+        // Storage onChanged should also fire from local write; soft reconcile later
+        scheduleUsageRefresh(6000, { force: false });
         sendResponse({ success: true });
     } else if (request.action === "getQuestion") {
         sendResponse({ question: currentQuestion });
@@ -821,7 +1222,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.message.includes('free tier limit') || request.message.includes('Free tier limit')) {
             chrome.storage.sync.get(['silentMode'], (settings) => {
                 if (!settings.silentMode) {
-                    showPremiumUpgradeMessage();
+                    qgptState.limitPopupDismissed = false;
+                    showFreeLimitOverlay({ force: true });
                 }
             });
         } else {
@@ -858,35 +1260,99 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
 });
 
+window.addEventListener('kahootGameReset', (event) => {
+    const soft = !!(event.detail && event.detail.soft);
+    lastSentQuestionHash = null;
+    if (!soft) {
+        lastQuestionPayload = null;
+        lastSentQuestionIndex = null;
+        lastSentHadText = false;
+        try { sessionStorage.removeItem('quizgpt_expect_reconnect'); } catch (_) { /* ignore */ }
+        try {
+            chrome.runtime.sendMessage({ action: 'resetGameState' }).catch(() => {});
+        } catch (_) { /* ignore */ }
+    }
+    updateStatus(soft ? 'Reconnected…' : 'New game…');
+});
+
 // Listen for question events from the injected script
 window.addEventListener('kahootQuestionParsed', (event) => {
     console.log('[Content] Received question event:', event.detail);
     updateStatus('Question detected');
-    
-    // Validate question data
-    const question = event.detail;
-    if (!question || !question.title || !Array.isArray(question.choices)) {
-        console.error('[Content] Invalid question data:', question);
-        updateStatus('Invalid question data');
-        return;
+
+    const question = { ...(event.detail || {}) };
+    if (!question || typeof question.questionIndex !== 'number') {
+        // Legacy full-text payloads without index: still allow if title+choices exist
+        if (!question || !question.title || !Array.isArray(question.choices)) {
+            console.error('[Content] Invalid question data:', question);
+            updateStatus('Invalid question data');
+            return;
+        }
     }
 
-    // Create a simple hash of the question (title + choices)
-    const questionHash = JSON.stringify({
-        title: question.title,
-        choices: question.choices
-    });
+    // If WS only sent an index, try scraping visible question text for AI
+    if (!(question.title && Array.isArray(question.choices) && question.choices.length)) {
+        const scraped = scrapeQuestionFromDom();
+        if (scraped) {
+            question.title = scraped.title;
+            question.choices = scraped.choices;
+            console.log('[Content] Scraped question from DOM:', scraped.title, scraped.choices.length);
+        } else {
+            // Choices often render a beat after QuestionStart — retry briefly
+            setTimeout(() => {
+                if (lastSentQuestionHash && lastQuestionPayload
+                    && lastQuestionPayload.questionIndex === question.questionIndex
+                    && lastQuestionPayload.title) {
+                    return; // already got text
+                }
+                const late = scrapeQuestionFromDom();
+                if (!late || typeof question.questionIndex !== 'number') return;
+                const enriched = {
+                    ...question,
+                    title: late.title,
+                    choices: late.choices
+                };
+                console.log('[Content] Late DOM scrape:', late.title);
+                // Only allow a one-time text upgrade if we never sent text for this index
+                if (!(lastSentQuestionIndex === question.questionIndex && lastSentHadText)) {
+                    lastSentHadText = false;
+                    window.dispatchEvent(new CustomEvent('kahootQuestionParsed', { detail: enriched }));
+                }
+            }, 600);
+        }
+    }
 
-    // Store the current question
-    currentQuestion = {
-        title: question.title,
-        choices: question.choices
-    };
+    const hasText = !!(question.title && Array.isArray(question.choices) && question.choices.length);
+    const qIndex = typeof question.questionIndex === 'number' ? question.questionIndex : null;
+    // Only a real reconnect may force a resend. GetReady fallback must not.
+    const forceResend = !!question._reconnectAnswer
+        && !(hasText && qIndex != null && qIndex === lastSentQuestionIndex && lastSentHadText);
 
-    // Nur wenn neu: an Backend schicken
-    if (questionHash !== lastSentQuestionHash) {
-        lastSentQuestionHash = questionHash;
-        updateStatus('Sending question to backend...');
+    // Deduplicate by question index (not full hash):
+    // - new index → always send
+    // - same index, first time we get text → send (upgrade)
+    // - same index, already sent with text → skip
+    // - same index, index-only after a text send → skip
+    const isNewIndex = qIndex == null || qIndex !== lastSentQuestionIndex;
+    const isTextUpgrade = hasText && qIndex != null && qIndex === lastSentQuestionIndex && !lastSentHadText;
+    const alreadyHandled = !isNewIndex && !isTextUpgrade && (
+        lastSentHadText || (!hasText && lastSentQuestionIndex === qIndex)
+    );
+    const isDuplicate = !forceResend && alreadyHandled;
+
+    if (hasText) {
+        currentQuestion = {
+            title: question.title,
+            choices: question.choices
+        };
+    }
+
+    if (!isDuplicate) {
+        lastQuestionPayload = question;
+        if (qIndex != null) lastSentQuestionIndex = qIndex;
+        if (hasText) lastSentHadText = true;
+        else if (isNewIndex) lastSentHadText = false;
+        updateStatus(hasText ? 'Resolving answer...' : 'Waiting for question text...');
         chrome.runtime.sendMessage({
             action: 'processQuestion',
             question: question
@@ -896,157 +1362,253 @@ window.addEventListener('kahootQuestionParsed', (event) => {
                 updateStatus('Error: ' + chrome.runtime.lastError.message);
             } else {
                 console.log('[Content] Message sent successfully:', response);
-                updateStatus('Question sent to backend');
-                scheduleUsageRefresh(3000);
+                updateStatus(hasText ? 'Question sent' : 'Waiting for question text...');
             }
         });
     } else {
-        console.log('[Content] Duplicate question detected, not sending again.');
+        console.log('[Content] Duplicate question detected, not sending again.', {
+            qIndex,
+            hasText,
+            lastSentQuestionIndex,
+            lastSentHadText
+        });
+        lastQuestionPayload = question;
     }
 
-    // Sende immer an Popup/UI (optional)
-    chrome.runtime.sendMessage({
-        action: 'updateQuestion',
-        question: {
-            title: question.title,
-            choices: question.choices
-        }
-    });
-
-    // Das Highlighting/AutoClick wird weiterhin durch highlightAnswer getriggert, sobald die Antwort vom Backend kommt.
+    if (hasText) {
+        chrome.runtime.sendMessage({
+            action: 'updateQuestion',
+            question: {
+                title: question.title,
+                choices: question.choices
+            }
+        });
+    }
 });
 
-// Function to highlight the correct answer
-function highlightAnswer(answer, options = {}, pollTries = 30) {
-    console.log('[Content] Highlighting answer:', answer, 'with options:', options);
-    // Try different selectors to find answer elements
+function findAnswerElements() {
     const selectors = [
         '[data-functional-selector="answer-option"]',
-        '.answer-option',
+        '[data-functional-selector^="question-choice"]',
+        '[data-functional-selector*="answer-"]',
         '[data-functional-selector="answer"]',
-        '.answer',
         '[data-functional-selector="answer-button"]',
-        '.answer-button',
         'button[data-functional-selector*="answer"]',
-        'button[class*="answer"]'
+        'button[data-functional-selector*="choice"]',
+        '.answer-option',
+        '.answer-button',
+        '.answer',
+        'button[class*="answer"]',
+        '[class*="answer-button"]'
     ];
-    let answerElements = [];
     for (const selector of selectors) {
         const elements = document.querySelectorAll(selector);
-        if (elements.length > 0) {
+        if (elements.length >= 2) {
             console.log('[Content] Found elements with selector:', selector, elements.length);
-            answerElements = elements;
-            break;
+            return Array.from(elements);
         }
     }
-    console.log('[Content] Found answer elements:', answerElements.length);
-    // --- NEU: Wenn keine Buttons gefunden, poll weiter ---
-    if (answerElements.length === 0 && pollTries > 0) {
-        setTimeout(() => highlightAnswer(answer, options, pollTries - 1), 300);
+    return [];
+}
+
+function applyHighlightStyles(correctElement) {
+    if (correctElement.querySelector('.quizgpt-checkmark')) return;
+
+    const checkmark = document.createElement('span');
+    checkmark.className = 'quizgpt-checkmark';
+    checkmark.textContent = '✅';
+    checkmark.setAttribute('aria-hidden', 'true');
+    checkmark.style.cssText = [
+        'display:inline-flex',
+        'align-items:center',
+        'margin-left:8px',
+        'font-size:1.15em',
+        'line-height:1',
+        'vertical-align:middle',
+        'pointer-events:none',
+        'user-select:none'
+    ].join(';');
+    correctElement.appendChild(checkmark);
+}
+
+function dispatchAutoClick(choiceIndex, questionIndex) {
+    const choice = Number(choiceIndex);
+    const qIndex = typeof questionIndex === 'number' ? questionIndex : undefined;
+
+    if (Number.isNaN(choice) || choice < 0) {
+        console.warn('[Content] Auto-click aborted — invalid choiceIndex', choiceIndex);
         return;
     }
+
+    const msg = {
+        source: 'quizgpt',
+        type: 'autoClickAnswer',
+        choice,
+        questionIndex: qIndex,
+        t: Date.now()
+    };
+    console.log('[Content] Auto-click by index:', choice, 'questionIndex:', qIndex);
+
+    // Kahoot UI may live in an iframe while the WS hook is on the top page —
+    // post to this frame, parent, and top.
+    const targets = new Set([window]);
+    try { if (window.parent) targets.add(window.parent); } catch (_) { /* cross-origin */ }
+    try { if (window.top) targets.add(window.top); } catch (_) { /* cross-origin */ }
+    targets.forEach((w) => {
+        try { w.postMessage(msg, '*'); } catch (_) { /* ignore */ }
+    });
+
+    // DOM bridge fallback (shared across isolated worlds)
+    try {
+        let bridge = document.getElementById('quizgpt-click-bridge');
+        if (!bridge) {
+            bridge = document.createElement('div');
+            bridge.id = 'quizgpt-click-bridge';
+            bridge.style.display = 'none';
+            (document.documentElement || document.body).appendChild(bridge);
+        }
+        // Force a mutation even if payload is identical
+        bridge.removeAttribute('data-payload');
+        bridge.setAttribute('data-payload', JSON.stringify(msg));
+    } catch (_) { /* ignore */ }
+}
+
+function autoClickByIndex(choiceIndex, answerElements, options) {
+    const answerDelay = typeof options.answerDelay === 'number' ? options.answerDelay : 0;
+    const questionIndex = options.questionIndex;
+    const fire = () => dispatchAutoClick(choiceIndex, questionIndex);
+
+    if (answerDelay > 0 && !options.silentMode) {
+        showTimerOverlay(answerDelay, fire);
+    } else if (answerDelay > 0 && options.silentMode) {
+        setTimeout(fire, answerDelay * 1000);
+    } else {
+        fire();
+    }
+}
+
+// Function to highlight the correct answer (by choiceIndex and/or answer text)
+function highlightAnswer(answer, options = {}, pollTries = 40, choiceIndex) {
+    console.log('[Content] Highlighting answer:', answer, 'choiceIndex:', choiceIndex, 'options:', options);
+
+    const answerElements = findAnswerElements();
+    console.log('[Content] Found answer elements:', answerElements.length);
+
+    // Prefer choice index (works when option text is hidden)
+    if (typeof choiceIndex === 'number') {
+        const byIndex = answerElements[choiceIndex] || null;
+
+        if (options.highlight !== false && byIndex) {
+            applyHighlightStyles(byIndex);
+        }
+
+        if (byIndex) {
+            // Buttons are on screen — click now (with optional delay)
+            if (options.autoClick !== false && !options._wsSubmitted) {
+                options._wsSubmitted = true;
+                waitAndAutoClick(byIndex, answerElements, {
+                    ...options,
+                    choiceIndex,
+                    questionIndex: options.questionIndex
+                });
+            }
+            return;
+        }
+
+        // No buttons yet: keep polling; WS-only fallback near the end
+        if (pollTries > 0) {
+            if (pollTries <= 5 && options.autoClick !== false && !options._wsSubmitted) {
+                options._wsSubmitted = true;
+                console.log('[Content] DOM buttons missing — WS-only click fallback');
+                autoClickByIndex(choiceIndex, answerElements, options);
+            }
+            setTimeout(() => highlightAnswer(answer, options, pollTries - 1, choiceIndex), 200);
+            return;
+        }
+
+        if (options.autoClick !== false && !options._wsSubmitted) {
+            options._wsSubmitted = true;
+            autoClickByIndex(choiceIndex, answerElements, options);
+        }
+        return;
+    }
+
+    if (answerElements.length === 0 && pollTries > 0) {
+        setTimeout(() => highlightAnswer(answer, options, pollTries - 1, choiceIndex), 300);
+        return;
+    }
+
     if (answerElements.length === 0) {
         console.log('[Content] No matching answer element found (after polling)');
         return;
     }
-    // Convert answer to lowercase for comparison
-    const answerLower = answer.toLowerCase().trim();
-    
-    // Find the matching answer element
+
+    const answerLower = (answer || '').toLowerCase().trim();
+    if (!answerLower) {
+        console.log('[Content] No answer text and no choiceIndex');
+        return;
+    }
+
     let correctElement = null;
     let bestMatch = null;
     let bestMatchScore = 0;
-    
+
     answerElements.forEach(element => {
-        // Get the text content and clean it up
         let text = element.textContent
             .toLowerCase()
             .trim()
-            .replace(/icon/g, '') // Remove "icon" text
-            .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+            .replace(/icon/g, '')
+            .replace(/\s+/g, ' ')
             .trim();
-            
-        // Handle tripled text (e.g., "cpucpucpu" -> "cpu")
+
         if (text.length >= 3) {
             const third = Math.floor(text.length / 3);
             const firstPart = text.substring(0, third);
             const secondPart = text.substring(third, third * 2);
             const thirdPart = text.substring(third * 2);
-            
             if (firstPart === secondPart && secondPart === thirdPart) {
                 text = firstPart;
             }
         }
-            
+
         console.log('[Content] Checking answer element:', text);
-        
-        // Calculate match score
+
         let score = 0;
         if (text === answerLower) {
-            score = 100; // Exact match
+            score = 100;
         } else if (text.includes(answerLower)) {
-            score = 80; // Contains the answer
+            score = 80;
         } else if (answerLower.includes(text)) {
-            score = 60; // Answer contains the text
+            score = 60;
         } else {
-            // Calculate similarity score
             const words1 = text.split(/\s+/);
             const words2 = answerLower.split(/\s+/);
             const commonWords = words1.filter(word => words2.includes(word));
             score = (commonWords.length / Math.max(words1.length, words2.length)) * 40;
         }
-        
+
         if (score > bestMatchScore) {
             bestMatchScore = score;
             bestMatch = element;
         }
-        
-        // If we find an exact match, use it immediately
+
         if (score === 100) {
             correctElement = element;
             console.log('[Content] Found exact match:', text);
-            return;
         }
     });
-    
-    // If no exact match was found, use the best match if it's good enough
+
     if (!correctElement && bestMatch && bestMatchScore >= 60) {
         correctElement = bestMatch;
         console.log('[Content] Using best match with score:', bestMatchScore);
     }
-    
+
     if (correctElement) {
         console.log('[Content] Found matching answer element');
-        
-        // Highlight the answer if enabled
         if (options.highlight !== false) {
-            // Add the old style highlighting
-            correctElement.style.border = '2px solid black';
-            correctElement.style.boxShadow = '0 0 10px 2px black';
-            correctElement.style.borderRadius = '10px';
-            correctElement.style.transition = 'all 0.3s ease-in-out';
-
-            // Add pulsing animation
-            correctElement.animate([
-                { transform: 'scale(1)', boxShadow: '0 0 10px 2px black' },
-                { transform: 'scale(1.05)', boxShadow: '0 0 15px 4px black' },
-                { transform: 'scale(1)', boxShadow: '0 0 10px 2px black' }
-            ], {
-                duration: 1000,
-                iterations: 8
-            });
-
-            // Add checkmark
-            const checkmark = document.createElement('span');
-            checkmark.textContent = ' ✅';
-            checkmark.style.fontSize = '1.2em';
-            checkmark.style.marginLeft = '8px';
-            correctElement.appendChild(checkmark);
+            applyHighlightStyles(correctElement);
         }
-        
-        // Auto-click if enabled
         if (options.autoClick !== false) {
-            // Statt setTimeout jetzt robustes Polling:
             waitAndAutoClick(correctElement, answerElements, options);
         }
     } else {
@@ -1054,42 +1616,66 @@ function highlightAnswer(answer, options = {}, pollTries = 30) {
     }
 }
 
+function simulateRealClick(element) {
+    if (!element) return false;
+    try {
+        const opts = { bubbles: true, cancelable: true, view: window, composed: true };
+        element.dispatchEvent(new PointerEvent('pointerdown', { ...opts, pointerId: 1, pointerType: 'mouse' }));
+        element.dispatchEvent(new MouseEvent('mousedown', opts));
+        element.dispatchEvent(new PointerEvent('pointerup', { ...opts, pointerId: 1, pointerType: 'mouse' }));
+        element.dispatchEvent(new MouseEvent('mouseup', opts));
+        element.dispatchEvent(new MouseEvent('click', opts));
+        if (typeof element.click === 'function') element.click();
+        return true;
+    } catch (err) {
+        console.warn('[Content] simulateRealClick failed:', err);
+        try { element.click(); return true; } catch (_) { return false; }
+    }
+}
+
 // Hilfsfunktion für AutoClick mit Polling und Timer
 function waitAndAutoClick(element, answerElements, options, retries = 20) {
     if (!element) return;
-    
-    const answerDelay = options.answerDelay !== undefined ? options.answerDelay : 3;
-    
-    // Prüfe, ob der Button klickbar ist
+
+    const answerDelay = typeof options.answerDelay === 'number' ? options.answerDelay : 0;
+    let choiceIndex = typeof options.choiceIndex === 'number'
+        ? options.choiceIndex
+        : Array.from(answerElements).indexOf(element);
+
+    if ((typeof choiceIndex !== 'number' || choiceIndex < 0) && options.answerText) {
+        const want = String(options.answerText).toLowerCase().trim();
+        choiceIndex = answerElements.findIndex((el) => {
+            const t = (el.textContent || '').toLowerCase().replace(/\s+/g, ' ').trim();
+            return t === want || t.includes(want) || want.includes(t);
+        });
+    }
+
+    if (typeof choiceIndex !== 'number' || choiceIndex < 0) {
+        console.warn('[Content] AutoClick: could not resolve choiceIndex');
+        return;
+    }
+
+    const fire = () => {
+        // DOM click + WS in parallel (no artificial delay).
+        // Reconnect resend in injected.js covers socket swaps.
+        const clicked = simulateRealClick(element);
+        console.log('[Content] DOM click', clicked ? 'ok' : 'failed', 'choice', choiceIndex);
+        dispatchAutoClick(choiceIndex, options.questionIndex);
+    };
+
     if (!element.disabled && element.offsetParent !== null) {
-        // Wenn der Button klickbar ist und Delay > 0, zeige Timer (außer in Silent Mode)
         if (answerDelay > 0 && !options.silentMode) {
-            showTimerOverlay(answerDelay, () => {
-                // Callback nach Ablauf des Timers
-                const index = Array.from(answerElements).indexOf(element);
-                console.log('[Content] Clicking answer at index:', index, 'after', answerDelay, 'seconds delay');
-                const event = new CustomEvent("autoClickAnswer", { detail: index });
-                window.dispatchEvent(event);
-            });
+            showTimerOverlay(answerDelay, fire);
         } else if (answerDelay > 0 && options.silentMode) {
-            // Silent mode: nur Delay ohne Timer-Overlay
-            setTimeout(() => {
-                const index = Array.from(answerElements).indexOf(element);
-                console.log('[Content] Clicking answer at index:', index, 'after', answerDelay, 'seconds delay (silent mode)');
-                const event = new CustomEvent("autoClickAnswer", { detail: index });
-                window.dispatchEvent(event);
-            }, answerDelay * 1000);
+            setTimeout(fire, answerDelay * 1000);
         } else {
-            // Sofortiger Click ohne Delay
-            const index = Array.from(answerElements).indexOf(element);
-            console.log('[Content] Clicking answer at index:', index, 'immediately');
-            const event = new CustomEvent("autoClickAnswer", { detail: index });
-            window.dispatchEvent(event);
+            fire();
         }
     } else if (retries > 0) {
-        setTimeout(() => waitAndAutoClick(element, answerElements, options, retries - 1), 2000);
+        setTimeout(() => waitAndAutoClick(element, answerElements, options, retries - 1), 250);
     } else {
-        console.warn('[Content] AutoClick: Button was never enabled.');
+        console.warn('[Content] AutoClick: Button was never enabled — WS fallback');
+        dispatchAutoClick(choiceIndex, options.questionIndex);
     }
 }
 
@@ -1292,103 +1878,9 @@ style.textContent = `
 `;
 appendStyleWhenReady(style);
 
-// Function to show premium upgrade message
+// Legacy name kept for any external callers
 function showPremiumUpgradeMessage() {
-    // Create message container
-    const container = document.createElement('div');
-    container.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.9);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        z-index: 9999;
-        text-align: center;
-        max-width: 400px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    `;
-
-    // Add title
-    const title = document.createElement('h2');
-    title.textContent = 'Free Tier Limit Reached';
-    title.style.cssText = `
-        color: #ff4444;
-        margin: 0 0 15px 0;
-        font-size: 24px;
-    `;
-    container.appendChild(title);
-
-    // Add message
-    const message = document.createElement('p');
-    message.textContent = 'You have used all 5 free quiz attempts. Upgrade to premium for unlimited access!';
-    message.style.cssText = `
-        margin: 0 0 20px 0;
-        font-size: 16px;
-        line-height: 1.5;
-    `;
-    container.appendChild(message);
-
-    // Add upgrade button
-    const button = document.createElement('button');
-    button.textContent = 'Upgrade to Premium';
-    button.style.cssText = `
-        background: #4CAF50;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background 0.3s;
-    `;
-    button.onmouseover = () => button.style.background = '#45a049';
-    button.onmouseout = () => button.style.background = '#4CAF50';
-    button.onclick = () => {
-        window.open('https://quizgpt.ch/premium', '_blank');
-        container.remove();
-    };
-    container.appendChild(button);
-
-    // Add close button
-    const closeButton = document.createElement('button');
-    closeButton.textContent = '×';
-    closeButton.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        color: white;
-        font-size: 24px;
-        cursor: pointer;
-        padding: 0;
-        line-height: 1;
-    `;
-    closeButton.onclick = () => container.remove();
-    container.appendChild(closeButton);
-
-    // Add to page
-    document.body.appendChild(container);
-
-    // Add overlay
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 9998;
-    `;
-    overlay.onclick = () => {
-        container.remove();
-        overlay.remove();
-    };
-    document.body.appendChild(overlay);
+    showFreeLimitOverlay();
 }
 
 // Silent mode tear-down (panel mount/destroy is handled by loadPanelData via the storage listener above).
@@ -1397,5 +1889,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (changes.silentMode.newValue) {
         const existingTimer = document.getElementById('quizgpt-timer-overlay');
         if (existingTimer) existingTimer.remove();
+        const overlay = document.querySelector('#quizgpt-panel [data-qgpt="limit-overlay"]');
+        if (overlay) overlay.hidden = true;
     }
 });

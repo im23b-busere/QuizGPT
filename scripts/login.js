@@ -14,7 +14,6 @@ const codeError = document.getElementById('codeError');
 const errorMessage = document.getElementById('errorMessage');
 const codeSection = document.getElementById('codeSection');
 const emailSection = document.getElementById('emailSection');
-const returningUserText = document.getElementById('returningUserText');
 
 let currentEmail = '';
 let rateLimitTimer = null;
@@ -25,13 +24,14 @@ const API_URL = 'https://api.quizgpt.site/api';
 function showError(element, message) {
     if (element) {
         element.textContent = message;
-        element.classList.remove('hidden');
+        element.classList.remove('hidden', 'auth-error--ok');
     }
 }
 function hideError(element) {
     if (element) {
         element.textContent = '';
         element.classList.add('hidden');
+        element.classList.remove('auth-error--ok');
     }
 }
 
@@ -129,11 +129,6 @@ async function goBackToEmail() {
         codeForm.classList.add('hidden');
         emailForm.classList.remove('hidden');
         
-        // Hide returning user text
-        if (returningUserText) {
-            returningUserText.classList.add('hidden');
-        }
-        
         // Clear any errors and reset button
         hideError(emailError);
         hideError(codeError);
@@ -186,11 +181,6 @@ async function checkPendingVerification() {
                 // Show code form directly
                 emailForm.classList.add('hidden');
                 codeForm.classList.remove('hidden');
-                
-                // Show returning user text
-                if (returningUserText) {
-                    returningUserText.classList.remove('hidden');
-                }
                 
                 // Clear any errors
                 hideError(emailError);
@@ -358,7 +348,7 @@ async function verifyCode() {
         showError(codeError, errorMessage);
     } finally {
         verifyCodeButton.disabled = false;
-        verifyCodeButton.textContent = 'Verify Code';
+        verifyCodeButton.textContent = 'Verify';
     }
 }
 
@@ -422,7 +412,7 @@ resendCodeButton.addEventListener('click', async () => {
     await requestCode();
     
     resendCodeButton.disabled = false;
-    resendCodeButton.textContent = 'Resend Code';
+    resendCodeButton.textContent = 'Resend';
 });
 
 // Input validation

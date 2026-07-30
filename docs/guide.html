@@ -111,7 +111,10 @@
         <strong style="display: block; margin-bottom: 12px;">Important Notice:</strong>
         <ul style="margin: 0; padding-left: 20px;">
           <li style="margin-bottom: 10px;">
-            This Kahoot cheat only works when the question is visible on your display. Make sure the host has enabled the setting to show questions on player screens.
+            For <b>public</b> Kahoot quizzes, QuizGPT tries to load the official answer key from the quiz UUID first — this can work even if the host has <b>not</b> enabled “show questions on player screens.”
+          </li>
+          <li style="margin-bottom: 10px;">
+            For <b>private</b> quizzes (or when no UUID/answer key is found), QuizGPT falls back to AI. That path needs the question text visible on your device, so the host should enable show questions on player screens.
           </li>
           <li>
             Questions that contain images or pictures are still sent to the AI, but the image itself is <b>not yet included</b> in the backend processing.
@@ -135,7 +138,7 @@
 
       <div class="pricing-link-section">
         <h2>💰 Pricing Plans</h2>
-        <p>Start with 5 free attempts, then upgrade to premium for unlimited access!</p>
+        <p>Start with 5 free attempts, then upgrade to premium for full access!</p>
         <a href="pricing.html" class="pricing-link-btn">View All Plans</a>
       </div>
 
@@ -199,7 +202,7 @@
             <span class="faq-toggle">+</span>
           </div>
           <div class="faq-answer">
-            <p>QuizGPT can only answer if the question is visible on your device. Make sure the host has enabled this setting to show questions on player screens.</p>
+            <p>For public quizzes, QuizGPT first tries the quiz UUID answer key (works even if questions are hidden). For private quizzes, or when no key is found, the AI needs the question text on your screen — ask the host to enable show questions on player screens.</p>
           </div>
         </div>
         

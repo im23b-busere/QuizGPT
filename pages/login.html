@@ -6,38 +6,59 @@
     <title>QuizGPT - Login</title>
     <link rel="stylesheet" href="../styles/styles.css"/>
 </head>
-<body class="popup-container">
-    <div class="popup-content">
-        <h1 class="title">QuizGPT</h1>
-        
-        <div id="emailForm" class="auth-form">
-            <h2 class="subtitle">Login with Email</h2>
-            <input type="email" id="emailInput" placeholder="Enter your email" class="text-field" required/>
-            <button id="requestCodeButton" class="button">Send Code</button>
-            <div id="emailError" class="error-message hidden"></div>
-            <p class="auth-switch">Don't have an account? <a href="register.html">Register</a></p>
+<body class="auth-page">
+    <main class="auth-shell">
+        <div class="auth-brand">
+            <img class="auth-brand-logo" src="../icons/icon48.png" alt="" width="48" height="48"/>
+            <h1 class="auth-brand-title">QuizGPT</h1>
         </div>
 
-        <div id="codeForm" class="auth-form hidden">
-            <div class="code-form-header">
-                <button id="backToEmailButton" class="back-button" title="Back to Email">←</button>
-                <h2 class="subtitle">Enter Code</h2>
-            </div>
-            <p class="info-text">We sent a 6-digit code to your email</p>
-            <p id="returningUserText" class="info-text small hidden">Welcome back! Please enter the verification code we sent to your email.</p>
-            <div class="code-input-container">
-                <input type="text" id="codeInput" placeholder="••••••" class="text-field" maxlength="6" pattern="[0-9]*" inputmode="numeric" required/>
-            </div>
-            <div class="code-form-actions">
-                <button id="verifyCodeButton" class="button">Verify Code</button>
-                <button id="resendCodeButton" class="button secondary">Resend Code</button>
-            </div>
-            <div id="codeError" class="error-message hidden"></div>
-        </div>
+        <div class="auth-body">
+            <div id="emailForm" class="auth-card">
+                <h2 class="auth-card-title">Enter your email</h2>
+                <p class="auth-card-lede">We’ll send a one-time login code.</p>
 
-        <div id="errorMessage" class="error-message hidden"></div>
-    </div>
+                <label class="auth-field">
+                    <span class="auth-label visually-hidden">Email</span>
+                    <input type="email" id="emailInput" class="auth-input" placeholder="you@example.com" autocomplete="email" required/>
+                </label>
+
+                <button type="button" id="requestCodeButton" class="auth-btn auth-btn--primary">Send Code</button>
+                <div id="emailError" class="auth-error hidden" role="alert"></div>
+
+                <p class="auth-switch">
+                    Don’t have an account?
+                    <a href="register.html">Create one</a>
+                </p>
+            </div>
+
+            <div id="codeForm" class="auth-card hidden">
+                <div class="auth-card-top">
+                    <button type="button" id="backToEmailButton" class="auth-back" title="Back" aria-label="Back to email">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                    </button>
+                    <h2 class="auth-card-title">Enter code</h2>
+                </div>
+                <p class="auth-card-lede">Check your email for a 6-digit code.</p>
+
+                <label class="auth-field">
+                    <span class="auth-label visually-hidden">Code</span>
+                    <input type="text" id="codeInput" class="auth-input auth-input--code" placeholder="••••••" maxlength="6" pattern="[0-9]*" inputmode="numeric" autocomplete="one-time-code" aria-label="6-digit code" required/>
+                </label>
+
+                <div class="auth-actions">
+                    <button type="button" id="verifyCodeButton" class="auth-btn auth-btn--primary">Verify</button>
+                    <button type="button" id="resendCodeButton" class="auth-btn auth-btn--ghost">Resend</button>
+                </div>
+                <div id="codeError" class="auth-error hidden" role="alert"></div>
+            </div>
+
+            <div id="errorMessage" class="auth-error hidden" role="alert"></div>
+        </div>
+    </main>
 
     <script type="module" src="../scripts/login.js"></script>
 </body>
-</html> 
+</html>

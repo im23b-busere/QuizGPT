@@ -1,6 +1,6 @@
 {
   "name": "QuizGPT",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Not affiliated with Kahoot! or ChatGPT: Use QuizGPT to win all your Kahoot! games.",
   "icons": {
     "16": "icons/icon16.png",
@@ -29,7 +29,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["scripts/injected.js", "icons/*"],
+      "resources": ["scripts/injected.js", "icons/*", "fonts/*"],
       "matches": ["*://*.kahoot.it/*"]
     }
   ],
@@ -39,6 +39,8 @@
   },
   "host_permissions": [
     "https://*.kahoot.it/*",
+    "https://create.kahoot.it/*",
+    "https://play.kahoot.it/*",
     "https://api.quizgpt.site/*"
   ],
   "content_security_policy": {

@@ -54,7 +54,8 @@ Now available in the **Chrome Web Store**! 🚀
 ---
 
 ## Important Notes
-- Some questions may require the text to be visible on the client device (depending on Kahoot settings)
+- Public quizzes: QuizGPT tries the quiz UUID answer key first (can work without “show questions on player screens”)
+- Private quizzes / no UUID: falls back to AI, which needs question text visible on the device
 - This project is **not affiliated with Kahoot! or OpenAI**
 - Use responsibly and only in settings where AI use is permitted
 

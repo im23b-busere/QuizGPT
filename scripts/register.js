@@ -17,13 +17,21 @@ let currentUsername = '';
 function showError(element, message) {
     if (element) {
         element.textContent = message;
-        element.classList.remove('hidden');
+        element.classList.remove('hidden', 'auth-error--ok');
     }
 }
 function hideError(element) {
     if (element) {
         element.textContent = '';
         element.classList.add('hidden');
+        element.classList.remove('auth-error--ok');
+    }
+}
+function showOk(element, message) {
+    if (element) {
+        element.textContent = message;
+        element.classList.add('auth-error--ok');
+        element.classList.remove('hidden');
     }
 }
 
@@ -185,7 +193,7 @@ verifyRegisterCodeButton.addEventListener('click', async (e) => {
         showError(registerCodeError, error.message || 'Verification error');
     } finally {
         verifyRegisterCodeButton.disabled = false;
-        verifyRegisterCodeButton.textContent = 'Verify Code';
+        verifyRegisterCodeButton.textContent = 'Verify';
     }
 });
 
@@ -288,13 +296,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     registrationTimestamp: Date.now()
                 });
                 
-                showError(registerCodeError, 'Code resent successfully!');
+                showOk(registerCodeError, 'Code resent successfully!');
                 setTimeout(() => hideError(registerCodeError), 3000);
             } catch (error) {
                 showError(registerCodeError, error.message || 'Error resending code');
             } finally {
                 resendRegisterCodeButton.disabled = false;
-                resendRegisterCodeButton.textContent = 'Resend Code';
+                resendRegisterCodeButton.textContent = 'Resend';
             }
         });
     }

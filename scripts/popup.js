@@ -4,18 +4,34 @@ import { authService } from './auth.js';
 const usernameElement = document.getElementById('username');
 const userProfile = document.getElementById('userProfile');
 const mainContent = document.getElementById('mainContent');
-const settingsButton = document.querySelector('.settings-button');
-const settingsModal = document.getElementById('settingsModal');
-const closeModal = document.querySelector('.close-modal');
-const highlightCheckbox = document.getElementById('highlight');
-const autoclickCheckbox = document.getElementById('autoclick');
-const silentModeCheckbox = document.getElementById('silentMode');
+const shell = document.getElementById('shell');
+const settingsButton = document.getElementById('btn-settings');
+const highlightSwitch = document.getElementById('highlight');
+const autoclickSwitch = document.getElementById('autoclick');
+const silentModeSwitch = document.getElementById('silentMode');
 const answerDelaySlider = document.getElementById('answerDelay');
 const delayValueDisplay = document.getElementById('delayValue');
-const logoutButton = document.querySelector('.logout-button');
+const logoutButton = document.getElementById('logoutButton');
 const upgradeButton = document.getElementById('upgradeButton');
+const homeUpgradeButton = document.getElementById('homeUpgradeButton');
 const manageSubscriptionButton = document.getElementById('manageSubscriptionButton');
-const premiumBadge = document.getElementById('premiumBadge');
+
+function isSwitchOn(el) {
+    return !!el && el.dataset.on === '1';
+}
+
+function setSwitchOn(el, on) {
+    if (!el) return;
+    el.dataset.on = on ? '1' : '0';
+}
+
+function setSettingsOpen(open) {
+    if (!shell || !settingsButton) return;
+    shell.dataset.view = open ? 'settings' : 'home';
+    settingsButton.dataset.open = open ? '1' : '0';
+    settingsButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+    settingsButton.title = open ? 'Close settings' : 'Settings';
+}
 
 // Check authentication and load user data
 async function checkAuth() {
@@ -30,16 +46,10 @@ async function checkAuth() {
 
         // Display username
         if (authData.user && authData.user.username) {
-            console.log('Setting username:', authData.user.username); // Debug log
+            console.log('Setting username:', authData.user.username);
             usernameElement.textContent = authData.user.username;
-            
-            // Also update username in settings modal
-            const modalUsername = document.querySelector('#settingsModal .username');
-            if (modalUsername) {
-                modalUsername.textContent = authData.user.username;
-            }
         } else {
-            console.log('No username found in auth data'); // Debug log
+            console.log('No username found in auth data');
             usernameElement.textContent = 'User Account';
         }
 
@@ -47,8 +57,9 @@ async function checkAuth() {
         loadMainContent();
         initializeEventListeners();
         
-        // Fetch and display membership status and usage counter
-        await updateMembershipStatus();
+        // Fetch and display membership — always hit the API on popup open so plan
+        // changes (e.g. admin/MySQL downgrade) aren't stuck behind the SW cache
+        await updateMembershipStatus({ force: true });
     } catch (error) {
         console.error('Auth check error:', error);
         window.location.href = 'login.html';
@@ -58,73 +69,45 @@ async function checkAuth() {
 // Load main content
 function loadMainContent() {
     mainContent.innerHTML = `
-        <button id="manualButton" class="button">Find Answer</button>
-        <div id="loadingSpinner" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
-            <div class="loader"></div>
-        </div>
-        <div id="extractedData" class="hidden">
-            <h2 class="subtitle">Detected Question:</h2>
-            <p id="questionText" class="text-field"></p>
-            <h2 class="subtitle">Found Answer:</h2>
-            <p id="answerText" class="text-field answer"></p>
-        </div>
-        
-        <div class="footer-buttons">
-            <a href="https://quizgpt.site/privacy" target="_blank" class="footer-link">Privacy</a>
-            <span class="footer-separator">•</span>
-            <a href="https://quizgpt.site/contact" target="_blank" class="footer-link">Contact</a>
-        </div>
+        <a class="geogpt-promo" href="https://guessrgpt.com" target="_blank" rel="noopener noreferrer"
+           aria-label="Try the GeoGuessr Hack">
+            <span class="geogpt-promo-icon" aria-hidden="true">
+                <img src="../icons/geogpt-logo.png" alt="">
+            </span>
+            <span class="geogpt-promo-copy">
+                <strong>Try the <span class="geoguessr-text">GeoGuessr</span> Hack!</strong>
+                <span>Use GeoGPT to troll your friends</span>
+            </span>
+            <span class="geogpt-promo-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"/>
+                    <path d="m13 6 6 6-6 6"/>
+                </svg>
+            </span>
+        </a>
     `;
 }
 
 // Initialize event listeners
 function initializeEventListeners() {
-    // Settings button click handler
+    // Settings panel slide (GeoGPT-style)
     if (settingsButton) {
         settingsButton.addEventListener('click', () => {
-            settingsModal.classList.remove('hidden');
+            const open = shell?.dataset.view !== 'settings';
+            setSettingsOpen(open);
         });
     }
-
-    // Close modal button click handler
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            settingsModal.classList.add('hidden');
-        });
-    }
-
-    // Tab switching functionality
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all buttons and contents
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
-
-            // Add active class to clicked button
-            button.classList.add('active');
-
-            // Show corresponding content
-            const tabId = button.getAttribute('data-tab');
-            const content = document.getElementById(`${tabId}-tab`);
-            if (content) {
-                content.classList.add('active');
-            }
-        });
-    });
 
     // Load settings
     chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay', 'silentMode'], (settings) => {
-        if (highlightCheckbox && settings.highlightOption !== undefined) {
-            highlightCheckbox.checked = settings.highlightOption;
+        if (highlightSwitch) {
+            setSwitchOn(highlightSwitch, settings.highlightOption !== false);
         }
-        if (autoclickCheckbox && settings.autoClickOption !== undefined) {
-            autoclickCheckbox.checked = settings.autoClickOption;
+        if (autoclickSwitch) {
+            setSwitchOn(autoclickSwitch, settings.autoClickOption !== false);
         }
-        if (silentModeCheckbox && settings.silentMode !== undefined) {
-            silentModeCheckbox.checked = settings.silentMode;
+        if (silentModeSwitch) {
+            setSwitchOn(silentModeSwitch, !!settings.silentMode);
         }
         if (answerDelaySlider && settings.answerDelay !== undefined) {
             answerDelaySlider.value = settings.answerDelay;
@@ -140,29 +123,30 @@ function initializeEventListeners() {
         }
     });
 
-    // Highlight checkbox change handler
-    if (highlightCheckbox) {
-        highlightCheckbox.addEventListener('change', async () => {
-            await chrome.storage.sync.set({ highlightOption: highlightCheckbox.checked });
+    // Toggle switches
+    if (highlightSwitch) {
+        highlightSwitch.addEventListener('click', async () => {
+            const next = !isSwitchOn(highlightSwitch);
+            setSwitchOn(highlightSwitch, next);
+            await chrome.storage.sync.set({ highlightOption: next });
         });
     }
 
-    // Autoclick checkbox change handler
-    if (autoclickCheckbox) {
-        autoclickCheckbox.addEventListener('change', async () => {
-            await chrome.storage.sync.set({ autoClickOption: autoclickCheckbox.checked });
+    if (autoclickSwitch) {
+        autoclickSwitch.addEventListener('click', async () => {
+            const next = !isSwitchOn(autoclickSwitch);
+            setSwitchOn(autoclickSwitch, next);
+            await chrome.storage.sync.set({ autoClickOption: next });
         });
     }
 
-    // Silent mode checkbox change handler
-    if (silentModeCheckbox) {
-        silentModeCheckbox.addEventListener('change', async () => {
-            // Check if user has permission to use this feature
-            if (silentModeCheckbox.disabled) {
-                silentModeCheckbox.checked = false;
-                return;
-            }
-            await chrome.storage.sync.set({ silentMode: silentModeCheckbox.checked });
+    if (silentModeSwitch) {
+        silentModeSwitch.addEventListener('click', async () => {
+            const row = document.getElementById('row-incognito');
+            if (row?.dataset.locked === '1') return;
+            const next = !isSwitchOn(silentModeSwitch);
+            setSwitchOn(silentModeSwitch, next);
+            await chrome.storage.sync.set({ silentMode: next });
         });
     }
 
@@ -194,21 +178,21 @@ function initializeEventListeners() {
         });
     }
 
-    // Upgrade button click handler
-    if (upgradeButton) {
-        upgradeButton.addEventListener('click', async () => {
-            let token = authService.token;
-            if (!token) {
-                const data = await chrome.storage.sync.get(['token']);
-                token = data.token;
-            }
-            if (!token) {
-                alert('You must be logged in to upgrade.');
-                return;
-            }
-            window.open(`https://quizgpt.site/pricing.html?token=${encodeURIComponent(token)}`, '_blank');
-        });
-    }
+    // Upgrade button click handlers (home card + settings)
+    const openPricing = async () => {
+        let token = authService.token;
+        if (!token) {
+            const data = await chrome.storage.sync.get(['token']);
+            token = data.token;
+        }
+        if (!token) {
+            alert('You must be logged in to upgrade.');
+            return;
+        }
+        window.open(`https://quizgpt.site/pricing.html?token=${encodeURIComponent(token)}`, '_blank');
+    };
+    if (upgradeButton) upgradeButton.addEventListener('click', openPricing);
+    if (homeUpgradeButton) homeUpgradeButton.addEventListener('click', openPricing);
 
     // Manage subscription button click handler
     if (manageSubscriptionButton) {
@@ -316,271 +300,195 @@ function initializeEventListeners() {
             }
         });
     }
-
-    // Find Answer button click handler
-    const manualButton = document.getElementById('manualButton');
-    if (manualButton) {
-        manualButton.addEventListener('click', handleManualButtonClick);
-    }
 }
 
-// Handle manual button click
-async function handleManualButtonClick() {
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const extractedData = document.getElementById('extractedData');
-    const questionText = document.getElementById('questionText');
-    const answerText = document.getElementById('answerText');
-    const manualButton = document.getElementById('manualButton');
-
+// Function to fetch and update membership status (via background cache — avoids 429)
+async function updateMembershipStatus({ force = false } = {}) {
     try {
-        loadingSpinner.classList.remove('hidden');
-        manualButton.disabled = true;
+        console.log('Fetching membership status...', force ? '(force)' : '');
 
-        // Get current tab
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        
-        // Send message to content script to get question
-        const response = await chrome.tabs.sendMessage(tab.id, { action: "getQuestion" });
-        
-        if (response && response.question) {
-            // Display the question
-            questionText.textContent = response.question.title;
-            extractedData.classList.remove('hidden');
-
-            // Get user settings
-            const settings = await chrome.storage.sync.get(['highlightOption', 'autoClickOption', 'answerDelay', 'silentMode']);
-            
-            // Format the question for the backend
-            const fullQuestion = `${response.question.title}\n\nOptions:\n${response.question.choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}`;
-
-            // Send to backend
-            const backendResponse = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/questions/answer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    question: fullQuestion
-                })
+        const result = await new Promise((resolve) => {
+            chrome.runtime.sendMessage({ action: 'getMembershipStatus', force }, (response) => {
+                if (chrome.runtime.lastError) {
+                    resolve({ ok: false, error: chrome.runtime.lastError.message });
+                    return;
+                }
+                resolve(response || { ok: false });
             });
+        });
 
-            if (!backendResponse.ok) {
-                throw new Error(`HTTP error! status: ${backendResponse.status}`);
-            }
+        let planType = 'free';
+        let usage = 0;
+        let limit = 5;
 
-            const result = await backendResponse.json();
-            answerText.textContent = result.answer;
-
-            // Send answer back to content script
-            await chrome.tabs.sendMessage(tab.id, {
-                action: 'highlightAnswer',
-                answer: result.answer,
-                options: {
-                    highlight: settings.highlightOption !== false,
-                    autoClick: settings.autoClickOption !== false,
-                    answerDelay: settings.answerDelay !== undefined ? settings.answerDelay : 3,
-                    silentMode: settings.silentMode || false
-                }
-            });
-
-            // Update usage counter
-            await updateMembershipStatus();
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        answerText.textContent = 'Error: ' + error.message;
-    } finally {
-        loadingSpinner.classList.add('hidden');
-        manualButton.disabled = false;
-    }
-}
-
-// Function to fetch and update membership status
-async function updateMembershipStatus() {
-    try {
-        console.log('Fetching membership status...');
-        console.log('Current auth token:', authService.token);
-        
-        const response = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/membership/status');
-        console.log('Membership status response:', response);
-        
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Membership status data:', data);
-            
-            const planType = data.plan_type || 'free';
-            console.log('Plan type:', planType);
-
-            try {
-                chrome.storage.sync.set({
-                    membershipStatus: {
-                        planType: planType.toLowerCase(),
-                        usage: data.usage ?? 0,
-                        limit: data.limit ?? 5,
-                        updatedAt: Date.now()
-                    }
-                });
-            } catch (_) { /* ignore */ }
-            
-            const planBadge = document.querySelector('.plan-badge');
-            
-            console.log('Found plan badge element:', planBadge);
-            
-            if (planBadge) {
-                // Display "Ultra" for enterprise membership, otherwise capitalize the plan type
-                const displayText = planType.toLowerCase() === 'enterprise' ? 'Ultra' : planType.charAt(0).toUpperCase() + planType.slice(1);
-                planBadge.textContent = displayText;
-                console.log('Updated plan badge text to:', planBadge.textContent);
-                
-                planBadge.className = 'plan-badge';
-                if (planType.toLowerCase() === 'premium') {
-                    planBadge.classList.add('premium');
-                    console.log('Added premium class to badge');
-                } else if (planType.toLowerCase() === 'enterprise') {
-                    planBadge.classList.add('enterprise');
-                    console.log('Added enterprise class to badge');
-                } else {
-                    planBadge.classList.add('free');
-                    console.log('Added free class to badge');
-                }
-            }
-            
-            // Show/hide upgrade button and premium badge
-            if (planType.toLowerCase() === 'premium' || planType.toLowerCase() === 'enterprise') {
-                if (upgradeButton) upgradeButton.classList.add('hidden');
-                if (manageSubscriptionButton) manageSubscriptionButton.classList.remove('hidden');
-                if (premiumBadge) premiumBadge.classList.remove('hidden');
-            } else {
-                if (upgradeButton) upgradeButton.classList.remove('hidden');
-                if (manageSubscriptionButton) manageSubscriptionButton.classList.add('hidden');
-                if (premiumBadge) premiumBadge.classList.add('hidden');
-            }
-            
-            // Update usage counter
-            const currentUsageElement = document.getElementById('currentUsage');
-            const usageLimitElement = document.getElementById('usageLimit');
-            const usageProgressElement = document.getElementById('usageProgress');
-            const usageRemainingElement = document.getElementById('usageRemaining');
-            
-            if (currentUsageElement && usageLimitElement && usageProgressElement) {
-                const usage = data.usage || 0;
-                const limit = data.limit || 5;
-                const remaining = Math.max(0, limit - usage);
-                
-                currentUsageElement.textContent = usage;
-                usageLimitElement.textContent = limit;
-                
-                if (usageRemainingElement) {
-                    usageRemainingElement.textContent = remaining;
-                }
-                
-                // Calculate progress percentage
-                const progressPercentage = Math.min((usage / limit) * 100, 100);
-                usageProgressElement.style.width = `${progressPercentage}%`;
-                
-                // Change progress bar color based on usage
-                if (progressPercentage >= 90) {
-                    usageProgressElement.style.background = 'linear-gradient(90deg, #ff6b6b, #ff8e8e)';
-                } else if (progressPercentage >= 75) {
-                    usageProgressElement.style.background = 'linear-gradient(90deg, #ffa726, #ffb74d)';
-                } else {
-                    usageProgressElement.style.background = 'linear-gradient(90deg, #8A2BE2, #DA70D6)';
-                }
-                
-                console.log('Updated usage counter:', usage, '/', limit, '(', progressPercentage, '%) -', remaining, 'remaining');
-            } else {
-                console.warn('Usage counter elements not found');
-            }
-            
-            // Update premium locks based on plan type
-            updatePremiumLocks(planType);
-            
-            console.log('Membership status updated successfully');
+        if (result.ok && result.membership) {
+            planType = result.membership.planType || 'free';
+            usage = result.membership.usage ?? 0;
+            limit = result.membership.limit ?? 5;
         } else {
-            console.error('Failed to fetch membership status:', response.status);
-            const errorText = await response.text();
-            console.error('Error response:', errorText);
+            console.warn('Membership fetch failed, using storage cache:', result);
+            const local = await chrome.storage.local.get(['membershipStatus']).catch(() => ({}));
+            const sync = await chrome.storage.sync.get(['membershipStatus']).catch(() => ({}));
+            const a = local.membershipStatus;
+            const b = sync.membershipStatus;
+            let ms = a || b;
+            if (a && b) {
+                // Freshest snapshot wins (don't keep stale paid over a newer free)
+                ms = (a.updatedAt || 0) >= (b.updatedAt || 0) ? a : b;
+            }
+            if (!ms) {
+                console.error('No cached membership status available');
+                return;
+            }
+            planType = ms.planType || 'free';
+            usage = ms.usage ?? 0;
+            limit = ms.limit ?? 5;
         }
+
+        console.log('Plan type:', planType);
+
+        const planKey = planType.toLowerCase();
+        const displayText = planKey === 'enterprise' || planKey === 'ultra'
+            ? 'Ultra'
+            : planKey.charAt(0).toUpperCase() + planKey.slice(1);
+        const badgeMod =
+            planKey === 'premium' ? 'premium'
+            : (planKey === 'enterprise' || planKey === 'ultra') ? 'enterprise'
+            : 'free';
+
+        document.querySelectorAll('.plan-badge').forEach((planBadge) => {
+            planBadge.textContent = displayText;
+            planBadge.className = `plan-badge ${badgeMod}`;
+        });
+
+        const homeCard = document.getElementById('userProfile');
+        if (homeCard) {
+            homeCard.classList.toggle('user-card--premium', badgeMod === 'premium');
+            homeCard.classList.toggle('user-card--ultra', badgeMod === 'enterprise');
+        }
+
+        const isPaid = planKey === 'premium' || planKey === 'enterprise' || planKey === 'ultra';
+        if (isPaid) {
+            if (upgradeButton) upgradeButton.hidden = true;
+            if (homeUpgradeButton) homeUpgradeButton.hidden = true;
+            if (manageSubscriptionButton) {
+                manageSubscriptionButton.hidden = false;
+                manageSubscriptionButton.classList.remove('hidden');
+            }
+        } else {
+            if (upgradeButton) upgradeButton.hidden = false;
+            if (homeUpgradeButton) homeUpgradeButton.hidden = false;
+            if (manageSubscriptionButton) {
+                manageSubscriptionButton.hidden = true;
+                manageSubscriptionButton.classList.add('hidden');
+            }
+        }
+
+        const usageCount = document.getElementById('usage-count');
+        const usageFill = document.getElementById('usage-fill');
+        const usageBar = document.getElementById('usage-bar');
+        const usageNote = document.getElementById('usage-note');
+        const usageLabel = document.getElementById('usage-label');
+        const progressPercentage = Math.min((usage / Math.max(limit, 1)) * 100, 100);
+
+        if (usageCount) {
+            usageCount.textContent = limit > 9999 ? `${usage} / ∞` : `${usage} / ${limit}`;
+        }
+        if (usageFill) {
+            usageFill.style.width = limit > 9999 ? '0%' : `${progressPercentage}%`;
+        }
+        if (usageBar) {
+            usageBar.classList.toggle('usage-bar--limit', !isPaid && progressPercentage >= 90);
+        }
+        if (usageLabel) {
+            usageLabel.textContent = 'Monthly usage';
+        }
+        if (usageNote) {
+            if (isPaid) {
+                usageNote.hidden = true;
+            } else {
+                usageNote.hidden = false;
+                usageNote.textContent = progressPercentage >= 90
+                    ? 'Free limit nearly reached — upgrade for more answers.'
+                    : 'Upgrade for more answers each month.';
+            }
+        }
+
+        updatePremiumLocks(planType);
+        console.log('Membership status updated successfully');
     } catch (error) {
         console.error('Error updating membership status:', error);
-        console.error('Error stack:', error.stack);
     }
 }
 
 // Function to update premium locks based on user plan
 function updatePremiumLocks(planType) {
     console.log('Updating premium locks for plan:', planType);
-    
+
     const plan = planType.toLowerCase();
-    
-    // Get elements
-    const silentModeRow = document.querySelector('[data-plan="ultra"]');
-    const answerDelayRow = document.querySelector('[data-plan="premium"]');
-    const silentModeCheckbox = document.getElementById('silentMode');
-    const answerDelaySlider = document.getElementById('answerDelay');
-    
-    // Check permissions for Silent Mode (Ultra/Enterprise required)
-    if (silentModeRow && silentModeCheckbox) {
+    const silentModeRow = document.getElementById('row-incognito')
+        || document.querySelector('[data-plan="ultra"]');
+    const answerDelayRow = document.getElementById('row-delay')
+        || document.querySelector('[data-plan="premium"]');
+    const silentModeSwitchEl = document.getElementById('silentMode');
+    const answerDelaySliderEl = document.getElementById('answerDelay');
+
+    // Incognito Mode (Ultra/Enterprise)
+    if (silentModeRow && silentModeSwitchEl) {
         const hasUltraAccess = plan === 'enterprise' || plan === 'ultra';
-        
         if (hasUltraAccess) {
-            // Unlock silent mode
+            silentModeRow.dataset.locked = '0';
             silentModeRow.classList.remove('premium-locked');
-            silentModeCheckbox.disabled = false;
-            console.log('Silent mode unlocked for Ultra/Enterprise user');
+            console.log('Incognito mode unlocked for Ultra/Enterprise user');
         } else {
-            // Lock silent mode
+            silentModeRow.dataset.locked = '1';
             silentModeRow.classList.add('premium-locked');
-            silentModeCheckbox.disabled = true;
-            silentModeCheckbox.checked = false; // Uncheck if locked
-            chrome.storage.sync.set({ silentMode: false }); // Save disabled state
-            console.log('Silent mode locked - requires Ultra');
+            setSwitchOn(silentModeSwitchEl, false);
+            chrome.storage.sync.set({ silentMode: false });
+            console.log('Incognito mode locked - requires Ultra');
         }
     }
-    
-    // Check permissions for Answer Delay (Premium+ required)
-    if (answerDelayRow && answerDelaySlider) {
+
+    // Answer Delay (Premium+)
+    if (answerDelayRow && answerDelaySliderEl) {
         const hasPremiumAccess = plan === 'premium' || plan === 'enterprise' || plan === 'ultra';
-        
         if (hasPremiumAccess) {
-            // Unlock answer delay
+            answerDelayRow.dataset.locked = '0';
             answerDelayRow.classList.remove('premium-locked');
-            answerDelaySlider.disabled = false;
+            answerDelaySliderEl.disabled = false;
             console.log('Answer delay unlocked for Premium+ user');
         } else {
-            // Lock answer delay
+            answerDelayRow.dataset.locked = '1';
             answerDelayRow.classList.add('premium-locked');
-            answerDelaySlider.disabled = true;
-            answerDelaySlider.value = 0; // Reset to default
-            document.getElementById('delayValue').textContent = '0';
-            chrome.storage.sync.set({ answerDelay: 0 }); // Save default value
+            answerDelaySliderEl.disabled = true;
+            answerDelaySliderEl.value = 0;
+            const delayVal = document.getElementById('delayValue');
+            if (delayVal) delayVal.textContent = '0';
+            chrome.storage.sync.set({ answerDelay: 0 });
             console.log('Answer delay locked - requires Premium');
         }
     }
-    
-    // Add click handlers for locked features to show upgrade prompts
+
     addLockedFeatureClickHandlers(plan);
 }
 
-// Function to add click handlers for locked features
-// NOTE: this used to clone the rows (destroying the existing change/input listeners
-// attached in initializeEventListeners) and then try to re-bind them — with a typo
-// (`newSilentChWeckbox`) that threw a ReferenceError, leaving the Silent mode checkbox
-// with no change handler at all (so toggling never persisted). We now only attach the
-// upgrade-prompt click handler once via a dataset flag, and never touch the real inputs.
+// Attach upgrade-prompt handlers once; never clone rows (that destroyed switch listeners).
 function addLockedFeatureClickHandlers(plan) {
-    const silentModeRow = document.querySelector('[data-plan="ultra"]');
-    const answerDelayRow = document.querySelector('[data-plan="premium"]');
+    const silentModeRow = document.getElementById('row-incognito')
+        || document.querySelector('[data-plan="ultra"]');
+    const answerDelayRow = document.getElementById('row-delay')
+        || document.querySelector('[data-plan="premium"]');
 
     if (silentModeRow) {
         silentModeRow.dataset.currentPlan = plan;
         if (!silentModeRow.dataset.upgradeHandlerAttached) {
             silentModeRow.addEventListener('click', (e) => {
                 const p = silentModeRow.dataset.currentPlan || 'free';
-                if (p === 'enterprise' || p === 'ultra') return; // unlocked, let the real toggle through
+                if (p === 'enterprise' || p === 'ultra') return;
+                if (silentModeRow.dataset.locked !== '1') return;
                 e.preventDefault();
                 e.stopPropagation();
-                showUpgradePrompt('Ultra', 'Silent mode is an Ultra exclusive feature that disables all overlays for a cleaner experience.');
+                showUpgradePrompt('Ultra', 'Incognito mode is an Ultra exclusive feature that hides all overlays for a cleaner experience.');
             });
             silentModeRow.dataset.upgradeHandlerAttached = 'true';
         }
@@ -591,9 +499,9 @@ function addLockedFeatureClickHandlers(plan) {
         if (!answerDelayRow.dataset.upgradeHandlerAttached) {
             answerDelayRow.addEventListener('click', (e) => {
                 const p = answerDelayRow.dataset.currentPlan || 'free';
-                if (p === 'premium' || p === 'enterprise' || p === 'ultra') return; // unlocked
-                // Let interactions with the slider itself bubble normally (it will be .disabled anyway)
-                if (e.target && e.target.closest && e.target.closest('input[type="range"]')) return;
+                if (p === 'premium' || p === 'enterprise' || p === 'ultra') return;
+                if (answerDelayRow.dataset.locked !== '1') return;
+                if (e.target?.closest?.('input[type="range"]')) return;
                 e.preventDefault();
                 e.stopPropagation();
                 showUpgradePrompt('Premium', 'Answer delay is a Premium feature that lets you customize the timing for a more natural experience.');
@@ -642,7 +550,9 @@ function showUpgradePrompt(requiredPlan, featureDescription) {
                 border-radius: 6px;
                 padding: 10px;
                 cursor: pointer;
-                font-weight: bold;
+                font-weight: 600;
+                letter-spacing: 0.03em;
+                -webkit-font-smoothing: antialiased;
             ">Upgrade Now</button>
             <button id="closePremiumPrompt" style="
                 flex: 1;
@@ -690,27 +600,23 @@ function showUpgradePrompt(requiredPlan, featureDescription) {
 // Listen for refreshMembership message from success page
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "refreshMembership") {
-    // Re-fetch membership status from backend
     authService.loadAuthData().then(async () => {
-      // Fetch latest plan status
       try {
-        await updateMembershipStatus();
-        // Show thank you message if premium
+        await updateMembershipStatus({ force: true });
         const planBadge = document.querySelector('.plan-badge');
         if (planBadge && planBadge.textContent.toLowerCase() === 'premium') {
           alert('Thank you for purchasing QuizGPT Premium! Have fun 🎉');
         }
       } catch (e) {
         console.error('Error refreshing membership:', e);
-        // fallback: just show thank you
         alert('Thank you for purchasing QuizGPT Premium! Have fun 🎉');
       }
     });
   }
-  
-  // Listen for usage update message
+
   if (request.action === "updateUsage") {
-    updateMembershipStatus();
+    // Storage optimistic bump already updated UI; soft refresh via cache
+    updateMembershipStatus({ force: false });
   }
 });
 
@@ -728,25 +634,36 @@ window.addEventListener('DOMContentLoaded', async () => {
     const freeLimitUpgradeBtn = document.getElementById('freeLimitUpgradeBtn');
     const freeLimitCloseBtn = document.getElementById('freeLimitCloseBtn');
     if (freeLimitModal && freeLimitUpgradeBtn && freeLimitCloseBtn) {
+        const closeFreeLimitModal = () => {
+            freeLimitModal.hidden = true;
+        };
+        const openFreeLimitModal = () => {
+            freeLimitModal.hidden = false;
+        };
+
         try {
-            // Fetch membership status from backend
-            const response = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/membership/status');
-            if (response.ok) {
-                const data = await response.json();
-                const planType = (data.plan_type || data.planType || 'free').toLowerCase();
-                const usage = data.usage ?? data.used;
-                const limit = data.limit ?? data.monthly_limit;
-                if (planType === 'free' && typeof usage === 'number' && typeof limit === 'number' && usage >= limit) {
-                    freeLimitModal.style.display = 'flex';
+            // Reuse cached membership from checkAuth's updateMembershipStatus — no second /status call
+            const local = await chrome.storage.local.get(['membershipStatus']).catch(() => ({}));
+            const sync = await chrome.storage.sync.get(['membershipStatus']).catch(() => ({}));
+            const a = local.membershipStatus;
+            const b = sync.membershipStatus;
+            let ms = a || b;
+            if (a && b) {
+                // Freshest snapshot wins (don't keep stale paid over a newer free)
+                ms = (a.updatedAt || 0) >= (b.updatedAt || 0) ? a : b;
+            }
+            if (ms) {
+                const planType = (ms.planType || 'free').toLowerCase();
+                const usage = ms.usage ?? 0;
+                const limit = ms.limit ?? 5;
+                if (planType === 'free' && usage >= limit) {
+                    openFreeLimitModal();
                 }
             }
         } catch (error) {
-            // If the backend returns a 403 or similar, assume limit reached for free users
-            if (error.message && error.message.toLowerCase().includes('kontingent') || error.message.toLowerCase().includes('limit')) {
-                freeLimitModal.style.display = 'flex';
-            }
+            // ignore — modal is best-effort
         }
-        // Upgrade button logic (same as settings)
+
         freeLimitUpgradeBtn.onclick = async () => {
             let token = authService.token;
             if (!token) {
@@ -759,9 +676,8 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
             window.open(`https://quizgpt.site/pricing.html?token=${encodeURIComponent(token)}`, '_blank');
         };
-        freeLimitCloseBtn.onclick = () => {
-            freeLimitModal.style.display = 'none';
-        };
+        freeLimitCloseBtn.onclick = closeFreeLimitModal;
+        freeLimitModal.querySelector('[data-qgpt-limit-dismiss]')?.addEventListener('click', closeFreeLimitModal);
     }
 });
 
