@@ -3087,7 +3087,8 @@ html {
 
 @media (max-width: 600px) {
     .geogpt-crosspromo {
-        margin-top: -2.5rem;
+        margin-top: 0;
+        margin-bottom: 3rem;
     }
 
     .geogpt-crosspromo-card {
