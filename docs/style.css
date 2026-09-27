@@ -2988,3 +2988,191 @@ html {
         height: 36px;
     }
 }
+
+/* GeoGPT cross-promo (homepage card + footer link) */
+.geogpt-crosspromo {
+    max-width: 720px;
+    margin: -1.5rem auto 4rem;
+    padding: 0 1rem;
+}
+
+.geogpt-crosspromo-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem 1.75rem;
+    background: var(--card-background);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.geogpt-crosspromo-card:hover {
+    color: #1f9e45;
+    transform: translateY(-4px);
+    border-color: #30d158;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.geogpt-crosspromo-card:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+}
+
+.geogpt-crosspromo-card img {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+}
+
+.geogpt-crosspromo-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    text-align: left;
+}
+
+.geogpt-crosspromo-kicker {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-light);
+}
+
+.geogpt-crosspromo-copy strong {
+    font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.geogpt-crosspromo-copy span:last-child {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-light);
+}
+
+.geogpt-crosspromo-arrow {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: var(--secondary-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.geogpt-crosspromo-arrow svg {
+    width: 20px;
+    height: 20px;
+}
+
+.geogpt-crosspromo-card:hover .geogpt-crosspromo-arrow {
+    background: #30d158;
+    border-color: #30d158;
+    color: #ffffff;
+    transform: translateX(3px);
+}
+
+@media (max-width: 600px) {
+    .geogpt-crosspromo {
+        margin-top: -2.5rem;
+    }
+
+    .geogpt-crosspromo-card {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+            "logo kicker arrow"
+            "logo title arrow"
+            "desc desc desc";
+        column-gap: 0.85rem;
+        row-gap: 0.15rem;
+        align-items: center;
+        padding: 1.1rem 1.1rem 1.2rem;
+    }
+
+    .geogpt-crosspromo-card img {
+        grid-area: logo;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+    }
+
+    .geogpt-crosspromo-copy {
+        display: contents;
+    }
+
+    .geogpt-crosspromo-kicker {
+        grid-area: kicker;
+        align-self: end;
+        font-size: 0.7rem;
+    }
+
+    .geogpt-crosspromo-copy strong {
+        grid-area: title;
+        align-self: start;
+        font-size: 1.1rem;
+    }
+
+    .geogpt-crosspromo-copy span:last-child {
+        grid-area: desc;
+        margin-top: 0.7rem;
+        font-size: 0.925rem;
+    }
+
+    .geogpt-crosspromo-arrow {
+        grid-area: arrow;
+        width: 36px;
+        height: 36px;
+        margin-left: 0;
+    }
+}
+
+.footer-geogpt {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.footer-geogpt img {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+footer > p:first-of-type a.footer-geogpt:hover {
+    color: #1f9e45;
+    border-bottom-color: #30d158;
+}
+
+.footer-meta {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-light);
+}
+
+.footer-meta a {
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 107, 107, 0.35);
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.footer-meta a:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-light);
+}
