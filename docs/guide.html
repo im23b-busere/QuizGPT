@@ -112,17 +112,7 @@
 
       <div class="important-notice" style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 20px; border-radius: 8px; margin-bottom: 24px; font-size: 1.1em; line-height: 1.5;">
         <strong style="display: block; margin-bottom: 12px;">Important Notice:</strong>
-        <ul style="margin: 0; padding-left: 20px;">
-          <li style="margin-bottom: 10px;">
-            For <b>public</b> Kahoot quizzes, QuizGPT tries to load the official answer key from the quiz UUID first — this can work even if the host has <b>not</b> enabled “show questions on player screens.”
-          </li>
-          <li style="margin-bottom: 10px;">
-            For <b>private</b> quizzes (or when no UUID/answer key is found), QuizGPT falls back to AI. That path needs the question text visible on your device, so the host should enable show questions on player screens.
-          </li>
-          <li>
-            Questions that contain images or pictures are still sent to the AI, but the image itself is <b>not yet included</b> in the backend processing.
-          </li>
-        </ul>
+        QuizGPT only works when the host has enabled “show questions on player screens.” Without that option, the question text never reaches your device, so there is nothing for the AI to answer.
       </div>
       
 
@@ -191,7 +181,7 @@
             <span class="faq-toggle">+</span>
           </div>
           <div class="faq-answer">
-            <p>Questions that contain images or pictures are still sent to the AI, but the image itself is not yet included in the backend processing. The AI will only see the text portion of the question.</p>
+            <p>Yes. If a question has a picture, QuizGPT sends it to the AI together with the question text. Answer options that are pictures instead of text are not supported yet.</p>
           </div>
         </div>
 
@@ -205,7 +195,7 @@
             <span class="faq-toggle">+</span>
           </div>
           <div class="faq-answer">
-            <p>For public quizzes, QuizGPT first tries the quiz UUID answer key (works even if questions are hidden). For private quizzes, or when no key is found, the AI needs the question text on your screen — ask the host to enable show questions on player screens.</p>
+            <p>The AI needs the question text on your screen — ask the host to enable show questions on player screens.</p>
           </div>
         </div>
         

@@ -23,6 +23,37 @@ initializeAuth();
 // Clear abandoned public-quiz cache leftovers from older builds
 chrome.storage.local.remove(['quizgptLastQuiz', 'quizgptHostQuiz']).catch(() => {});
 
+const UPDATE_ANNOUNCEMENT_ID = 'image-support';
+const UPDATE_ANNOUNCEMENT_URL = 'https://quizgpt.site/whats-new.html';
+
+async function markUpdateAnnouncementSeen() {
+    await chrome.storage.local.set({ seenUpdateAnnouncement: UPDATE_ANNOUNCEMENT_ID });
+}
+
+async function hasSeenUpdateAnnouncement() {
+    const stored = await chrome.storage.local.get(['seenUpdateAnnouncement']);
+    return stored.seenUpdateAnnouncement === UPDATE_ANNOUNCEMENT_ID;
+}
+
+async function announceUpdateOnce() {
+    if (await hasSeenUpdateAnnouncement()) return;
+    await chrome.tabs.create({ url: UPDATE_ANNOUNCEMENT_URL });
+    await markUpdateAnnouncementSeen();
+}
+
+async function handleExtensionInstalled(details) {
+    if (details.reason === 'install') {
+        await markUpdateAnnouncementSeen();
+    } else if (details.reason === 'update') {
+        await announceUpdateOnce();
+    }
+}
+
+chrome.runtime.onInstalled.addListener((details) => {
+    handleExtensionInstalled(details)
+        .catch(error => console.error('[AutoResponder] Error handling update announcement:', error));
+});
+
 function resolveChoiceIndexFromAnswer(answer, choices) {
     if (!answer || !Array.isArray(choices) || choices.length === 0) return undefined;
 
@@ -432,7 +463,7 @@ async function processQuestionWithBackend(question, tabId) {
         const response = await authService.makeAuthenticatedRequest('https://api.quizgpt.site/api/questions/answer', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question: fullQuestion })
+            body: JSON.stringify({ question: fullQuestion, imageUrl: question.imageUrl })
         });
 
         console.log('[AutoResponder] Backend response status:', response.status);

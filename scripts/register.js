@@ -1,3 +1,5 @@
+import { authService } from './auth.js';
+
 const API_URL = 'https://api.quizgpt.site/api';
 
 const registerForm = document.getElementById('registerForm');
@@ -138,14 +140,18 @@ registerButton.addEventListener('click', async (e) => {
             return;
         }
         
-        // Store pending registration state
+        // Store pending registration (and clear any login-pending state)
+        await chrome.storage.sync.remove([
+            'pendingVerification',
+            'verificationTimestamp',
+        ]);
         await chrome.storage.sync.set({
             pendingRegistration: true,
             pendingEmail: email,
             pendingUsername: username,
-            registrationTimestamp: Date.now()
+            registrationTimestamp: Date.now(),
         });
-        
+
         // Show code form
         registerForm.classList.add('hidden');
         registerCodeForm.classList.remove('hidden');
@@ -171,24 +177,16 @@ verifyRegisterCodeButton.addEventListener('click', async (e) => {
     verifyRegisterCodeButton.disabled = true;
     verifyRegisterCodeButton.textContent = 'Verifying...';
     try {
-        const response = await fetch(`${API_URL}/auth/verify-code`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, code })
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            showError(registerCodeError, data.message || 'Verification failed');
-            return;
-        }
-        
-        // Clear pending registration state
-        await chrome.storage.sync.remove(['pendingRegistration', 'pendingEmail', 'pendingUsername', 'registrationTimestamp']);
-        
-        // Registration complete, redirect to login
-        window.location.href = 'login.html';
+        await authService.verifyCode(email, code);
+        await chrome.storage.sync.remove([
+            'pendingRegistration',
+            'pendingEmail',
+            'pendingUsername',
+            'registrationTimestamp',
+            'pendingVerification',
+            'verificationTimestamp',
+        ]);
+        window.location.href = 'popup.html';
     } catch (error) {
         showError(registerCodeError, error.message || 'Verification error');
     } finally {
@@ -289,11 +287,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 
                 // Update pending registration state
+                await chrome.storage.sync.remove([
+                    'pendingVerification',
+                    'verificationTimestamp',
+                ]);
                 await chrome.storage.sync.set({
                     pendingRegistration: true,
                     pendingEmail: email,
                     pendingUsername: username,
-                    registrationTimestamp: Date.now()
+                    registrationTimestamp: Date.now(),
                 });
                 
                 showOk(registerCodeError, 'Code resent successfully!');

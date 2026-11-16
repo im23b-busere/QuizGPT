@@ -40,7 +40,8 @@ async function checkAuth() {
         console.log('Auth data:', authData); // Debug log
         
         if (!authData.isLoggedIn) {
-            window.location.href = 'login.html';
+            const pending = await chrome.storage.sync.get(['pendingRegistration']);
+            window.location.href = pending.pendingRegistration ? 'register.html' : 'login.html';
             return;
         }
 

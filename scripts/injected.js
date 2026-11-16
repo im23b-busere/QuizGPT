@@ -16,6 +16,9 @@ window.kahootQuestionIndex = 0;
 window.kahootMessageId = 0;
 window.kahootDataId = 45; // Fixed value for answer submissions based on Burp Suite analysis
 
+const KAHOOT_IMAGE_CDN_URL = 'https://images-cdn.kahoot.it';
+const IMAGE_MEDIA_TYPES = ['giphy_gif', 'giphy_sticker', 'unsplash_image', 'getty_image'];
+
 function handleParsedContent(content, dataId) {
     if (!content || typeof content !== 'object') return;
 
@@ -41,6 +44,7 @@ function handleParsedContent(content, dataId) {
         const question = {
             title: content.title,
             choices: content.choices.map(c => (typeof c === 'string' ? c : c.answer)),
+            imageUrl: extractQuestionImageUrl(content),
             questionIndex: questionIndex != null ? questionIndex : window.kahootQuestionIndex,
             _fromQuestionStart: true
         };
@@ -86,6 +90,7 @@ function handleParsedContent(content, dataId) {
             const question = {
                 title: null,
                 choices: null,
+                imageUrl: extractQuestionImageUrl(content),
                 questionIndex,
                 _fromQuestionStart: true
             };
@@ -101,6 +106,24 @@ function handleParsedContent(content, dataId) {
         persistLastQuestionIndex(questionIndex);
         scheduleGetReadyFallback(questionIndex);
     }
+}
+
+function extractQuestionImageUrl(content) {
+    if (typeof content.image === 'string' && content.image) return content.image;
+    return imageUrlFromMetadata(content.imageMetadata) || imageUrlFromMedia(content.media);
+}
+
+function imageUrlFromMetadata(imageMetadata) {
+    if (!imageMetadata || typeof imageMetadata !== 'object') return null;
+    if (imageMetadata.url) return imageMetadata.url;
+    return imageMetadata.id ? `${KAHOOT_IMAGE_CDN_URL}/${imageMetadata.id}` : null;
+}
+
+function imageUrlFromMedia(media) {
+    const firstMedia = Array.isArray(media) ? media[0] : null;
+    if (!firstMedia || firstMedia.isBackground === true) return null;
+    if (!IMAGE_MEDIA_TYPES.includes(firstMedia.type)) return null;
+    return firstMedia.stillUrl || imageUrlFromMetadata(firstMedia);
 }
 
 function persistLastQuestionIndex(questionIndex) {

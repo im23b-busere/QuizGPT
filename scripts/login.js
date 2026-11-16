@@ -282,11 +282,16 @@ async function requestCode() {
             return;
         }
 
-        // Store pending verification state
+        // Store pending verification (and clear any registration-pending state)
+        await chrome.storage.sync.remove([
+            'pendingRegistration',
+            'pendingUsername',
+            'registrationTimestamp',
+        ]);
         await chrome.storage.sync.set({
             pendingVerification: true,
             pendingEmail: email,
-            verificationTimestamp: Date.now()
+            verificationTimestamp: Date.now(),
         });
 
         // Show code form
@@ -451,6 +456,11 @@ codeInput.addEventListener('keypress', (e) => {
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', async () => {
+    const pending = await chrome.storage.sync.get(['pendingRegistration']);
+    if (pending.pendingRegistration) {
+        window.location.href = 'register.html';
+        return;
+    }
     await checkPendingVerification();
 });
 

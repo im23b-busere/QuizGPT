@@ -129,11 +129,18 @@ class AuthService {
         this.user = null;
         await chrome.storage.sync.remove(['token', 'user']);
         
-        // Also clear any pending verification state
+        // Also clear any pending verification / registration state
         try {
-            await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+            await chrome.storage.sync.remove([
+                'pendingVerification',
+                'pendingEmail',
+                'verificationTimestamp',
+                'pendingRegistration',
+                'pendingUsername',
+                'registrationTimestamp',
+            ]);
         } catch (error) {
-            console.log('Could not clear pending verification state:', error);
+            console.log('Could not clear pending auth state:', error);
         }
     }
 
@@ -146,12 +153,19 @@ class AuthService {
         this.token = token;
         this.user = user;
         await chrome.storage.sync.set({ token, user });
-        
-        // Clear any pending verification state since we're now authenticated
+
+        // Clear any pending verification / registration state since we're now authenticated
         try {
-            await chrome.storage.sync.remove(['pendingVerification', 'pendingEmail', 'verificationTimestamp']);
+            await chrome.storage.sync.remove([
+                'pendingVerification',
+                'pendingEmail',
+                'verificationTimestamp',
+                'pendingRegistration',
+                'pendingUsername',
+                'registrationTimestamp',
+            ]);
         } catch (error) {
-            console.log('Could not clear pending verification state:', error);
+            console.log('Could not clear pending auth state:', error);
         }
         
         // Verify the data was stored
